@@ -68,15 +68,15 @@ type Category {
 
 TODO: describe
 
-### Docker
-
-### Docker Compose
-
 ### Node
 
 ```bash
 npm install -g desolid
 ```
+
+### Docker
+
+#### Docker Compose
 
 ## Primitive Scalars
 
