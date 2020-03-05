@@ -1,16 +1,20 @@
 enum UserGroup {
+    Admin # default
+    User # default
     Editor
     Author
-    User
 }
 
 @Authorization(
-    READ: "user.group = Editor | user.id = this.id", # default "TRUE"
-    CREATE: "TRUE", # default "user.group = Admin"
-    UPDATE: "user.group = Editor | user.id = this.id", # default "user.group = Admin"
-    DELETE: "user.group = Editor | user.id = this.id", # default "user.group = Admin"
+    READ: "user.group = Editor || user.id = this.id",
+    CREATE: "true",
+    UPDATE: "user.group = Editor || user.id = this.id",
+    DELETE: "user.group = Editor || user.id = this.id",
 )
-type User @extends(SoftDeleteResource) {
+type User {
+    id: ID!
+    createdAt: DateTime! @createdAt
+    updatedAt: DateTime! @updatedAt
     email: String! @unique
     phone: String @unique
     group: UserGroup!
@@ -20,13 +24,13 @@ type User @extends(SoftDeleteResource) {
 }
 
 @Authorization(
-    READ: "this.published | user.group = Editor | user.id = this.author", # default "TRUE"
-    CREATE: "user.group IN [Editor, Author]", # default "user.group = Admin"
-    UPDATE: "user.group = Editor | user.id = this.author", # default "user.group = Admin"
-    DELETE: "user.group = Editor | user.id = this.author", # default "user.group = Admin"
+    READ: "this.published || user.group = Editor || user.id = this.author",
+    CREATE: "user.group in [Editor, Author]",
+    UPDATE: "user.group = Editor || user.id = this.author",
+    DELETE: "user.group = Editor || user.id = this.author",
 )
-type Post @extends(SoftDeleteResource) {
-    id: ID! this.id
+type Post {
+    id: ID!
     createdAt: DateTime! @createdAt
     updatedAt: DateTime! @updatedAt
     author: User!
@@ -37,13 +41,13 @@ type Post @extends(SoftDeleteResource) {
 }
 
 @Authorization(
-    READ: "TRUE", # default "TRUE"
-    CREATE: "user.group = Editor", # default "user.group = Admin"
-    UPDATE: "user.group = Editor", # default "user.group = Admin"
-    DELETE: "user.group = Editor", # default "user.group = Admin"
+    READ: "true",
+    CREATE: "user.group = Editor",
+    UPDATE: "user.group = Editor",
+    DELETE: "user.group = Editor",
 )
-type Category @extends(SoftDeleteResource) {
-    id: ID! this.id
+type Category {
+    id: ID!
     createdAt: DateTime! @createdAt
     updatedAt: DateTime! @updatedAt
     name: String!
