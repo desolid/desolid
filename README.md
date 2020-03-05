@@ -64,10 +64,40 @@ type Category {
 }
 ```
 
-## Primitive Types
+## Primitive Scalars
 
 -   ID
+-   Int
+-   Float
 -   String
--   File
--   Json
 -   Datetime
+-   Json
+-   File
+
+## Authorization
+
+Authorization describes using `@Athorization` directive. you can indicate the logic using javascript boolean operators:
+
+```graphql
+@Authorization(
+    READ: "this.published || user.group = Editor || user.id = this.author",
+    CREATE: "user.group in [Editor, Author]",
+    UPDATE: "user.group = Editor || user.id = this.author",
+    DELETE: "user.group = Editor || user.id = this.author",
+)
+type Post {
+    id: ID!
+    createdAt: DateTime! @createdAt
+    updatedAt: DateTime! @updatedAt
+    author: User!
+    title: String!
+    content: String!
+    published: Boolean! @default(false)
+    categories: [Category!]!
+}
+```
+
+2 objects are available in the scope:
+
+-   `user`: refers to the authenticated user
+-   `this`: refers to the selected model record
