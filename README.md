@@ -64,6 +64,20 @@ type Category {
 }
 ```
 
+## Usgae
+
+TODO: describe
+
+### Docker
+
+### Docker Compose
+
+### Node
+
+```bash
+npm install -g desolid
+```
+
 ## Primitive Scalars
 
 -   ID
