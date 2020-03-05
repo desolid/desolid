@@ -7,6 +7,7 @@
         "experimentalDecorators": true,
         "target": "es2017",
         "sourceMap": true,
+        "lib": ["esnext", "dom"],
         "outDir": "./dist",
         "baseUrl": "./"
     },

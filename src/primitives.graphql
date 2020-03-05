@@ -1,0 +1,15 @@
+scalar DateTime;
+
+interface Resource {
+    id: ID! @id
+    createdAt: DateTime! @createdAt
+    updatedAt: DateTime! @updatedAt
+}
+
+type File implements Resource {
+    id: ID! @id
+    createdAt: DateTime! @createdAt
+    updatedAt: DateTime! @updatedAt
+    mimeType: String!
+    path: String!
+}

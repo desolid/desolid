@@ -1,6 +1,29 @@
-const watchMe = 'ne ne';
+import { PrismaClient } from '@prisma/client';
 
-const sayHello = (name: string) => console.log(`Hello ${name} in node in vscode!`);
+const prisma = new PrismaClient();
 
-sayHello('typescript');
-debugger;
+// A `main` function so that we can use async/await
+async function main() {
+    const user1 = await prisma.user.create({
+        data: {
+            email: 'alice@prisma.io',
+            name: 'Alice',
+            posts: {
+                create: {
+                    title: 'Watch the talks from Prisma Day 2019',
+                    content: 'https://www.prisma.io/blog/z11sg6ipb3i1/',
+                },
+            },
+        },
+        include: {
+            posts: true,
+        },
+    });
+    console.log(user1);
+}
+
+main()
+    .catch((e) => console.error(e))
+    .finally(async () => {
+        await prisma.disconnect();
+    });
