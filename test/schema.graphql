@@ -1,3 +1,17 @@
+scalar Email
+scalar Password
+scalar Json
+scalar File
+directive @authorization(
+    READ: String
+    CREATE: String
+    UPDATE: String
+    DELETE: String
+) on FIELD_DEFINITION | TYPE_DEFINITION
+directive @unique on FIELD_DEFINITION
+directive @createdAt on FIELD_DEFINITION
+directive @updateAt on FIELD_DEFINITION
+
 enum UserGroup {
     Admin # default
     User # default
@@ -5,8 +19,10 @@ enum UserGroup {
     Author
 }
 
+"""
+This is a description of a User
+"""
 type User
-    @model
     @authorization(
         READ: "$user.group = Editor || $user.id = $this.id"
         CREATE: "true"
@@ -25,8 +41,10 @@ type User
     avatar: File @upload(accept: "imagee/*", size: { max: "5MB", min: "10KB" })
 }
 
+"""
+This is a description of a Post
+"""
 type Post
-    @model
     @authorization(
         READ: "$this.published || $user.group = Editor || $user.id = $this.author"
         CREATE: "$user.group in [Editor, Author]"
@@ -39,12 +57,14 @@ type Post
     author: User!
     title: String!
     content: String!
-    published: Boolean! @default(value: false) @authorize(READ: "$user.group in [Editor, Author]")
+    published: Boolean! @default(value: false) @authorization(READ: "$user.group in [Editor, Author]")
     categories: [Category!]!
 }
 
+"""
+This is a description of a Category
+"""
 type Category
-    @model
     @authorization(
         READ: "true"
         CREATE: "$user.group = Editor"
