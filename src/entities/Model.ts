@@ -11,36 +11,36 @@ export class Model extends Type {
     }
     public generateQueries(t: ObjectDefinitionBlock<string>) {
         t.field(this.name.toLowerCase(), {
-            type: Desolid.dictionary.get(this.name),
+            type: Type.dictionary.get(this.name),
             resolve: this.findOne.bind(this),
         });
         t.list.field(pluralize(this.name.toLowerCase()), {
-            type: Desolid.dictionary.get(this.name),
+            type: Type.dictionary.get(this.name),
             resolve: this.find.bind(this),
         });
     }
     public generateMutations(t: ObjectDefinitionBlock<string>) {
         t.field(`create${this.name}`, {
-            type: Desolid.dictionary.get(this.name),
+            type: Type.dictionary.get(this.name),
             resolve: this.createOne.bind(this),
         });
         t.field(`update${this.name}`, {
-            type: Desolid.dictionary.get(this.name),
+            type: Type.dictionary.get(this.name),
             nullable: true,
             resolve: this.updateOne.bind(this),
         });
         t.list.field(`updateMany${pluralize(this.name)}`, {
-            type: Desolid.dictionary.get(this.name),
+            type: Type.dictionary.get(this.name),
             nullable: true,
             resolve: this.updateMany.bind(this),
         });
         t.field(`delete${this.name}`, {
-            type: Desolid.dictionary.get(this.name),
+            type: Type.dictionary.get(this.name),
             nullable: true,
             resolve: this.deleteOne.bind(this),
         });
         t.list.field(`deleteMany${pluralize(this.name)}`, {
-            type: Desolid.dictionary.get(this.name),
+            type: Type.dictionary.get(this.name),
             nullable: true,
             resolve: this.deleteMany.bind(this),
         });

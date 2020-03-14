@@ -23,16 +23,16 @@ export interface ObjectTypeDefinitionSummary {
     fields: FieldSummary[];
 }
 
-export function summary(definition: ObjectTypeDefinitionNode): ObjectTypeDefinitionSummary {
+export function summarize(definition: ObjectTypeDefinitionNode): ObjectTypeDefinitionSummary {
     return {
         name: definition.name.value,
         description: definition.description?.value,
-        directives: definition.directives.map(directiveSummary),
-        fields: definition.fields.map(fieldsSummary),
+        directives: definition.directives.map(summarizeDirective),
+        fields: definition.fields.map(summarizeField),
     };
 }
 
-function directiveSummary(directive: DirectiveNode): DirectiveSummary {
+function summarizeDirective(directive: DirectiveNode): DirectiveSummary {
     return {
         name: directive.name.value,
         value: directive.arguments.map((argument) => {
@@ -44,7 +44,7 @@ function directiveSummary(directive: DirectiveNode): DirectiveSummary {
     };
 }
 
-function fieldsSummary(field: FieldDefinitionNode): FieldSummary {
+function summarizeField(field: FieldDefinitionNode): FieldSummary {
     const encodedFieldType = encodeFieldType(field);
     const list = encodedFieldType.match(/[\w!]\]/g);
     const nexusOptions = {
@@ -55,7 +55,7 @@ function fieldsSummary(field: FieldDefinitionNode): FieldSummary {
         name: field.name.value,
         type: encodedFieldType.replace(/[!\]]/g, ''),
         description: field.description?.value,
-        directives: field.directives.map(directiveSummary),
+        directives: field.directives.map(summarizeDirective),
         nexusOptions,
     };
 }

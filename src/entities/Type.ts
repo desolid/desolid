@@ -1,8 +1,37 @@
-import { NexusObjectTypeDef, ObjectDefinitionBlock } from 'nexus/dist/core';
-import Desolid from '../Desolid';
-import { ObjectTypeDefinitionSummary } from 'src/helpers/ObjectTypeDefinitionSummary';
+import { DefinitionNode } from 'graphql';
+import { NexusObjectTypeDef, ObjectDefinitionBlock, enumType } from 'nexus/dist/core';
+import { ObjectTypeDefinitionSummary, summarize } from '../helpers/ObjectTypeDefinitionSummary';
+import { Model } from './Model';
 
 export class Type extends NexusObjectTypeDef<string> {
+    public static readonly dictionary = new Map<string, any>();
+    public static import(definitions: readonly DefinitionNode[]) {
+        const models: Model[] = [];
+        definitions.forEach((definition) => {
+            let typeDef: any;
+            switch (definition.kind) {
+                case 'EnumTypeDefinition':
+                    typeDef = enumType({
+                        name: definition.name.value,
+                        description: definition.description?.value,
+                        members: definition.values.map((item) => item.name.value),
+                    });
+                    break;
+                case 'ObjectTypeDefinition':
+                    const definitionSummary = summarize(definition);
+                    if (Model.isModel(definitionSummary)) {
+                        typeDef = new Model(definitionSummary);
+                        models.push(typeDef);
+                    } else {
+                        typeDef = new Type(definitionSummary);
+                    }
+                default:
+                    break;
+            }
+            this.dictionary.set(typeDef.name, typeDef);
+        });
+        return models;
+    }
     constructor(protected readonly definition: ObjectTypeDefinitionSummary) {
         super(definition.name, {
             name: definition.name,
@@ -28,7 +57,7 @@ export class Type extends NexusObjectTypeDef<string> {
                     t.boolean(field.name, field.nexusOptions);
                     break;
                 default:
-                    t.field(field.name, { ...field.nexusOptions, type: Desolid.dictionary.get(field.type) });
+                    t.field(field.name, { ...field.nexusOptions, type: Type.dictionary.get(field.type) });
                     break;
             }
         });

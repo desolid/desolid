@@ -1,0 +1,5 @@
+databse:
+  type: "sqlite"
+  file: "databse.sqlite"
+api:
+  port: 3000

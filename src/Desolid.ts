@@ -1,61 +1,29 @@
-import { makeSchema, queryType, mutationType } from 'nexus';
-import { DefinitionNode } from 'graphql';
-import { readFile } from 'fs-extra';
+import { readFileSync } from 'fs-extra';
+import * as yaml from 'js-yaml';
 import gql from 'graphql-tag';
-import { Enum, Model, TypeDef, Type } from './entities';
-import { summary } from './helpers/ObjectTypeDefinitionSummary';
+import { Model } from './entities/Model';
+import { DatabaseConfig, Database } from './helpers/Database';
+import { GraphQLAPIConfig, GraphQLAPI } from './helpers/GraphQLAPI';
 
-export default class Desolid /** extends Singleton */ {
-    public static dictionary = new Map<string, TypeDef>();
+export interface DesolidCongfig {
+    database: DatabaseConfig;
+    api: GraphQLAPIConfig;
+}
+
+export default class Desolid {
+    protected config: DesolidCongfig;
+    protected database: Database;
+    protected api: GraphQLAPI;
+    protected models: Model[];
     constructor(private readonly path: string) {
-        // erm?
+        this.config = yaml.safeLoad(readFileSync(`${path}/desolid.yaml`, { encoding: 'utf8' }));
+        const { definitions } = gql(readFileSync(`${this.path}/schema.graphql`, { encoding: 'utf8' }));
+        this.database = new Database(this.config.database);
+        this.api = new GraphQLAPI(this.config.api);
+        this.models = Model.import(definitions);
     }
-    private generateModels(definitions: readonly DefinitionNode[]) {
-        const models: Model[] = [];
-        definitions.forEach((definition) => {
-            let typeDef: TypeDef;
-            switch (definition.kind) {
-                case 'EnumTypeDefinition':
-                    typeDef = new Enum(definition);
-                    break;
-                case 'ObjectTypeDefinition':
-                    const definitionSummary = summary(definition);
-                    if (Model.isModel(definitionSummary)) {
-                        typeDef = new Model(definitionSummary);
-                        models.push(typeDef as Model);
-                    } else {
-                        typeDef = new Type(definitionSummary);
-                    }
-                default:
-                    break;
-            }
-            Desolid.dictionary.set(typeDef.name, typeDef);
-        });
-        return models;
-    }
-    private generateQueries(models: Model[]) {
-        return queryType({
-            definition(t) {
-                models.forEach((model) => model.generateQueries(t));
-            },
-        });
-    }
-    private generateMutations(models: Model[]) {
-        return mutationType({
-            definition(t) {
-                models.forEach((model) => model.generateMutations(t));
-            },
-        });
-    }
-    public async generateSchema() {
-        const schemaSource: string = await readFile(this.path, { encoding: 'utf8' });
-        const { definitions } = gql(schemaSource);
-        const models = this.generateModels(definitions);
-        const Query = this.generateQueries(models);
-        const Mutations = this.generateMutations(models);
-        return makeSchema({
-            types: [Query, Mutations],
-            outputs: {},
-        });
+    public async start() {
+        await this.database.start(this.models);
+        await this.api.start(this.models);
     }
 }
