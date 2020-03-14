@@ -1,10 +1,12 @@
 import { readFileSync } from 'fs-extra';
 import * as yaml from 'js-yaml';
 import gql from 'graphql-tag';
-import { Model } from './entities/Model';
+import { queryType, mutationType, makeSchema } from 'nexus';
 import { DatabaseConfig, Database } from './helpers/Database';
 import { GraphQLAPIConfig, GraphQLAPI } from './helpers/GraphQLAPI';
-import { queryType, mutationType, makeSchema } from 'nexus';
+import { Model } from './entities/Model';
+import { ModelQuery } from './helpers/ModelQuery';
+import { ModelMutation } from './helpers/ModelMutation';
 
 export interface DesolidConfig {
     api: GraphQLAPIConfig;
@@ -32,16 +34,19 @@ export default class Desolid {
             types: [
                 queryType({
                     definition(t) {
-                        models.forEach((model) => model.generateQueries(t));
+                        models.forEach((model) => new ModelQuery(model, t));
                     },
                 }),
                 mutationType({
                     definition(t) {
-                        models.forEach((model) => model.generateMutations(t));
+                        models.forEach((model) => new ModelMutation(model, t));
                     },
                 }),
             ],
-            outputs: {},
+            outputs: {
+                // typegen: __dirname + '/generated/typings.ts',
+                // schema: __dirname + '/generated/schema.graphql',
+            },
         });
     }
 }

@@ -13,7 +13,7 @@ export interface FieldSummary {
     type: string;
     description: string;
     directives: DirectiveSummary[];
-    nexusOptions: FieldOutConfig<any, any>;
+    config: FieldOutConfig<any, any>;
 }
 
 export interface ObjectTypeDefinitionSummary {
@@ -47,16 +47,16 @@ function summarizeDirective(directive: DirectiveNode): DirectiveSummary {
 function summarizeField(field: FieldDefinitionNode): FieldSummary {
     const encodedFieldType = encodeFieldType(field);
     const list = encodedFieldType.match(/[\w!]\]/g);
-    const nexusOptions = {
+    const config = {
         nullable: !/!$/.test(encodedFieldType),
         list: list ? list.map((item) => /^!/.test(item)) : false,
-    } as any;
+    } as FieldOutConfig<any, any>;
     return {
         name: field.name.value,
         type: encodedFieldType.replace(/[!\]]/g, ''),
         description: field.description?.value,
         directives: field.directives.map(summarizeDirective),
-        nexusOptions,
+        config,
     };
 }
 
