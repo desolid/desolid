@@ -1,9 +1,9 @@
-import { makeSchema, queryType } from 'nexus';
+import { makeSchema, queryType, mutationType } from 'nexus';
 import { DefinitionNode } from 'graphql';
 import { readFile } from 'fs-extra';
 import gql from 'graphql-tag';
-import { Enum, Model, TypeDef } from './generators';
-import { Query } from './generators/Query';
+import { Enum, Model, TypeDef, Type } from './entities';
+import { summary } from './helpers/ObjectTypeDefinitionSummary';
 
 export default class Desolid /** extends Singleton */ {
     public static dictionary = new Map<string, TypeDef>();
@@ -19,8 +19,13 @@ export default class Desolid /** extends Singleton */ {
                     typeDef = new Enum(definition);
                     break;
                 case 'ObjectTypeDefinition':
-                    typeDef = new Model(definition);
-                    models.push(typeDef);
+                    const definitionSummary = summary(definition);
+                    if (Model.isModel(definitionSummary)) {
+                        typeDef = new Model(definitionSummary);
+                        models.push(typeDef as Model);
+                    } else {
+                        typeDef = new Type(definitionSummary);
+                    }
                 default:
                     break;
             }
@@ -31,7 +36,14 @@ export default class Desolid /** extends Singleton */ {
     private generateQueries(models: Model[]) {
         return queryType({
             definition(t) {
-                models.forEach((model) => model.createQuery(t));
+                models.forEach((model) => model.generateQueries(t));
+            },
+        });
+    }
+    private generateMutations(models: Model[]) {
+        return mutationType({
+            definition(t) {
+                models.forEach((model) => model.generateMutations(t));
             },
         });
     }
@@ -40,8 +52,9 @@ export default class Desolid /** extends Singleton */ {
         const { definitions } = gql(schemaSource);
         const models = this.generateModels(definitions);
         const Query = this.generateQueries(models);
+        const Mutations = this.generateMutations(models);
         return makeSchema({
-            types: [Query],
+            types: [Query, Mutations],
             outputs: {},
         });
     }

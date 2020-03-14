@@ -23,6 +23,7 @@ enum UserGroup {
 This is a description of a User
 """
 type User
+    @model
     @authorization(
         READ: "$user.group = Editor || $user.id = $this.id"
         CREATE: "true"
@@ -45,6 +46,7 @@ type User
 This is a description of a Post
 """
 type Post
+    @model
     @authorization(
         READ: "$this.published || $user.group = Editor || $user.id = $this.author"
         CREATE: "$user.group in [Editor, Author]"
@@ -65,6 +67,7 @@ type Post
 This is a description of a Category
 """
 type Category
+    @model
     @authorization(
         READ: "true"
         CREATE: "$user.group = Editor"
