@@ -4,26 +4,44 @@ import gql from 'graphql-tag';
 import { Model } from './entities/Model';
 import { DatabaseConfig, Database } from './helpers/Database';
 import { GraphQLAPIConfig, GraphQLAPI } from './helpers/GraphQLAPI';
+import { queryType, mutationType, makeSchema } from 'nexus';
 
-export interface DesolidCongfig {
-    database: DatabaseConfig;
+export interface DesolidConfig {
     api: GraphQLAPIConfig;
+    datasource: DatabaseConfig;
 }
 
 export default class Desolid {
-    protected config: DesolidCongfig;
+    protected config: DesolidConfig;
     protected database: Database;
     protected api: GraphQLAPI;
-    protected models: Model[];
     constructor(private readonly path: string) {
         this.config = yaml.safeLoad(readFileSync(`${path}/desolid.yaml`, { encoding: 'utf8' }));
-        const { definitions } = gql(readFileSync(`${this.path}/schema.graphql`, { encoding: 'utf8' }));
-        this.database = new Database(this.config.database);
+        this.database = new Database(this.config.datasource);
         this.api = new GraphQLAPI(this.config.api);
-        this.models = Model.import(definitions);
     }
     public async start() {
-        await this.database.start(this.models);
-        await this.api.start(this.models);
+        const { definitions } = gql(readFileSync(`${this.path}/schema.graphql`, { encoding: 'utf8' }));
+        const models = Model.import(definitions);
+        const schema = this.makeSchema(models);
+        await this.database.start(models);
+        await this.api.start(schema);
+    }
+    private makeSchema(models: Model[]) {
+        return makeSchema({
+            types: [
+                queryType({
+                    definition(t) {
+                        models.forEach((model) => model.generateQueries(t));
+                    },
+                }),
+                mutationType({
+                    definition(t) {
+                        models.forEach((model) => model.generateMutations(t));
+                    },
+                }),
+            ],
+            outputs: {},
+        });
     }
 }

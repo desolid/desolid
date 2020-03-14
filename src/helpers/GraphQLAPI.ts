@@ -1,33 +1,14 @@
 import { makeSchema, queryType, mutationType } from 'nexus';
-import { Model } from 'src/entities/Model';
 import { GraphQLServer } from 'graphql-yoga';
+import { GraphQLSchema } from 'graphql';
 
 export interface GraphQLAPIConfig {
     port: number;
 }
 export class GraphQLAPI {
     constructor(protected config: GraphQLAPIConfig) {}
-    private makeSchema(models: Model[]) {
-        return makeSchema({
-            types: [
-                queryType({
-                    definition(t) {
-                        models.forEach((model) => model.generateQueries(t));
-                    },
-                }),
-                mutationType({
-                    definition(t) {
-                        models.forEach((model) => model.generateMutations(t));
-                    },
-                }),
-            ],
-            outputs: {},
-        });
-    }
-    public async start(models: Model[]) {
-        const server = new GraphQLServer({
-            schema: this.makeSchema(models),
-        });
+    public async start(schema: GraphQLSchema) {
+        const server = new GraphQLServer({ schema });
         await server.start({
             port: process.env.PORT || this.config.port || 3000,
         });

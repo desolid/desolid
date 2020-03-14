@@ -9,6 +9,7 @@ export class Model extends Type {
     public static isModel(summary: ObjectTypeDefinitionSummary) {
         return summary.directives.filter((directive) => directive.name == 'model').length > 0;
     }
+    public isModel = true;
     public generateQueries(t: ObjectDefinitionBlock<string>) {
         t.field(this.name.toLowerCase(), {
             type: Type.dictionary.get(this.name),
