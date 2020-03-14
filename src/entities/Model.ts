@@ -43,7 +43,7 @@ export class Model extends Type {
                             name: ref.name.toLowerCase(),
                             target: ref.name,
                             nullable: field.config.nullable,
-                            type: 'one-to-one',
+                            type: field.config.list ? 'one-to-many' : 'one-to-one',
                             cascade: true,
                         } as EntitySchemaRelationOptions;
                         break;
