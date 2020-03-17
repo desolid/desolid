@@ -1,7 +1,5 @@
 import { makeSchema, queryType, mutationType } from 'nexus';
 import { GraphQLServer } from 'graphql-yoga';
-import { ModelQuery } from './ModelQuery';
-import { ModelMutation } from './ModelMutation';
 import Model from '../entities/Model';
 
 export interface GraphQLAPIConfig {
@@ -22,12 +20,12 @@ export class GraphQLAPI {
             types: [
                 queryType({
                     definition(t) {
-                        models.forEach((model) => new ModelQuery(model, t));
+                        models.forEach((model) => model.getQueries(t));
                     },
                 }),
                 mutationType({
                     definition(t) {
-                        models.forEach((model) => new ModelMutation(model, t));
+                        models.forEach((model) => model.getMutations(t));
                     },
                 }),
             ],

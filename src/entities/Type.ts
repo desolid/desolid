@@ -3,14 +3,17 @@ import { ObjectTypeDefinitionSummary } from '../helpers/TypeDefinitionSummary';
 import Model from './Model';
 import Entity from './Entity';
 
-export default class extends Entity {
-    public type = 'type';
-    constructor(public readonly definition: ObjectTypeDefinitionSummary) {
-        super(definition.name, {
-            name: definition.name,
-            description: definition.description,
-            definition: (t) => this.fieldTypeDefs.forEach(({ name, config }) => t.field(name, config)),
-        });
+export default class Type extends Entity {
+    constructor(public readonly definition: ObjectTypeDefinitionSummary, type: 'type' | 'model' = 'type') {
+        super(
+            definition.name,
+            {
+                name: definition.name,
+                description: definition.description,
+                definition: (t) => this.fieldTypeDefs.forEach(({ name, config }) => t.field(name, config)),
+            },
+            type,
+        );
     }
     private get fieldTypeDefs() {
         return this.definition.fields.map((field) => {

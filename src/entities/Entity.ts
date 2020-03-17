@@ -33,8 +33,7 @@ export default class Entity extends NexusObjectTypeDef<string> {
         });
         return models;
     }
-    public type: 'type' | 'model' | undefined;
-    constructor(name: string, config: NexusObjectTypeConfig<string>) {
+    constructor(name: string, config: NexusObjectTypeConfig<string>, public type: 'type' | 'model' | undefined) {
         super(name, config);
     }
 }

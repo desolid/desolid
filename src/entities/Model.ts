@@ -6,10 +6,10 @@ import { ObjectTypeDefinitionSummary } from '../helpers/TypeDefinitionSummary';
 import Type from './Type';
 
 export default class extends Type {
-    public type = 'model';
     public repository: Repository<any>;
     constructor(public readonly definition: ObjectTypeDefinitionSummary) {
-        super(definition);
+        super(definition, 'model');
+        this.type;
     }
     public setRepository(repository: Repository<any>) {
         this.repository = repository;
