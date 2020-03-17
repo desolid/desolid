@@ -33,7 +33,7 @@ type User
     id: ID!
     createdAt: DateTime! @createdAt
     updatedAt: DateTime! @updatedAt
-    email: Email! @unique
+    email: EmailAddress! @unique
     phone: PhoneNumber @unique
     password: Password! @validation(length: { min: 12, max: 25 })
     group: UserGroup!

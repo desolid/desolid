@@ -2,14 +2,12 @@ import { GraphQLResolveInfo } from 'graphql';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 import { Repository } from 'typeorm';
 import * as pluralize from 'pluralize';
-import { ObjectTypeDefinitionSummary } from '../helpers/TypeDefinitionSummary';
 import Type from './Type';
 
 export default class extends Type {
     public repository: Repository<any>;
-    constructor(public readonly definition: ObjectTypeDefinitionSummary) {
+    constructor(definition) {
         super(definition, 'model');
-        this.type;
     }
     public setRepository(repository: Repository<any>) {
         this.repository = repository;

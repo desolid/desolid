@@ -1,7 +1,7 @@
 import { FieldOutConfig } from 'nexus/dist/core';
-import { ObjectTypeDefinitionSummary } from '../helpers/TypeDefinitionSummary';
 import Model from './Model';
 import Entity from './Entity';
+import { ObjectTypeDefinitionSummary } from '../helpers/definition-summary';
 
 export default class Type extends Entity {
     constructor(public readonly definition: ObjectTypeDefinitionSummary, type: 'type' | 'model' = 'type') {

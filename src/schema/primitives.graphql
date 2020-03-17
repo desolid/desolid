@@ -1,0 +1,8 @@
+type File @model {
+    id: ID!
+    createdAt: DateTime! @createdAt
+    updatedAt: DateTime! @updatedAt
+    name: String!
+    mimeType: String!
+    path: String!
+}

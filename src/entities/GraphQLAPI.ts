@@ -1,6 +1,6 @@
 import { makeSchema, queryType, mutationType } from 'nexus';
 import { GraphQLServer } from 'graphql-yoga';
-import Model from '../entities/Model';
+import Model from './Model';
 
 export interface GraphQLAPIConfig {
     port: number;

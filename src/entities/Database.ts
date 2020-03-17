@@ -7,8 +7,8 @@ import {
     EntitySchemaRelationOptions,
 } from 'typeorm';
 import { EntitySchemaOptions } from 'typeorm/entity-schema/EntitySchemaOptions';
-import Model from '../entities/Model';
-import { FieldSummary } from './TypeDefinitionSummary';
+import Model from './Model';
+import { FieldSummary } from '../helpers/definition-summary';
 
 export type DatabaseConfig = ConnectionOptions;
 export class Database {
