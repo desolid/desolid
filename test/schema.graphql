@@ -30,7 +30,7 @@ type User
         UPDATE: "$user.group = Editor || $user.id = $this.id"
         DELETE: "$user.group = Editor || $user.id = $this.id"
     ) {
-    id: ID! @auto
+    id: ID!
     createdAt: DateTime! @createdAt
     updatedAt: DateTime! @updatedAt
     email: Email! @unique
@@ -53,7 +53,7 @@ type Post
         UPDATE: "$user.group = Editor || $user.id = $this.author"
         DELETE: "$user.group = Editor || $user.id = $this.author"
     ) {
-    id: ID! @auto
+    id: ID!
     createdAt: DateTime! @createdAt
     updatedAt: DateTime! @updatedAt
     author: User!
@@ -74,7 +74,7 @@ type Category
         UPDATE: "$user.group = Editor"
         DELETE: "$user.group = Editor"
     ) {
-    id: ID! @auto
+    id: ID!
     createdAt: DateTime! @createdAt
     updatedAt: DateTime! @updatedAt
     name: String!

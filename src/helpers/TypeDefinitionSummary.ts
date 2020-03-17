@@ -1,33 +1,37 @@
 import { ObjectTypeDefinitionNode, StringValueNode, DirectiveNode, FieldDefinitionNode, TypeNode } from 'graphql';
 import { FieldOutConfig } from 'nexus/dist/core';
 
+type ModelDirectives = 'model' | 'authorization';
+type FieldDirectives = 'authorization' | 'createdAt' | 'updatedAt' | 'default' | 'upload' | 'unique' | 'validation';
+
 export interface DirectiveSummary {
     name: string;
-    value: {
-        name: string;
-        value: any;
-    }[];
+    value: { [key: string]: any };
 }
 export interface FieldSummary {
     name: string;
     type: string;
     description: string;
-    directives: DirectiveSummary[];
+    directives: { [key in FieldDirectives]: any };
     config: FieldOutConfig<any, any>;
 }
 
 export interface ObjectTypeDefinitionSummary {
     name: string;
     description: string;
-    directives: DirectiveSummary[];
+    directives: { [key in ModelDirectives]: any };
     fields: FieldSummary[];
 }
 
 export function summarize(definition: ObjectTypeDefinitionNode): ObjectTypeDefinitionSummary {
+    const directives: any = {};
+    definition.directives.map(summarizeDirective).forEach((item) => {
+        directives[item.name] = item.value;
+    });
     return {
         name: definition.name.value,
         description: definition.description?.value,
-        directives: definition.directives.map(summarizeDirective),
+        directives,
         fields: definition.fields.map(summarizeField),
     };
 }
@@ -51,11 +55,15 @@ function summarizeField(field: FieldDefinitionNode): FieldSummary {
         nullable: !/!$/.test(encodedFieldType),
         list: list ? list.map((item) => /^!/.test(item)) : false,
     } as FieldOutConfig<any, any>;
+    const directives: any = {};
+    field.directives.map(summarizeDirective).forEach((item) => {
+        directives[item.name] = item.value;
+    });
     return {
         name: field.name.value,
         type: encodedFieldType.replace(/[!\]]/g, ''),
         description: field.description?.value,
-        directives: field.directives.map(summarizeDirective),
+        directives,
         config,
     };
 }

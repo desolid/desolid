@@ -1,20 +1,20 @@
 import { FieldOutConfig } from 'nexus/dist/core';
 import { ObjectTypeDefinitionSummary } from '../helpers/TypeDefinitionSummary';
-import { Model } from './Model';
-import { Entity } from './Entity';
+import Model from './Model';
+import Entity from './Entity';
 
-export class Type extends Entity {
+export default class extends Entity {
     public type = 'type';
-    constructor(protected readonly definition: ObjectTypeDefinitionSummary) {
+    constructor(public readonly definition: ObjectTypeDefinitionSummary) {
         super(definition.name, {
             name: definition.name,
             description: definition.description,
-            definition: (t) => this.fieldsTypeDef.forEach(({ name, config }) => t.field(name, config)),
+            definition: (t) => this.fieldTypeDefs.forEach(({ name, config }) => t.field(name, config)),
         });
     }
-    private get fieldsTypeDef() {
+    private get fieldTypeDefs() {
         return this.definition.fields.map((field) => {
-            const type = Type.dictionary.get(field.type) as Model;
+            const type = Entity.dictionary.get(field.type) as Model;
             return {
                 name: field.name,
                 config: {

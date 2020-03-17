@@ -1,55 +1,75 @@
-import { EntitySchemaOptions } from 'typeorm/entity-schema/EntitySchemaOptions';
-import { Repository, EntitySchemaRelationOptions, EntitySchema } from 'typeorm';
+import { GraphQLResolveInfo } from 'graphql';
+import { ObjectDefinitionBlock } from 'nexus/dist/core';
+import { Repository } from 'typeorm';
+import * as pluralize from 'pluralize';
 import { ObjectTypeDefinitionSummary } from '../helpers/TypeDefinitionSummary';
-import { Type } from './Type';
-import { Database } from '../helpers/Database';
-import { Entity } from './Entity';
+import Type from './Type';
 
-export class Model extends Type {
-    public static isModel(summary: ObjectTypeDefinitionSummary) {
-        return summary.directives.filter((directive) => directive.name == 'model').length > 0;
-    }
+export default class extends Type {
     public type = 'model';
     public repository: Repository<any>;
-    constructor(protected readonly definition: ObjectTypeDefinitionSummary) {
+    constructor(public readonly definition: ObjectTypeDefinitionSummary) {
         super(definition);
     }
     public setRepository(repository: Repository<any>) {
         this.repository = repository;
     }
-    public toEntitySchema(database: Database) {
-        const schema = new EntitySchemaOptions();
-        schema.name = this.definition.name;
-        schema.columns = {};
-        schema.relations = {};
-        this.definition.fields.forEach((field) => {
-            const column = database.fieldToColumnDefinition(field);
-            if (column.type) {
-                schema.columns[field.name] = column;
-            } else {
-                const ref = Type.dictionary.get(field.type) as Entity;
-                switch (ref.type) {
-                    case 'enum':
-                        column.type = database.getLocalColumnType('String');
-                        schema.columns[field.name] = column;
-                        break;
-                    case 'type':
-                        column.type = database.getLocalColumnType('Text');
-                        schema.columns[field.name] = column;
-                        break;
-                    case 'model':
-                        // TODO
-                        schema.relations[ref.name.toLowerCase()] = {
-                            name: ref.name.toLowerCase(),
-                            target: ref.name,
-                            nullable: field.config.nullable,
-                            type: field.config.list ? 'one-to-many' : 'one-to-one',
-                            cascade: true,
-                        } as EntitySchemaRelationOptions;
-                        break;
-                }
-            }
+    public getQueries(t: ObjectDefinitionBlock<string>) {
+        t.field(this.name.toLowerCase(), {
+            type: Type.dictionary.get(this.name),
+            resolve: this.findOne.bind(this),
         });
-        return new EntitySchema(schema);
+        t.list.field(pluralize(this.name.toLowerCase()), {
+            type: Type.dictionary.get(this.name),
+            resolve: this.find.bind(this),
+        });
+    }
+
+    public getMutations(t: ObjectDefinitionBlock<string>) {
+        t.field(`create${this.name}`, {
+            type: Type.dictionary.get(this.name),
+            resolve: this.createOne.bind(this),
+        });
+        t.field(`update${this.name}`, {
+            type: Type.dictionary.get(this.name),
+            nullable: true,
+            resolve: this.updateOne.bind(this),
+        });
+        t.list.field(`updateMany${pluralize(this.name)}`, {
+            type: Type.dictionary.get(this.name),
+            nullable: true,
+            resolve: this.updateMany.bind(this),
+        });
+        t.field(`delete${this.name}`, {
+            type: Type.dictionary.get(this.name),
+            nullable: true,
+            resolve: this.deleteOne.bind(this),
+        });
+        t.list.field(`deleteMany${pluralize(this.name)}`, {
+            type: Type.dictionary.get(this.name),
+            nullable: true,
+            resolve: this.deleteMany.bind(this),
+        });
+    }
+    private createOne(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+        debugger;
+    }
+    private updateOne(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+        debugger;
+    }
+    private updateMany(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+        debugger;
+    }
+    private deleteOne(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+        debugger;
+    }
+    private deleteMany(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+        debugger;
+    }
+    private find(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+        debugger;
+    }
+    private findOne(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+        debugger;
     }
 }
