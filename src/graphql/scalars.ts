@@ -1,19 +1,18 @@
-import * as scalars from 'graphql-scalars';
-import { GraphQLUpload } from 'graphql-upload';
 import { scalarType } from 'nexus';
+import { GraphQLUpload } from 'graphql-upload';
+import * as StandardScalars from 'graphql-scalars';
 import { NexusScalarTypeDef } from 'nexus/dist/core';
 
-const standardScalars = Object.keys(scalars)
+export const scalars = Object.keys(StandardScalars)
     .map<NexusScalarTypeDef<string>>((key) => {
-        if (scalars.hasOwnProperty(key) && /\w+Resolver$/.test(key)) {
-            return scalarType(scalars[key]);
+        if (StandardScalars.hasOwnProperty(key) && /\w+Resolver$/.test(key)) {
+            return scalarType(StandardScalars[key]);
         }
     })
     .filter((scalar) => scalar);
 
-export default [
-    ...standardScalars,
-    scalarType(GraphQLUpload),
+scalars.push(scalarType(GraphQLUpload));
+scalars.push(
     scalarType({
         name: 'Password',
         description: 'TODO: describe',
@@ -30,4 +29,4 @@ export default [
             debugger;
         },
     }),
-];
+);

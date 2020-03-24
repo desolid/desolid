@@ -56,11 +56,11 @@ type Post
     id: ID!
     createdAt: DateTime! @createdAt
     updatedAt: DateTime! @updatedAt
-    author: User!
+    author: User! @relation(type: "many-to-one")
     title: String!
     content: String!
     published: Boolean! @default(value: false) @authorization(READ: "$user.group in [Editor, Author]")
-    categories: [Category!]!
+    categories: [Category!]! @relation(type: "many-to-many")
 }
 
 """
@@ -78,5 +78,5 @@ type Category
     createdAt: DateTime! @createdAt
     updatedAt: DateTime! @updatedAt
     name: String!
-    posts: [Post!]!
+    posts: [Post!]! @relation(type: "many-to-many")
 }

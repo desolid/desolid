@@ -1,8 +1,7 @@
 import { readFileSync } from 'fs-extra';
 import * as yaml from 'js-yaml';
-import { DatabaseConfig, Database } from './entities/Database';
-import { GraphQLAPIConfig, GraphQLAPI } from './entities/GraphQLAPI';
-import Model from './entities/Model';
+import { DatabaseConfig, Database } from './database';
+import { GraphQLAPIConfig, GraphQLAPI, Schema } from './graphql';
 
 export interface DesolidConfig {
     api: GraphQLAPIConfig;
@@ -13,14 +12,15 @@ export default class Desolid {
     protected config: DesolidConfig;
     protected database: Database;
     protected api: GraphQLAPI;
+    protected schema: Schema;
     constructor(private readonly path: string) {
         this.config = yaml.safeLoad(readFileSync(`${path}/desolid.yaml`, { encoding: 'utf8' }));
-        this.database = new Database(this.config.datasource);
-        this.api = new GraphQLAPI(this.config.api);
+        this.schema = new Schema(path);
+        this.database = new Database(this.config.datasource, this.schema);
+        this.api = new GraphQLAPI(this.config.api, this.schema);
     }
     public async start() {
-        const models = Model.import(this.path);
-        await this.database.start(models);
-        await this.api.start(models);
+        await this.database.start();
+        await this.api.start();
     }
 }

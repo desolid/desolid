@@ -7,22 +7,24 @@ import {
     EntitySchemaRelationOptions,
 } from 'typeorm';
 import { EntitySchemaOptions } from 'typeorm/entity-schema/EntitySchemaOptions';
-import Model from './Model';
-import { FieldSummary } from '../helpers/definition-summary';
+import { Model, Schema, Type, FieldSummary } from '../graphql';
+import { RelationType } from 'typeorm/metadata/types/RelationTypes';
 
 export type DatabaseConfig = ConnectionOptions;
 export class Database {
-    constructor(protected config: DatabaseConfig) {}
-    public async start(models: Model[]) {
-        const entities = models.map((model) => this.modelToEntitySchema(model));
+    private readonly entities: EntitySchema[] = [];
+    constructor(protected config: DatabaseConfig, protected schema: Schema) {
+        schema.models.forEach((model) => this.importModel(model));
+    }
+    public async start() {
         const connection = await createConnection({
             ...this.config,
             synchronize: true,
-            entities,
+            entities: this.entities,
         });
-        models.forEach((model) => model.setRepository(connection.getRepository(model.name)));
+        this.schema.models.forEach((model) => model.setRepository(connection.getRepository(model.name)));
     }
-    modelToEntitySchema(model: Model) {
+    importModel(model: Model) {
         const schema = new EntitySchemaOptions();
         schema.name = model.definition.name;
         schema.columns = {};
@@ -32,8 +34,8 @@ export class Database {
             if (column.type) {
                 schema.columns[field.name] = column;
             } else {
-                const ref = Model.dictionary.get(field.type);
-                switch (ref.type) {
+                const ref = this.schema.dictionary.get(field.type) as Type;
+                switch (ref.kind) {
                     case 'type':
                         column.type = this.getLocalColumnType('Text');
                         schema.columns[field.name] = column;
@@ -44,7 +46,11 @@ export class Database {
                             name: ref.name.toLowerCase(),
                             target: ref.name,
                             nullable: field.config.nullable,
-                            type: field.config.list ? 'one-to-many' : 'one-to-one',
+                            type: field.directives.relation
+                                ? field.directives.relation.type
+                                : field.config.list
+                                ? 'one-to-many'
+                                : 'one-to-one',
                             cascade: true,
                         } as EntitySchemaRelationOptions;
                         break;
@@ -56,7 +62,7 @@ export class Database {
                 }
             }
         });
-        return new EntitySchema(schema);
+        this.entities.push(new EntitySchema(schema));
     }
     getLocalColumnType(fieldType: FieldTypes) {
         return localColumnsTypesMap[this.config.type][fieldType];
