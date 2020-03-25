@@ -29,11 +29,7 @@ export class Schema {
         let entity: NexusTypeDef;
         switch (definition.kind) {
             case 'ScalarTypeDefinition':
-                entity = scalarType({
-                    name: definition.name.value,
-                    description: definition.description?.value,
-                    serialize() {},
-                });
+                throw new Error(`Scalar Difinition ("${definition.name.value}") Forbidden !`);
                 break;
             case 'EnumTypeDefinition':
                 entity = enumType({

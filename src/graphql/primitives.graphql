@@ -4,5 +4,5 @@ type File @model {
     updatedAt: DateTime! @updatedAt
     name: String!
     mimeType: String!
-    path: String!
+    path: String! @unique
 }

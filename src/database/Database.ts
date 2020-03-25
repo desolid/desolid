@@ -5,9 +5,11 @@ import {
     EntitySchemaColumnOptions,
     ColumnType,
     EntitySchemaRelationOptions,
+    DatabaseType,
 } from 'typeorm';
 import { EntitySchemaOptions } from 'typeorm/entity-schema/EntitySchemaOptions';
-import { Model, Schema, Type, FieldSummary } from '../graphql';
+import { Model, Schema, Type, FieldDefinition, FieldType } from '../graphql';
+import { NexusEnumTypeDef } from 'nexus/dist/core';
 import { RelationType } from 'typeorm/metadata/types/RelationTypes';
 
 export type DatabaseConfig = ConnectionOptions;
@@ -30,33 +32,29 @@ export class Database {
         schema.columns = {};
         schema.relations = {};
         model.definition.fields.forEach((field) => {
-            const column = this.fieldToColumnDefinition(field);
-            if (column.type) {
+            const column = this.fieldToColumn(field);
+            if (field.isScalar) {
                 schema.columns[field.name] = column;
             } else {
                 const ref = this.schema.dictionary.get(field.type) as Type;
                 switch (ref.kind) {
                     case 'type':
-                        column.type = this.getLocalColumnType('Text');
+                        column.type = this.mapColumnType('JSON');
                         schema.columns[field.name] = column;
                         break;
                     case 'model':
-                        // TODO
                         schema.relations[ref.name.toLowerCase()] = {
                             name: ref.name.toLowerCase(),
                             target: ref.name,
                             nullable: field.config.nullable,
-                            type: field.directives.relation
-                                ? field.directives.relation.type
-                                : field.config.list
-                                ? 'one-to-many'
-                                : 'one-to-one',
+                            type: this.getFieldRelationType(field),
                             cascade: true,
                         } as EntitySchemaRelationOptions;
                         break;
                     default:
-                        // enum
-                        column.type = this.getLocalColumnType('String');
+                        // so it's enum
+                        column.type = this.mapColumnType('Enum');
+                        column.enum = ((ref as any) as NexusEnumTypeDef<string>).value.members;
                         schema.columns[field.name] = column;
                         break;
                 }
@@ -64,47 +62,55 @@ export class Database {
         });
         this.entities.push(new EntitySchema(schema));
     }
-    getLocalColumnType(fieldType: FieldTypes) {
-        return localColumnsTypesMap[this.config.type][fieldType];
+    mapColumnType(fieldType: FieldType) {
+        return fieldTypesMap[this.config.type][fieldType];
     }
-    fieldToColumnDefinition(field: FieldSummary) {
+    getFieldRelationType(field: FieldDefinition): RelationType {
+        if (field.directives.relation) {
+            return field.directives.relation.type;
+        } else {
+            return field.config.list ? 'one-to-many' : 'one-to-one';
+        }
+    }
+    fieldToColumn(field: FieldDefinition) {
         const column = {
             nullable: field.config.nullable,
+            unique: field.directives.unique ? true : false,
+            default: field.directives.default?.value,
+            comment: field.type,
         } as EntitySchemaColumnOptions;
         switch (field.type) {
             case 'ID':
                 column.primary = true;
                 column.generated = true;
-                column.type = this.getLocalColumnType('ID');
+                column.type = this.mapColumnType('ID');
                 break;
             case 'Int':
-                column.type = this.getLocalColumnType('Int');
+                column.type = this.mapColumnType('Int');
                 break;
             case 'Float':
-                column.type = this.getLocalColumnType('Float');
+                column.type = this.mapColumnType('Float');
                 break;
             case 'Boolean':
-                column.type = this.getLocalColumnType('Boolean');
+                column.type = this.mapColumnType('Boolean');
                 break;
             case 'DateTime':
-                column.type = this.getLocalColumnType('DateTime');
+                column.type = this.mapColumnType('DateTime');
+                column.createDate = field.directives.createdAt ? true : false;
+                column.updateDate = field.directives.updatedAt ? true : false;
                 break;
-            case 'String':
-            case 'Email':
-            case 'Password':
-            case 'PhoneNumber':
-                column.type = this.getLocalColumnType('String');
-                break;
-            case 'Text':
-                column.type = this.getLocalColumnType('Text');
+            case 'JSON':
+                column.type = this.mapColumnType('JSON');
+            default:
+                column.type = this.mapColumnType('String');
                 break;
         }
+        field.databaseType = column.type;
         return column;
     }
 }
 
-type FieldTypes = 'ID' | 'Int' | 'Float' | 'Boolean' | 'DateTime' | 'String' | 'Text';
-const localColumnsTypesMap: { [key: string]: { [key in FieldTypes]: ColumnType } } = {
+const fieldTypesMap: { [key in DatabaseType]?: { [key in FieldType]?: ColumnType } } = {
     sqlite: {
         ID: 'int',
         Int: 'int',
@@ -112,6 +118,17 @@ const localColumnsTypesMap: { [key: string]: { [key in FieldTypes]: ColumnType }
         Boolean: 'boolean',
         DateTime: 'datetime',
         String: 'varchar',
-        Text: 'text',
+        JSON: 'mediumtext',
+        Enum: 'varchar',
+    },
+    mongodb: {
+        ID: 'string',
+        Int: 'int',
+        Float: 'float',
+        Boolean: 'boolean',
+        DateTime: 'datetime',
+        String: 'string',
+        JSON: 'string',
+        Enum: 'string',
     },
 };

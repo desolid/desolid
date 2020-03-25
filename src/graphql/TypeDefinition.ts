@@ -1,8 +1,12 @@
 import { ObjectTypeDefinitionNode, StringValueNode, DirectiveNode, FieldDefinitionNode, TypeNode } from 'graphql';
 import { FieldOutConfig } from 'nexus/dist/core';
+import { Scalar } from '.';
+import { scalarTypes } from './scalars';
+import { ColumnType } from 'typeorm';
 
-type ModelDirectives = 'model' | 'authorization';
-type FieldDirectives =
+export type FieldType = Scalar | 'Enum' | 'Object' | 'Relation';
+export type ModelDirectives = 'model' | 'authorization';
+export type FieldDirectives =
     | 'authorization'
     | 'createdAt'
     | 'updatedAt'
@@ -12,13 +16,15 @@ type FieldDirectives =
     | 'validation'
     | 'relation';
 
-export interface DirectiveSummary {
+export interface DirectiveDefinition {
     name: string;
     arguments: { [key: string]: any };
 }
-export interface FieldSummary {
+export interface FieldDefinition {
     name: string;
-    type: string;
+    type: FieldType;
+    databaseType?: ColumnType;
+    isScalar: boolean;
     description: string;
     directives: { [key in FieldDirectives]: any };
     config: FieldOutConfig<any, any>;
@@ -28,7 +34,7 @@ export class TypeDefinition {
     name: string;
     description: string;
     directives: { [key in ModelDirectives]: any } = {} as any;
-    fields: FieldSummary[];
+    fields: FieldDefinition[];
     constructor(definition: ObjectTypeDefinitionNode) {
         this.name = definition.name.value;
         this.description = definition.description?.value;
@@ -39,7 +45,7 @@ export class TypeDefinition {
         });
     }
 
-    private summarizeDirective(directive: DirectiveNode): DirectiveSummary {
+    private summarizeDirective(directive: DirectiveNode): DirectiveDefinition {
         return {
             name: directive.name.value,
             arguments: directive.arguments.reduce((output, argument) => {
@@ -49,7 +55,7 @@ export class TypeDefinition {
         };
     }
 
-    private summarizeField(field: FieldDefinitionNode): FieldSummary {
+    private summarizeField(field: FieldDefinitionNode): FieldDefinition {
         const encodedFieldType = this.encodeFieldType(field);
         const list = encodedFieldType.match(/[\w!]\]/g);
         const config = {
@@ -61,12 +67,14 @@ export class TypeDefinition {
             const summary = this.summarizeDirective(item);
             directives[summary.name] = summary.arguments;
         });
+        const type = encodedFieldType.replace(/[!\]]/g, '') as FieldType;
         return {
             name: field.name.value,
-            type: encodedFieldType.replace(/[!\]]/g, ''),
             description: field.description?.value,
-            directives,
+            type,
+            isScalar: scalarTypes.indexOf(type as Scalar) >= 0,
             config,
+            directives,
         };
     }
 

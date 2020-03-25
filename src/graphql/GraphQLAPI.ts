@@ -8,9 +8,7 @@ export interface GraphQLAPIConfig {
 }
 export class GraphQLAPI {
     private server: GraphQLServer;
-    constructor(protected config: GraphQLAPIConfig, protected schema: Schema) {
-        this.server = new GraphQLServer({ schema: this.generateSchema(schema.models) });
-    }
+    constructor(protected config: GraphQLAPIConfig, protected schema: Schema) {}
     private generateSchema(models: readonly Model[]) {
         return makeSchema({
             types: [
@@ -32,6 +30,7 @@ export class GraphQLAPI {
         });
     }
     public async start() {
+        this.server = new GraphQLServer({ schema: this.generateSchema(this.schema.models) });
         await this.server.start({
             port: process.env.PORT || this.config.port || 3000,
         });
