@@ -1,30 +1,22 @@
 import { GraphQLResolveInfo } from 'graphql';
-import {
-    ObjectDefinitionBlock,
-    arg,
-    stringArg,
-    ScalarArgConfig,
-    NexusArgDef,
-    intArg,
-    inputObjectType,
-} from 'nexus/dist/core';
+import { ObjectDefinitionBlock, stringArg, intArg } from 'nexus/dist/core';
 import { Repository } from 'typeorm';
 import * as pluralize from 'pluralize';
 import { Schema, TypeDefinition } from '..';
-import { WhereInput, WhereUniqueInput, Type, OrderBy } from '.';
+import { WhereInput, WhereUniqueInput, Type, OrderBy, CreateInput } from '.';
 
 export class Model extends Type {
     public repository: Repository<any>;
     private inputs: {
         where: WhereInput;
         uniqueWhere: WhereUniqueInput;
-        orderBy: OrderBy;
+        create: CreateInput;
     } = {} as any;
     constructor(definition: TypeDefinition, schema: Schema) {
         super(definition, schema, 'model');
         this.inputs.where = new WhereInput(this, schema);
         this.inputs.uniqueWhere = new WhereUniqueInput(this, schema);
-        this.inputs.orderBy = new OrderBy(this);
+        this.inputs.create = new CreateInput(this, schema);
     }
     public setRepository(repository: Repository<any>) {
         this.repository = repository;
@@ -32,15 +24,14 @@ export class Model extends Type {
     public getQueries(t: ObjectDefinitionBlock<string>) {
         t.field(this.name.toLowerCase(), {
             type: this,
-            // args: this.generateFindOneArgs(),
-            args: { where: this.inputs.uniqueWhere },
+            args: { where: this.inputs.uniqueWhere.toArg(true) },
             resolve: this.findOne.bind(this),
         });
         t.list.field(pluralize(this.name.toLowerCase()), {
             type: this,
             args: {
-                where: this.inputs.where,
-                orderBy: this.inputs.orderBy,
+                where: this.inputs.where.toArg(true),
+                orderBy: new OrderBy(this),
                 skip: intArg(),
                 after: stringArg(),
                 before: stringArg(),
@@ -54,6 +45,7 @@ export class Model extends Type {
     public getMutations(t: ObjectDefinitionBlock<string>) {
         t.field(`create${this.name}`, {
             type: this,
+            args: { data: this.inputs.create.toArg(true) },
             resolve: this.createOne.bind(this),
         });
         t.field(`update${this.name}`, {

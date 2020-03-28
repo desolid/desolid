@@ -1,10 +1,8 @@
-import { NexusInputObjectTypeDef, NexusInputFieldConfig, InputDefinitionBlock } from 'nexus/dist/core';
-import { Model } from '.';
-import { Schema } from '../Schema';
-import { Input } from './Input';
+import { Model, Input } from '.';
+import { Schema } from '..';
 
 export class WhereInput extends Input {
-    constructor(protected readonly model: Model, protected schema: Schema) {
+    constructor(model: Model, schema: Schema) {
         super(model, schema, `${model.name}WhereInput`);
     }
 }

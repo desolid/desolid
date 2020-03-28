@@ -1,9 +1,8 @@
-import { NexusInputFieldConfig, InputDefinitionBlock } from 'nexus/dist/core';
 import { Input, Model } from '.';
 import { Schema } from '..';
 
 export class WhereUniqueInput extends Input {
-    constructor(protected readonly model: Model, protected schema: Schema) {
+    constructor(model: Model, schema: Schema) {
         super(model, schema, `${model.name}WhereUniqueInput`);
     }
     public get fields() {
