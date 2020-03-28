@@ -9,9 +9,10 @@ export abstract class Input extends NexusInputObjectTypeDef<string> {
             definition: (t) => this.definition(t),
         });
     }
-    public toArg(required) {
+    public toArg(required, list: boolean[] = undefined) {
         return arg({
             type: this,
+            list,
             required,
         });
     }

@@ -50,6 +50,11 @@ export class Model extends Type {
             args: { data: this.inputs.create.toArg(true) },
             resolve: this.createOne.bind(this),
         });
+        t.field(`createMany${this.name}`, {
+            type: this,
+            args: { data: this.inputs.create.toArg(true, [true]) },
+            resolve: this.createMany.bind(this),
+        });
         t.field(`update${this.name}`, {
             type: this,
             nullable: true,
@@ -75,25 +80,28 @@ export class Model extends Type {
             resolve: this.deleteMany.bind(this),
         });
     }
-    private createOne(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+    private createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo): any {
         debugger;
     }
-    private updateOne(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+    private createMany(root: any, { data }: any, context: any, info: GraphQLResolveInfo): any {
         debugger;
     }
-    private updateMany(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+    private updateOne(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo): any {
         debugger;
     }
-    private deleteOne(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+    private updateMany(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo): any {
         debugger;
     }
-    private deleteMany(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+    private deleteOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo): any {
         debugger;
     }
-    private find(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+    private deleteMany(root: any, { where }: any, context: any, info: GraphQLResolveInfo): any {
         debugger;
     }
-    private findOne(root: any, args: any, context: any, info: GraphQLResolveInfo): any {
+    private find(root: any, { where }: any, context: any, info: GraphQLResolveInfo): any {
+        debugger;
+    }
+    private findOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo): any {
         debugger;
     }
 }
