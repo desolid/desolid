@@ -60,7 +60,7 @@ export class TypeDefinition {
         const list = encodedFieldType.match(/[\w!]\]/g);
         const config = {
             nullable: !/!$/.test(encodedFieldType),
-            list: list ? list.map((item) => !/^!/.test(item)) : false,
+            list: list ? list.map((item) => /^!/.test(item)) : false,
         } as FieldOutConfig<any, any>;
         const directives: any = {};
         field.directives.forEach((item) => {
