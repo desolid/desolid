@@ -1,4 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql';
+import * as graphqlFields from 'graphql-fields';
 import { ObjectDefinitionBlock, intArg, idArg } from 'nexus/dist/core';
 import { Repository } from 'typeorm';
 import * as pluralize from 'pluralize';
@@ -9,10 +10,7 @@ interface FindArgs {
     where: any;
     orderBy: string;
     skip: number;
-    after: string | number;
-    before: string | number;
-    first: number;
-    last: number;
+    limit: number;
 }
 
 export class Model extends Type {
@@ -45,10 +43,7 @@ export class Model extends Type {
                 where: this.inputs.where.toArg(true),
                 orderBy: new OrderBy(this),
                 skip: intArg(),
-                after: idArg(),
-                before: idArg(),
-                first: intArg(),
-                last: intArg(),
+                limit: intArg(),
             },
             resolve: this.find.bind(this),
         });
@@ -95,8 +90,8 @@ export class Model extends Type {
     private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
         return await this.repository.save({ ...data });
     }
-    private async createMany(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
-        debugger;
+    private async createMany(root: any, { data }: { data: any[] }, context: any, info: GraphQLResolveInfo) {
+        return await this.repository.save(data.map((item) => ({ ...item })));
     }
     private async updateOne(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {
         debugger;
@@ -110,15 +105,19 @@ export class Model extends Type {
     private async deleteMany(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
         debugger;
     }
-    private async find(
-        root: any,
-        { where, orderBy, skip, after, before, first, last }: FindArgs,
-        context: any,
-        info: GraphQLResolveInfo,
-    ) {
-        debugger;
+    private async find(root: any, { where, orderBy, skip, limit }: FindArgs, context: any, info: GraphQLResolveInfo) {
+        const select = Object.keys(graphqlFields(info));
+        const order = orderBy ? { [orderBy.split('_')[0]]: orderBy.split('_')[1] as 'ASC' | 'DESC' } : undefined;
+        return await this.repository.find({
+            where: { ...where },
+            select,
+            skip,
+            order,
+            take: limit,
+        });
     }
     private async findOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
-        debugger;
+        const select = Object.keys(graphqlFields(info));
+        return await this.repository.findOne({ ...where }, { select });
     }
 }

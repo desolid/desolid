@@ -24,6 +24,7 @@
   "dependencies": {
     "fs-extra": "^8.1.0",
     "graphql": "^14.6.0",
+    "graphql-fields": "^2.0.3",
     "graphql-scalars": "^1.0.7",
     "graphql-tag": "^2.10.3",
     "graphql-upload": "^10.0.0",
