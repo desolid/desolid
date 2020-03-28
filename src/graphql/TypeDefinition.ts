@@ -38,14 +38,14 @@ export class TypeDefinition {
     constructor(definition: ObjectTypeDefinitionNode) {
         this.name = definition.name.value;
         this.description = definition.description?.value;
-        this.fields = definition.fields.map((field) => this.summarizeField(field));
+        this.fields = definition.fields.map((field) => this.createField(field));
         definition.directives.forEach((item) => {
-            const summary = this.summarizeDirective(item);
-            this.directives[summary.name] = summary.arguments;
+            const directive = this.createDirective(item);
+            this.directives[directive.name] = directive.arguments;
         });
     }
 
-    private summarizeDirective(directive: DirectiveNode): DirectiveDefinition {
+    private createDirective(directive: DirectiveNode): DirectiveDefinition {
         return {
             name: directive.name.value,
             arguments: directive.arguments.reduce((output, argument) => {
@@ -55,16 +55,16 @@ export class TypeDefinition {
         };
     }
 
-    private summarizeField(field: FieldDefinitionNode): FieldDefinition {
+    private createField(field: FieldDefinitionNode): FieldDefinition {
         const encodedFieldType = this.encodeFieldType(field);
         const list = encodedFieldType.match(/[\w!]\]/g);
         const config = {
             nullable: !/!$/.test(encodedFieldType),
-            list: list ? list.map((item) => /^!/.test(item)) : false,
+            list: list ? list.map((item) => !/^!/.test(item)) : false,
         } as FieldOutConfig<any, any>;
         const directives: any = {};
         field.directives.forEach((item) => {
-            const summary = this.summarizeDirective(item);
+            const summary = this.createDirective(item);
             directives[summary.name] = summary.arguments;
         });
         const type = encodedFieldType.replace(/[!\]]/g, '') as FieldType;

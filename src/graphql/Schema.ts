@@ -2,7 +2,7 @@ import { NexusScalarTypeDef, NexusEnumTypeDef, scalarType, enumType } from 'nexu
 import * as path from 'path';
 import gql from 'graphql-tag';
 import { readFileSync } from 'fs-extra';
-import { TypeDefinitionNode } from 'graphql';
+import { TypeDefinitionNode, EnumTypeExtensionNode } from 'graphql';
 import { Model, Type, TypeDefinition, scalars } from '.';
 
 type NexusTypeDef = Type | NexusScalarTypeDef<string> | NexusEnumTypeDef<string>;
@@ -22,8 +22,8 @@ export class Schema {
         const { definitions } = gql(readFileSync(filePath, { encoding: 'utf8' }));
         definitions.forEach((definition) => this.importTypeDef(definition as TypeDefinitionNode));
     }
-    private importTypeDef(definition: TypeDefinitionNode) {
-        if (this.dictionary.get(definition.name.value)) {
+    private importTypeDef(definition: TypeDefinitionNode | EnumTypeExtensionNode) {
+        if (this.dictionary.get(definition.name.value) && definition.kind != 'EnumTypeExtension') {
             throw new Error(`Conflict on "${definition.name.value}" !`);
         }
         let entity: NexusTypeDef;
@@ -38,6 +38,10 @@ export class Schema {
                     members: definition.values.map((item) => item.name.value),
                 });
                 break;
+            case 'EnumTypeExtension':
+                const base = this.dictionary.get(definition.name.value) as NexusEnumTypeDef<string>;
+                (base.value.members as string[]).push(...definition.values.map((item) => item.name.value));
+                return;
             case 'ObjectTypeDefinition':
                 const typeDef = new TypeDefinition(definition);
                 if (typeDef.directives.model) {

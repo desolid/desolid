@@ -1,20 +1,4 @@
-# scalar Email
-# scalar Password
-# scalar Json
-# scalar File
-# directive @authorization(
-#     READ: String
-#     CREATE: String
-#     UPDATE: String
-#     DELETE: String
-# ) on FIELD_DEFINITION | TYPE_DEFINITION
-# directive @unique on FIELD_DEFINITION
-# directive @createdAt on FIELD_DEFINITION
-# directive @updateAt on FIELD_DEFINITION
-
-enum UserGroup {
-    Admin # default
-    User # default
+extend enum UserGroup {
     Editor
     Author
 }
