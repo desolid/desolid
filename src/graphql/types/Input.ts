@@ -24,14 +24,13 @@ export abstract class Input extends NexusInputObjectTypeDef<string> {
             t.field(field.name, {
                 // TODO: create or connect on relations
                 type: field.isScalar ? field.type : type && type.kind == 'model' ? 'ID' : type,
+                required: !field.config.nullable,
                 list: field.config.list,
                 ...this.configField(field),
             });
         });
     }
     protected configField(field: FieldDefinition): NexusInputFieldConfig<string, string> {
-        return {
-            required: false,
-        } as NexusInputFieldConfig<string, string>;
+        return {} as NexusInputFieldConfig<string, string>;
     }
 }
