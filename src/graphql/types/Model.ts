@@ -38,7 +38,15 @@ export class Model extends Type {
         });
         t.list.field(pluralize(this.name.toLowerCase()), {
             type: this,
-            args: { where: this.inputs.where, orderBy: this.inputs.orderBy },
+            args: {
+                where: this.inputs.where,
+                orderBy: this.inputs.orderBy,
+                skip: intArg(),
+                after: stringArg(),
+                before: stringArg(),
+                first: intArg(),
+                last: intArg(),
+            },
             resolve: this.find.bind(this),
         });
     }

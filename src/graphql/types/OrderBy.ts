@@ -1,14 +1,11 @@
 import { NexusEnumTypeDef } from 'nexus/dist/core';
-import { Model } from '.';
+import { Model, Enum } from '.';
 
-export class OrderBy extends NexusEnumTypeDef<string> {
+export class OrderBy extends Enum {
     constructor(protected readonly model: Model) {
-        super(`${model.name}`, {
-            name: `${model.name}`,
-            members: [
-                ...model.definition.fields.map((field) => `${field.name}_ASC`),
-                ...model.definition.fields.map((field) => `${field.name}_DESC`),
-            ],
-        });
+        super(`${model.name}OrderBy`, [
+            ...model.definition.fields.map((field) => `${field.name}_ASC`),
+            ...model.definition.fields.map((field) => `${field.name}_DESC`),
+        ]);
     }
 }
