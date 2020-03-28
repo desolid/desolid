@@ -1,9 +1,19 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { ObjectDefinitionBlock, stringArg, intArg } from 'nexus/dist/core';
+import { ObjectDefinitionBlock, intArg, idArg } from 'nexus/dist/core';
 import { Repository } from 'typeorm';
 import * as pluralize from 'pluralize';
 import { Schema, TypeDefinition } from '..';
 import { WhereInput, WhereUniqueInput, Type, OrderBy, CreateInput, UpdateInput } from '.';
+
+interface FindArgs {
+    where: any;
+    orderBy: string;
+    skip: number;
+    after: string | number;
+    before: string | number;
+    first: number;
+    last: number;
+}
 
 export class Model extends Type {
     public repository: Repository<any>;
@@ -35,8 +45,8 @@ export class Model extends Type {
                 where: this.inputs.where.toArg(true),
                 orderBy: new OrderBy(this),
                 skip: intArg(),
-                after: stringArg(),
-                before: stringArg(),
+                after: idArg(),
+                before: idArg(),
                 first: intArg(),
                 last: intArg(),
             },
@@ -52,6 +62,8 @@ export class Model extends Type {
         });
         t.field(`createMany${this.name}`, {
             type: this,
+            nullable: true,
+            list: [true],
             args: { data: this.inputs.create.toArg(true, [true]) },
             resolve: this.createMany.bind(this),
         });
@@ -80,28 +92,33 @@ export class Model extends Type {
             resolve: this.deleteMany.bind(this),
         });
     }
-    private createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo): any {
+    private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
+        return await this.repository.save({ ...data });
+    }
+    private async createMany(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
         debugger;
     }
-    private createMany(root: any, { data }: any, context: any, info: GraphQLResolveInfo): any {
+    private async updateOne(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {
         debugger;
     }
-    private updateOne(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo): any {
+    private async updateMany(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {
         debugger;
     }
-    private updateMany(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo): any {
+    private async deleteOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
         debugger;
     }
-    private deleteOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo): any {
+    private async deleteMany(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
         debugger;
     }
-    private deleteMany(root: any, { where }: any, context: any, info: GraphQLResolveInfo): any {
+    private async find(
+        root: any,
+        { where, orderBy, skip, after, before, first, last }: FindArgs,
+        context: any,
+        info: GraphQLResolveInfo,
+    ) {
         debugger;
     }
-    private find(root: any, { where }: any, context: any, info: GraphQLResolveInfo): any {
-        debugger;
-    }
-    private findOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo): any {
+    private async findOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
         debugger;
     }
 }
