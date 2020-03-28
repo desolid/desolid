@@ -1,6 +1,6 @@
 import { FieldOutConfig, NexusObjectTypeDef } from 'nexus/dist/core';
-import { TypeDefinition } from './TypeDefinition';
-import { Schema } from '.';
+import { TypeDefinition } from '../TypeDefinition';
+import { Schema } from '..';
 
 export class Type extends NexusObjectTypeDef<string> {
     constructor(
@@ -11,10 +11,10 @@ export class Type extends NexusObjectTypeDef<string> {
         super(definition.name, {
             name: definition.name,
             description: definition.description,
-            definition: (t) => this.fieldTypeDefs.forEach(({ name, config }) => t.field(name, config)),
+            definition: (t) => this.fieldDefs.forEach(({ name, config }) => t.field(name, config)),
         });
     }
-    private get fieldTypeDefs() {
+    private get fieldDefs() {
         return this.definition.fields.map((field) => {
             const type = this.schema.dictionary.get(field.type);
             return {

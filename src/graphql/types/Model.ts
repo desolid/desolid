@@ -1,44 +1,44 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { ObjectDefinitionBlock, arg, stringArg, ScalarArgConfig, NexusArgDef, intArg } from 'nexus/dist/core';
+import {
+    ObjectDefinitionBlock,
+    arg,
+    stringArg,
+    ScalarArgConfig,
+    NexusArgDef,
+    intArg,
+    inputObjectType,
+} from 'nexus/dist/core';
 import { Repository } from 'typeorm';
 import * as pluralize from 'pluralize';
-import { Type, Schema, TypeDefinition } from '.';
+import { Schema, TypeDefinition } from '..';
+import { WhereInput, WhereUniqueInput, Type, OrderBy } from '.';
 
 export class Model extends Type {
     public repository: Repository<any>;
+    private inputs: {
+        where: WhereInput;
+        uniqueWhere: WhereUniqueInput;
+        orderBy: OrderBy;
+    } = {} as any;
     constructor(definition: TypeDefinition, schema: Schema) {
         super(definition, schema, 'model');
+        this.inputs.where = new WhereInput(this, schema);
+        this.inputs.uniqueWhere = new WhereUniqueInput(this, schema);
+        this.inputs.orderBy = new OrderBy(this);
     }
     public setRepository(repository: Repository<any>) {
         this.repository = repository;
     }
-    private generateFindOneArgs() {
-        const output: { [key: string]: NexusArgDef<any> } = {};
-        const uniqueFields = this.definition.fields.filter((field) => field.type == 'ID' || field.directives.unique);
-        uniqueFields.forEach((field) => {
-            let arg: NexusArgDef<any>;
-            const options: ScalarArgConfig<any> = {
-                required: false,
-            };
-            switch (field.databaseType) {
-                case 'int':
-                    arg = intArg(options);
-                    break;
-                default:
-                    arg = stringArg(options);
-            }
-            output[field.name] = arg;
-        });
-        return output;
-    }
     public getQueries(t: ObjectDefinitionBlock<string>) {
         t.field(this.name.toLowerCase(), {
             type: this,
-            args: this.generateFindOneArgs(),
+            // args: this.generateFindOneArgs(),
+            args: { where: this.inputs.uniqueWhere },
             resolve: this.findOne.bind(this),
         });
         t.list.field(pluralize(this.name.toLowerCase()), {
             type: this,
+            args: { where: this.inputs.where, orderBy: this.inputs.orderBy },
             resolve: this.find.bind(this),
         });
     }

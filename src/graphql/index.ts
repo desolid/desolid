@@ -1,5 +1,4 @@
-export * from './Type';
-export * from './Model';
+export * from './types';
 export * from './TypeDefinition';
 export * from './Schema';
 export * from './GraphQLAPI';
