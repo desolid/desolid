@@ -60,7 +60,7 @@ type Post
     title: String!
     content: String!
     published: Boolean! @default(value: false) @authorization(READ: "$user.group in [Editor, Author]")
-    categories: [Category!]! @relation(type: "many-to-many")
+    categories: [Category]! @relation(type: "many-to-many")
 }
 
 """
@@ -78,5 +78,5 @@ type Category
     createdAt: DateTime! @createdAt
     updatedAt: DateTime! @updatedAt
     name: String!
-    posts: [Post!]! @relation(type: "many-to-many")
+    posts: [Post]! @relation(type: "many-to-many")
 }

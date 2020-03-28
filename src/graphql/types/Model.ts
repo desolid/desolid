@@ -3,7 +3,7 @@ import { ObjectDefinitionBlock, stringArg, intArg } from 'nexus/dist/core';
 import { Repository } from 'typeorm';
 import * as pluralize from 'pluralize';
 import { Schema, TypeDefinition } from '..';
-import { WhereInput, WhereUniqueInput, Type, OrderBy, CreateInput } from '.';
+import { WhereInput, WhereUniqueInput, Type, OrderBy, CreateInput, UpdateInput } from '.';
 
 export class Model extends Type {
     public repository: Repository<any>;
@@ -11,12 +11,14 @@ export class Model extends Type {
         where: WhereInput;
         uniqueWhere: WhereUniqueInput;
         create: CreateInput;
+        update: UpdateInput;
     } = {} as any;
     constructor(definition: TypeDefinition, schema: Schema) {
         super(definition, schema, 'model');
         this.inputs.where = new WhereInput(this, schema);
         this.inputs.uniqueWhere = new WhereUniqueInput(this, schema);
         this.inputs.create = new CreateInput(this, schema);
+        this.inputs.update = new UpdateInput(this, schema);
     }
     public setRepository(repository: Repository<any>) {
         this.repository = repository;
@@ -51,21 +53,25 @@ export class Model extends Type {
         t.field(`update${this.name}`, {
             type: this,
             nullable: true,
+            args: { where: this.inputs.uniqueWhere.toArg(true), data: this.inputs.update.toArg(true) },
             resolve: this.updateOne.bind(this),
         });
         t.list.field(`updateMany${pluralize(this.name)}`, {
             type: this,
             nullable: true,
+            args: { where: this.inputs.where.toArg(true), data: this.inputs.update.toArg(true) },
             resolve: this.updateMany.bind(this),
         });
         t.field(`delete${this.name}`, {
             type: this,
             nullable: true,
+            args: { where: this.inputs.uniqueWhere.toArg(true) },
             resolve: this.deleteOne.bind(this),
         });
         t.list.field(`deleteMany${pluralize(this.name)}`, {
             type: this,
             nullable: true,
+            args: { where: this.inputs.where.toArg(true) },
             resolve: this.deleteMany.bind(this),
         });
     }
