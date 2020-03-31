@@ -5,7 +5,7 @@ import { Schema } from '..';
 export class Type extends NexusObjectTypeDef<string> {
     constructor(
         public readonly definition: TypeDefinition,
-        protected schema: Schema,
+        public readonly schema: Schema,
         public kind: 'type' | 'model' = 'type',
     ) {
         super(definition.name, {

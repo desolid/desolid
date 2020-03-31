@@ -3,7 +3,7 @@ import { Model, Type } from '.';
 import { Schema, FieldDefinition } from '..';
 
 export abstract class Input extends NexusInputObjectTypeDef<string> {
-    constructor(protected readonly model: Model, protected schema: Schema, name: string) {
+    constructor(protected readonly model: Model, name: string) {
         super(name, {
             name,
             definition: (t) => this.definition(t),
@@ -21,7 +21,7 @@ export abstract class Input extends NexusInputObjectTypeDef<string> {
     }
     private definition(t: InputDefinitionBlock<string>) {
         this.fields.forEach((field) => {
-            const type = this.schema.dictionary.get(field.type) as Type;
+            const type = this.model.schema.dictionary.get(field.type) as Type;
             t.field(field.name, {
                 // TODO: create or connect on relations
                 type: field.isScalar ? field.type : type && type.kind == 'model' ? 'ID' : type,

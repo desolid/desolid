@@ -1,3 +1,7 @@
+type BatchPayload {
+    count: Long
+}
+
 enum UserGroup {
     """
     System Administrator

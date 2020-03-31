@@ -1,36 +1,48 @@
-import { makeSchema, queryType, mutationType } from 'nexus';
+import { makeSchema, queryType, mutationType, intArg } from 'nexus';
+import { ObjectDefinitionBlock } from 'nexus/dist/core';
 import { GraphQLServer } from 'graphql-yoga';
-import { Model } from '.';
-import { Schema } from './Schema';
+import { Schema } from '.';
+import { Model, OrderBy, Input, CreateInput, UpdateInput, WhereInput, WhereUniqueInput } from './types';
+import { CRUD } from './CRUD';
 
 export interface GraphQLAPIConfig {
     port: number;
 }
+
 export class GraphQLAPI {
     private server: GraphQLServer;
-    constructor(protected config: GraphQLAPIConfig, protected schema: Schema) {}
-    private generateSchema(models: readonly Model[]) {
+    private cruds: { [model: string]: CRUD } = {};
+
+    constructor(protected config: GraphQLAPIConfig, protected schema: Schema) {
+        // creating cruds
+        schema.models.forEach((model) => (this.cruds[model.name] = new CRUD(model)));
+    }
+
+    private generateSchema(outputs: any) {
         return makeSchema({
             types: [
                 queryType({
-                    definition(t) {
-                        models.forEach((model) => model.getQueries(t));
+                    definition: (t) => {
+                        this.schema.models.forEach((model) => this.cruds[model.name].generateQuery(t));
                     },
                 }),
                 mutationType({
-                    definition(t) {
-                        models.forEach((model) => model.getMutations(t));
+                    definition: (t) => {
+                        this.schema.models.forEach((model) => this.cruds[model.name].generateMutation(t));
                     },
                 }),
             ],
-            outputs: {
-                // typegen: __dirname + '/generated/typings.ts',
-                // schema: __dirname + '/generated/schema.graphql',
-            },
+            outputs,
         });
     }
+
     public async start() {
-        this.server = new GraphQLServer({ schema: this.generateSchema(this.schema.models) });
+        this.server = new GraphQLServer({
+            schema: this.generateSchema({
+                // typegen: __dirname + '/generated/typings.ts',
+                // schema: __dirname + '/generated/schema.graphql',
+            }),
+        });
         await this.server.start({
             port: process.env.PORT || this.config.port || 3000,
         });

@@ -1,10 +1,10 @@
 import { NexusInputFieldConfig } from 'nexus/dist/core';
 import { Input, Model } from '.';
-import { Schema, FieldDefinition } from '..';
+import { FieldDefinition } from '..';
 
 export class CreateInput extends Input {
-    constructor(protected readonly model: Model, protected schema: Schema) {
-        super(model, schema, `${model.name}CreateInput`);
+    constructor(protected readonly model: Model) {
+        super(model, `${model.name}CreateInput`);
     }
 
     public get fields() {
@@ -13,6 +13,11 @@ export class CreateInput extends Input {
             (field) => !field.directives.createdAt && !field.directives.updatedAt,
         );
     }
+
+    /**
+     *
+     * @todo handle file upload
+     */
     protected configField(field: FieldDefinition): NexusInputFieldConfig<string, string> {
         return {
             required: field.type == 'ID' ? false : !field.config.nullable,

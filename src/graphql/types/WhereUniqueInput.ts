@@ -1,11 +1,10 @@
 import { Input, Model } from '.';
-import { Schema } from '..';
 import { FieldDefinition } from '../TypeDefinition';
 import { NexusInputFieldConfig } from 'nexus/dist/core';
 
 export class WhereUniqueInput extends Input {
-    constructor(model: Model, schema: Schema) {
-        super(model, schema, `${model.name}WhereUniqueInput`);
+    constructor(model: Model) {
+        super(model, `${model.name}WhereUniqueInput`);
     }
     public get fields() {
         // only ID & unique fields

@@ -3,8 +3,8 @@ import { Input, Model } from '.';
 import { Schema, FieldDefinition } from '..';
 
 export class UpdateInput extends Input {
-    constructor(protected readonly model: Model, protected schema: Schema) {
-        super(model, schema, `${model.name}UpdateInput`);
+    constructor(model: Model) {
+        super(model, `${model.name}UpdateInput`);
     }
 
     public get fields() {
@@ -13,6 +13,11 @@ export class UpdateInput extends Input {
             (field) => field.type != 'ID' && !field.directives.createdAt && !field.directives.updatedAt,
         );
     }
+
+    /**
+     *
+     * @todo handle file upload
+     */
     protected configField(field: FieldDefinition): NexusInputFieldConfig<string, string> {
         return {
             required: field.type == 'ID' ? false : !field.config.nullable,

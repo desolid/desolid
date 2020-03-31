@@ -54,7 +54,9 @@ export class Database {
                     default:
                         // so it's enum
                         column.type = this.mapColumnType('Enum');
-                        column.enum = ((ref as any) as NexusEnumTypeDef<string>).value.members;
+                        if (column.type == 'enum') {
+                            column.enum = ((ref as any) as NexusEnumTypeDef<string>).value.members;
+                        }
                         schema.columns[field.name] = column;
                         break;
                 }
