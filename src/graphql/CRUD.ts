@@ -1,7 +1,7 @@
 import { ObjectDefinitionBlock, intArg } from 'nexus/dist/core';
 import * as pluralize from 'pluralize';
 import * as graphqlFields from 'graphql-fields';
-import { Model, CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from './types';
+import { Model, CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy, Type } from './types';
 import { GraphQLResolveInfo } from 'graphql';
 
 export interface FindArgs {
@@ -11,6 +11,9 @@ export interface FindArgs {
     limit: number;
 }
 
+/**
+ * @todo select relations
+ */
 export class CRUD {
     private inputs: {
         create: CreateInput;
@@ -66,7 +69,7 @@ export class CRUD {
             resolve: this.updateOne.bind(this),
         });
         t.field(`updateMany${pluralize(this.model.name)}`, {
-            type: this.model.schema.dictionary.get('BatchPayload'),
+            type: this.model.schema.dictionary.get('BatchPayload') as Type,
             args: {
                 where: this.inputs.where.toArg(true),
                 data: this.inputs.update.toArg(true),
@@ -79,7 +82,7 @@ export class CRUD {
             resolve: this.deleteOne.bind(this),
         });
         t.field(`deleteMany${pluralize(this.model.name)}`, {
-            type: this.model.schema.dictionary.get('BatchPayload'),
+            type: this.model.schema.dictionary.get('BatchPayload') as Type,
             args: { where: this.inputs.where.toArg(true) },
             resolve: this.deleteMany.bind(this),
         });

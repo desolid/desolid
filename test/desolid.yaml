@@ -1,5 +1,8 @@
 datasource:
-  type: "sqlite"
-  database: "databse.sqlite"
+    type: 'sqlite'
+    database: 'databse.sqlite'
+    # https://github.com/typeorm/typeorm/blob/master/docs/caching.md
+    cache:
+        duration: 30000 # 30 seconds
 api:
-  port: 3000
+    port: 3000

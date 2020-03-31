@@ -8,6 +8,7 @@ export abstract class Input extends NexusInputObjectTypeDef<string> {
             name,
             definition: (t) => this.definition(t),
         });
+        this.model.schema.dictionary.set(name, this);
     }
     public toArg(required, list: boolean[] = undefined) {
         return arg({

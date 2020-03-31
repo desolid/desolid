@@ -121,3 +121,22 @@ scalars.push(
         },
     }),
 );
+
+export const searchableScalars = [
+    // primitives
+    'String',
+    // standard scalars
+    'EmailAddress',
+    'PhoneNumber',
+    'PostalCode',
+    'URL',
+    'HexColorCode',
+    'HSL',
+    'HSLA',
+    'IPv4',
+    'IPv6',
+    'ISBN',
+    'MAC',
+    'RGB',
+    'RGBA',
+];

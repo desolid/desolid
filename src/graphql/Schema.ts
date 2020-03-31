@@ -1,11 +1,11 @@
-import { NexusScalarTypeDef, NexusEnumTypeDef, scalarType, enumType } from 'nexus/dist/core';
+import { NexusScalarTypeDef, NexusEnumTypeDef, scalarType, enumType, NexusInputObjectTypeDef } from 'nexus/dist/core';
 import * as path from 'path';
 import gql from 'graphql-tag';
 import { readFileSync } from 'fs-extra';
 import { TypeDefinitionNode, EnumTypeExtensionNode } from 'graphql';
 import { Model, Type, TypeDefinition, scalars } from '.';
 
-type NexusTypeDef = Type | NexusScalarTypeDef<string> | NexusEnumTypeDef<string>;
+type NexusTypeDef = Type | NexusScalarTypeDef<string> | NexusEnumTypeDef<string> | NexusInputObjectTypeDef<string>;
 
 export class Schema {
     public readonly dictionary = new Map<string, NexusTypeDef>();
