@@ -1,7 +1,7 @@
 import { ObjectDefinitionBlock, intArg } from 'nexus/dist/core';
 import * as pluralize from 'pluralize';
 import * as graphqlFields from 'graphql-fields';
-import { Model, Input, CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from './types';
+import { Model, CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from './types';
 import { GraphQLResolveInfo } from 'graphql';
 
 export interface FindArgs {
@@ -17,6 +17,7 @@ export class CRUD {
         update: UpdateInput;
         where: WhereInput;
         whereUnique: WhereUniqueInput;
+        orderBy: OrderBy;
     } = {} as any;
 
     constructor(private model: Model) {
@@ -24,6 +25,7 @@ export class CRUD {
         this.inputs.update = new UpdateInput(model);
         this.inputs.where = new WhereInput(model);
         this.inputs.whereUnique = new WhereUniqueInput(model);
+        this.inputs.orderBy = new OrderBy(model);
     }
 
     public generateQuery(t: ObjectDefinitionBlock<'Query'>) {
@@ -36,7 +38,7 @@ export class CRUD {
             type: this.model,
             args: {
                 where: this.inputs.where.toArg(true),
-                orderBy: new OrderBy(this.model),
+                orderBy: this.inputs.orderBy,
                 skip: intArg(),
                 limit: intArg(),
             },
@@ -112,7 +114,7 @@ export class CRUD {
 
     private async find(root: any, { where, orderBy, skip, limit }: FindArgs, context: any, info: GraphQLResolveInfo) {
         const select = Object.keys(graphqlFields(info));
-        const order = orderBy ? { [orderBy.split('_')[0]]: orderBy.split('_')[1] as 'ASC' | 'DESC' } : undefined;
+        const order = orderBy ? this.inputs.orderBy.parse(orderBy) : undefined;
         return await this.model.find({ ...where }, select, order, skip, limit);
     }
 
