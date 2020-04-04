@@ -1,4 +1,5 @@
 import { ObjectDefinitionBlock, intArg } from 'nexus/dist/core';
+import * as flat from 'flat';
 import * as pluralize from 'pluralize';
 import * as graphqlFields from 'graphql-fields';
 import { Model, CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy, Type } from './types';
@@ -118,7 +119,7 @@ export class CRUD {
     private async find(root: any, { where, orderBy, skip, limit }: FindArgs, context: any, info: GraphQLResolveInfo) {
         return await this.model.find(
             this.inputs.where.parse(where),
-            Object.keys(graphqlFields(info)),
+            Object.keys(flat(graphqlFields(info))),
             this.inputs.orderBy.parse(orderBy),
             skip,
             limit,
