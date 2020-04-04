@@ -1,6 +1,7 @@
 datasource:
     type: 'sqlite'
     database: 'databse.sqlite'
+    logging: true
     # https://github.com/typeorm/typeorm/blob/master/docs/caching.md
     cache:
         duration: 30000 # 30 seconds

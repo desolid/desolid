@@ -4,29 +4,6 @@ extend enum UserGroup {
 }
 
 """
-This is a description of a User
-"""
-type User
-    @model
-    @authorization(
-        READ: "$user.group = Editor || $user.id = $this.id"
-        CREATE: "true"
-        UPDATE: "$user.group = Editor || $user.id = $this.id"
-        DELETE: "$user.group = Editor || $user.id = $this.id"
-    ) {
-    id: ID!
-    createdAt: DateTime! @createdAt
-    updatedAt: DateTime! @updatedAt
-    email: EmailAddress! @unique
-    phone: PhoneNumber @unique
-    password: Password! @validation(length: { min: 12, max: 25 })
-    group: UserGroup!
-    name: String!
-    family: String!
-    avatar: File @upload(accept: "imagee/*", size: { max: "5MB", min: "10KB" })
-}
-
-"""
 This is a description of a Post
 """
 type Post
@@ -44,7 +21,7 @@ type Post
     title: String!
     content: String!
     published: Boolean! @default(value: false) @authorization(READ: "$user.group in [Editor, Author]")
-    categories: [Category]! @relation(type: "many-to-many")
+    categories: [Category] @relation(type: "many-to-many")
 }
 
 """
@@ -62,5 +39,5 @@ type Category
     createdAt: DateTime! @createdAt
     updatedAt: DateTime! @updatedAt
     name: String!
-    posts: [Post]! @relation(type: "many-to-many")
+    posts: [Post] @relation(type: "many-to-many")
 }

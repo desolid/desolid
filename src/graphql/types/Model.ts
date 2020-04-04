@@ -41,15 +41,15 @@ export class Model extends Type {
     }
 
     public async find(
-        select: string[],
         where: any,
+        select: any[],
         order: {
             [x: string]: 'ASC' | 'DESC' | 1 | -1;
         },
         skip: number,
         limit: number,
     ) {
-        return this.repository.find({ where, select: select as any, skip, order, take: limit });
+        return this.repository.find({ where, select, skip, take: limit, order });
     }
     public async findOne(select: string[], where: any) {
         return this.repository.findOne(where, { select: select as any });

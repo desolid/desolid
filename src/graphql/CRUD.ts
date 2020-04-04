@@ -40,7 +40,7 @@ export class CRUD {
         t.list.field(pluralize(this.model.name.toLowerCase()), {
             type: this.model,
             args: {
-                where: this.inputs.where.toArg(true),
+                where: this.inputs.where.toArg(false),
                 orderBy: this.inputs.orderBy,
                 skip: intArg(),
                 limit: intArg(),
@@ -116,9 +116,13 @@ export class CRUD {
     }
 
     private async find(root: any, { where, orderBy, skip, limit }: FindArgs, context: any, info: GraphQLResolveInfo) {
-        const select = Object.keys(graphqlFields(info));
-        const order = orderBy ? this.inputs.orderBy.parse(orderBy) : undefined;
-        return await this.model.find({ ...where }, select, order, skip, limit);
+        return await this.model.find(
+            this.inputs.where.parse(where),
+            Object.keys(graphqlFields(info)),
+            this.inputs.orderBy.parse(orderBy),
+            skip,
+            limit,
+        );
     }
 
     private async findOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {

@@ -9,6 +9,9 @@ export class OrderBy extends Enum {
         ]);
     }
     public parse(value: string) {
-        return { [value.split('_')[0]]: value.split('_')[1] as 'ASC' | 'DESC' };
+        if (value) {
+            const [field, sort] = value.split('_');
+            return { [field]: sort as 'ASC' | 'DESC' };
+        }
     }
 }

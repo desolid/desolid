@@ -12,6 +12,7 @@ enum UserGroup {
     """
     User
 }
+
 type File @model {
     id: ID!
     createdAt: DateTime! @createdAt
@@ -19,4 +20,27 @@ type File @model {
     name: String!
     mimeType: String!
     path: String! @unique
+}
+
+"""
+This is a description of a User
+"""
+type User
+    @model
+    @authorization(
+        READ: "$user.group = Editor || $user.id = $this.id"
+        CREATE: "true"
+        UPDATE: "$user.group = Editor || $user.id = $this.id"
+        DELETE: "$user.group = Editor || $user.id = $this.id"
+    ) {
+    id: ID!
+    createdAt: DateTime! @createdAt
+    updatedAt: DateTime! @updatedAt
+    email: EmailAddress! @unique
+    phone: PhoneNumber @unique
+    password: Password! @validation(length: { min: 12, max: 25 })
+    group: UserGroup!
+    name: String!
+    family: String!
+    avatar: File @upload(accept: "imagee/*", size: { max: "5MB", min: "10KB" })
 }
