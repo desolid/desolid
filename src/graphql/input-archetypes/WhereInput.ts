@@ -1,7 +1,8 @@
 import { Input } from '.';
 import { FieldDefinition } from '..';
 import { NexusInputFieldConfig } from 'nexus/dist/core';
-import { searchableScalars, DesolidObjectTypeDef } from '../../schema';
+import { searchableScalars as stringScalars, DesolidObjectTypeDef } from '../../schema';
+import { WhereOptions, Op } from 'sequelize';
 
 /**
  * @todo include all possibe where operators
@@ -20,58 +21,33 @@ export class WhereInput extends Input {
         }, this.booleanOperatorFields);
     }
 
-    public parse(value: any): Object {
+    public parse(value: any) {
         if (!value) return;
-        return new Object((qb) => {
-            for (let [fieldOperator, operand] of Object.entries<any>(value)) {
-                switch (fieldOperator) {
-                    case 'OR':
-                        (operand as any[]).forEach((item) => qb.orWhere(this.parse(item)));
-                        break;
-                    default:
-                        const [field, operator] = fieldOperator.split('_');
-                        switch (operator) {
-                            case 'in':
-                                qb.andWhere(`${field} IN (:...operand)`, { operand });
-                                break;
-                            case 'not_in':
-                                qb.andWhere(`${field} NOT IN (:...operand)`, { operand });
-                                break;
-                            case 'not':
-                                qb.andWhere(`${field} != :operand`, { operand });
-                                break;
-                            case 'lt':
-                                qb.andWhere(`${field} < :operand`, { operand });
-                                break;
-                            case 'lte':
-                                qb.andWhere(`${field} <= :operand`, { operand });
-                                break;
-                            case 'gt':
-                                qb.andWhere(`${field} > :operand`, { operand });
-                                break;
-                            case 'gte':
-                                qb.andWhere(`${field} >= :operand`, { operand });
-                                break;
-                            case 'like':
-                                qb.andWhere(`${field} LIKE :operand`, { operand });
-                                break;
-                            case 'not_like':
-                                qb.andWhere(`${field} NOT LIKE :operand`, { operand });
-                                break;
-                            case 'is_null':
-                                if (operand) {
-                                    qb.andWhere(`${field} IS NULL`);
-                                } else {
-                                    qb.andWhere(`${field} IS NOT NULL`);
-                                }
-                                break;
-                            default:
-                                qb.andWhere(`${field} = :operand`, { operand });
-                                break;
-                        }
-                }
+        const expressions: WhereOptions[] = [];
+        for (let [fieldOperator, operand] of Object.entries<any>(value)) {
+            switch (fieldOperator) {
+                case 'OR':
+                    (operand as any[]).forEach((item) => expressions.push(this.parse(item)));
+                    break;
+                default:
+                    const [field, operator] = fieldOperator.split('_');
+                    let expression;
+                    switch (operator) {
+                        case 'isNull':
+                            if (operand) {
+                                expression = { [field]: { [Op.is]: null } };
+                            } else {
+                                expression = { [field]: { [Op.not]: null } };
+                            }
+                            break;
+                        default:
+                            expression = { [field]: { [Op[operator]]: operand } };
+                            break;
+                    }
+                    expressions.push(expression);
             }
-        });
+        }
+        return { [Op.and]: expressions } as WhereOptions;
     }
 
     protected configField(field: FieldDefinition): NexusInputFieldConfig<string, string> {
@@ -93,7 +69,7 @@ export class WhereInput extends Input {
 
     private genrateFieldOperators(field: FieldDefinition) {
         const fields = [field];
-        ['in', 'not_in'].forEach((operator) => {
+        ['in', 'notIn'].forEach((operator) => {
             fields.push({
                 name: `${field.name}_${operator}`,
                 type: field.type,
@@ -101,19 +77,19 @@ export class WhereInput extends Input {
                 config: { nullable: true, list: [true] },
             } as FieldDefinition);
         });
-        const scalarOperators = ['not'];
-        if (searchableScalars.indexOf(field.type) >= 0) {
-            scalarOperators.push('like', 'not_like');
+        const scalarOperators = ['eq', 'ne'];
+        if (stringScalars.indexOf(field.type) >= 0) {
+            scalarOperators.push('startsWith', 'endsWith', 'substring');
         } else if (field.type != 'ID') {
             scalarOperators.push('lt', 'lte', 'gt', 'gte');
         }
         if (field.config.nullable) {
-            scalarOperators.push('is_null');
+            scalarOperators.push('isNull');
         }
         scalarOperators.forEach((operator) => {
             fields.push({
                 name: `${field.name}_${operator}`,
-                type: operator != 'is_null' ? field.type : 'Boolean',
+                type: operator != 'isNull' ? field.type : 'Boolean',
                 isScalar: field.isScalar,
                 config: { nullable: true },
             } as FieldDefinition);

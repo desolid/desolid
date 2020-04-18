@@ -54,7 +54,7 @@ export class DesolidObjectTypeDef extends NexusObjectTypeDef<string> {
     fields: FieldDefinition[] = undefined;
     directives: { [key in ModelDirectives]: any } = {} as any;
     // Will set on the database constructor
-    model: ModelCtor<any> = undefined;
+    datasource: ModelCtor<any> = undefined;
 
     constructor(public schema: Schema, private readonly definition: ObjectTypeDefinitionNode) {
         super(definition.name.value, undefined);

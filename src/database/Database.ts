@@ -24,7 +24,7 @@ export class Database {
         this.connection = new Sequelize(this.config);
         modelTypeDefs.forEach((typeDef: DesolidObjectTypeDef) => {
             const definition = new ModelDefinition(typeDef);
-            typeDef.model = this.connection.define(definition.name, definition.attributes, definition.options) as ModelCtor<any>;
+            typeDef.datasource = this.connection.define(definition.name, definition.attributes, definition.options) as ModelCtor<any>;
             this.modelDefinitions.push(definition);
         });
         this.modelDefinitions.forEach((definition) => {
@@ -37,6 +37,7 @@ export class Database {
     }
 
     public async start() {
-        await this.connection.authenticate();
+        await this.connection.sync();
+
     }
 }

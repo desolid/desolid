@@ -118,20 +118,20 @@ export class ModelDefinition {
             const right = models[relation.with];
             switch (relation.type) {
                 case 'one-to-one':
-                    left.hasOne(right);
-                    right.hasOne(left);
+                    left.hasOne(right, { constraints: false });
+                    right.hasOne(left, { constraints: false });
                     break;
                 case 'one-to-many':
-                    left.hasOne(right);
-                    right.belongsTo(left);
+                    left.hasOne(right, { constraints: false });
+                    right.belongsTo(left, { constraints: false });
                     break;
                 case 'many-to-one':
-                    left.belongsTo(right);
-                    right.hasOne(left);
+                    left.belongsTo(right, { constraints: false });
+                    right.hasOne(left, { constraints: false });
                     break;
                 case 'many-to-many':
-                    left.hasMany(right);
-                    right.hasMany(left);
+                    left.hasMany(right, { constraints: false });
+                    right.hasMany(left, { constraints: false });
                     break;
             }
         });
