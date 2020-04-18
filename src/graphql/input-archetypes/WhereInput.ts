@@ -1,19 +1,18 @@
-import { Brackets, WhereExpression } from 'typeorm';
-import { Model, Input } from '.';
+import { Input } from '.';
 import { FieldDefinition } from '..';
 import { NexusInputFieldConfig } from 'nexus/dist/core';
-import { searchableScalars } from '../scalars';
+import { searchableScalars, DesolidObjectTypeDef } from '../../schema';
 
 /**
  * @todo include all possibe where operators
  */
 export class WhereInput extends Input {
-    constructor(model: Model) {
+    constructor(model: DesolidObjectTypeDef) {
         super(model, `${model.name}WhereInput`);
     }
 
     public get fields() {
-        return this.model.definition.fields.reduce((output, field) => {
+        return this.model.fields.reduce((output, field) => {
             if (field.isScalar) {
                 output.push(...this.genrateFieldOperators(field));
             }
@@ -21,9 +20,9 @@ export class WhereInput extends Input {
         }, this.booleanOperatorFields);
     }
 
-    public parse(value: any): Brackets {
+    public parse(value: any): Object {
         if (!value) return;
-        return new Brackets((qb) => {
+        return new Object((qb) => {
             for (let [fieldOperator, operand] of Object.entries<any>(value)) {
                 switch (fieldOperator) {
                     case 'OR':

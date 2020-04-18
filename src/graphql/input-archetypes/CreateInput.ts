@@ -1,15 +1,16 @@
 import { NexusInputFieldConfig } from 'nexus/dist/core';
-import { Input, Model } from '.';
+import { Input } from '.';
 import { FieldDefinition } from '..';
+import { DesolidObjectTypeDef } from '../../schema';
 
 export class CreateInput extends Input {
-    constructor(protected readonly model: Model) {
+    constructor(protected readonly model: DesolidObjectTypeDef) {
         super(model, `${model.name}CreateInput`);
     }
 
     public get fields() {
         // remove auto fill fields
-        return this.model.definition.fields.filter(
+        return this.model.fields.filter(
             (field) => !field.directives.createdAt && !field.directives.updatedAt,
         );
     }

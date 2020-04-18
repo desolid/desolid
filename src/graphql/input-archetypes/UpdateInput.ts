@@ -1,15 +1,15 @@
 import { NexusInputFieldConfig } from 'nexus/dist/core';
-import { Input, Model } from '.';
-import { Schema, FieldDefinition } from '..';
+import { Input } from '.';
+import { DesolidObjectTypeDef, FieldDefinition } from '../../schema';
 
 export class UpdateInput extends Input {
-    constructor(model: Model) {
+    constructor(model: DesolidObjectTypeDef) {
         super(model, `${model.name}UpdateInput`);
     }
 
     public get fields() {
         // remove forbidden fields
-        return this.model.definition.fields.filter(
+        return this.model.fields.filter(
             (field) => field.type != 'ID' && !field.directives.createdAt && !field.directives.updatedAt,
         );
     }

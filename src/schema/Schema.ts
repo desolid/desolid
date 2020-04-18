@@ -1,15 +1,18 @@
-import { NexusScalarTypeDef, NexusEnumTypeDef, scalarType, enumType, NexusInputObjectTypeDef } from 'nexus/dist/core';
+import { NexusScalarTypeDef, NexusEnumTypeDef, enumType, NexusInputObjectTypeDef } from 'nexus/dist/core';
 import * as path from 'path';
 import gql from 'graphql-tag';
 import { readFileSync } from 'fs-extra';
 import { TypeDefinitionNode, EnumTypeExtensionNode } from 'graphql';
-import { Model, Type, TypeDefinition, scalars } from '.';
+import { DesolidObjectTypeDef, scalars } from '.';
 
-type NexusTypeDef = Type | NexusScalarTypeDef<string> | NexusEnumTypeDef<string> | NexusInputObjectTypeDef<string>;
+type TypeDef =
+    | DesolidObjectTypeDef
+    | NexusScalarTypeDef<string>
+    | NexusEnumTypeDef<string>
+    | NexusInputObjectTypeDef<string>;
 
 export class Schema {
-    public readonly dictionary = new Map<string, NexusTypeDef>();
-    public readonly models: Model[] = [];
+    public readonly dictionary = new Map<string, TypeDef>();
     /**
      * @param root root desolid directory
      */
@@ -18,15 +21,21 @@ export class Schema {
         this.import(path.join(__dirname, 'primitives.graphql'));
         this.import(`${root}/schema.graphql`);
     }
+
+    public get models() {
+        return [...this.dictionary.values()].filter((typeDef: DesolidObjectTypeDef) => typeDef.isModel) as DesolidObjectTypeDef[];
+    }
+
     private import(filePath: string) {
         const { definitions } = gql(readFileSync(filePath, { encoding: 'utf8' }));
         definitions.forEach((definition) => this.importTypeDef(definition as TypeDefinitionNode));
     }
+
     private importTypeDef(definition: TypeDefinitionNode | EnumTypeExtensionNode) {
         if (this.dictionary.get(definition.name.value) && definition.kind != 'EnumTypeExtension') {
             throw new Error(`Conflict on "${definition.name.value}" !`);
         }
-        let entity: NexusTypeDef;
+        let entity: TypeDef;
         switch (definition.kind) {
             case 'ScalarTypeDefinition':
                 throw new Error(`Scalar Difinition ("${definition.name.value}") Forbidden !`);
@@ -43,13 +52,7 @@ export class Schema {
                 (base.value.members as string[]).push(...definition.values.map((item) => item.name.value));
                 return;
             case 'ObjectTypeDefinition':
-                const typeDef = new TypeDefinition(definition);
-                if (typeDef.directives.model) {
-                    entity = new Model(typeDef, this);
-                    this.models.push(entity as Model);
-                } else {
-                    entity = new Type(typeDef, this);
-                }
+                entity = new DesolidObjectTypeDef(this, definition);
         }
         this.dictionary.set(entity.name, entity);
         return entity;

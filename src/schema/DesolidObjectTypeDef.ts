@@ -1,8 +1,8 @@
 import { ObjectTypeDefinitionNode, StringValueNode, DirectiveNode, FieldDefinitionNode, TypeNode } from 'graphql';
-import { FieldOutConfig } from 'nexus/dist/core';
-import { Scalar } from '.';
+import { FieldOutConfig, NexusObjectTypeDef, NexusObjectTypeConfig, ObjectDefinitionBlock } from 'nexus/dist/core';
+import { Scalar, Schema } from '../graphql';
 import { scalarTypes } from './scalars';
-import { ColumnType } from 'typeorm';
+import { DataType, ModelCtor } from 'sequelize/types';
 
 export type FieldType = Scalar | 'Enum' | 'Object' | 'Relation';
 export type ModelDirectives = 'model' | 'authorization';
@@ -20,29 +20,57 @@ export interface DirectiveDefinition {
     name: string;
     arguments: { [key: string]: any };
 }
+
 export interface FieldDefinition {
     name: string;
     type: FieldType;
-    databaseType?: ColumnType;
+    databaseType?: DataType;
     isScalar: boolean;
     description: string;
     directives: { [key in FieldDirectives]: any };
     config: FieldOutConfig<any, any>;
 }
 
-export class TypeDefinition {
+class DesolidObjectTypeConfig implements NexusObjectTypeConfig<string> {
     name: string;
     description: string;
+    constructor(private typedef: DesolidObjectTypeDef) {
+        this.name = typedef.name;
+        this.description = typedef.description;
+    }
+    public definition(t: ObjectDefinitionBlock<string>) {
+        this.typedef.fields.forEach((field) => {
+            const type = this.typedef.schema.dictionary.get(field.type);
+            t.field(field.name, {
+                ...field.config,
+                type: type || field.type,
+            } as FieldOutConfig<any, any>);
+        });
+    }
+}
+
+export class DesolidObjectTypeDef extends NexusObjectTypeDef<string> {
+    config = new DesolidObjectTypeConfig(this);
+    fields: FieldDefinition[] = undefined;
     directives: { [key in ModelDirectives]: any } = {} as any;
-    fields: FieldDefinition[];
-    constructor(definition: ObjectTypeDefinitionNode) {
-        this.name = definition.name.value;
-        this.description = definition.description?.value;
+    // Will set on the database constructor
+    model: ModelCtor<any> = undefined;
+
+    constructor(public schema: Schema, private readonly definition: ObjectTypeDefinitionNode) {
+        super(definition.name.value, undefined);
         this.fields = definition.fields.map((field) => this.createField(field));
         definition.directives.forEach((item) => {
             const directive = this.createDirective(item);
             this.directives[directive.name] = directive.arguments;
         });
+    }
+
+    public get description() {
+        return this.definition.description?.value;
+    }
+
+    public get isModel() {
+        return this.directives.model ? true : false;
     }
 
     private createDirective(directive: DirectiveNode): DirectiveDefinition {

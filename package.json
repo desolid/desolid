@@ -1,39 +1,39 @@
 {
-  "version": "0.0.1",
-  "name": "desolid",
-  "repository": "git@github.com:desolid/desolid.git",
-  "author": "Sajjad Shirazy <shirazy.sajjad@gmail.com>",
-  "license": "MIT",
-  "scripts": {
-    "start": "ts-node src/server.ts",
-    "dev": "nodemon -e ts -w ./src -x npm start",
-    "build": "tsc -d",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "release:patch": "standard-version && git push --tags",
-    "release:minor": "standard-version --release-as minor && git push --tags",
-    "release:major": "standard-version --release-as major && git push --tags"
-  },
-  "devDependencies": {
-    "@types/fs-extra": "^8.1.0",
-    "nodemon": "^2.0.2",
-    "prettier": "^1.19.1",
-    "standard-version": "^7.1.0",
-    "ts-node": "^7.0.1",
-    "typescript": "^3.0.1"
-  },
-  "dependencies": {
-    "flat": "^5.0.0",
-    "fs-extra": "^8.1.0",
-    "graphql": "^14.6.0",
-    "graphql-fields": "^2.0.3",
-    "graphql-scalars": "^1.0.7",
-    "graphql-tag": "^2.10.3",
-    "graphql-upload": "^10.0.0",
-    "graphql-yoga": "^1.18.3",
-    "js-yaml": "^3.13.1",
-    "nexus": "^0.12.0-rc.13",
-    "pluralize": "^8.0.0",
-    "sqlite3": "^4.1.1",
-    "typeorm": "^0.2.24"
-  }
+    "version": "0.0.1",
+    "name": "desolid",
+    "repository": "git@github.com:desolid/desolid.git",
+    "author": "Sajjad Shirazy <shirazy.sajjad@gmail.com>",
+    "license": "MIT",
+    "scripts": {
+        "start": "ts-node src/server.ts",
+        "dev": "nodemon -e ts -w ./src -x npm start",
+        "build": "tsc -d",
+        "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+        "release:patch": "standard-version && git push --tags",
+        "release:minor": "standard-version --release-as minor && git push --tags",
+        "release:major": "standard-version --release-as major && git push --tags"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^8.1.0",
+        "nodemon": "^2.0.2",
+        "prettier": "^1.19.1",
+        "standard-version": "^7.1.0",
+        "ts-node": "^7.0.1",
+        "typescript": "^3.8.3"
+    },
+    "dependencies": {
+        "flat": "^5.0.0",
+        "fs-extra": "^8.1.0",
+        "graphql": "^14.6.0",
+        "graphql-fields": "^2.0.3",
+        "graphql-scalars": "^1.0.7",
+        "graphql-tag": "^2.10.3",
+        "graphql-upload": "^10.0.0",
+        "graphql-yoga": "^1.18.3",
+        "js-yaml": "^3.13.1",
+        "nexus": "^0.12.0-rc.13",
+        "pluralize": "^8.0.0",
+        "sequelize": "^5.21.6",
+        "sqlite3": "^4.1.1"
+    }
 }

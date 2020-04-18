@@ -1,14 +1,14 @@
-import { Input, Model } from '.';
-import { FieldDefinition } from '../TypeDefinition';
+import { Input } from '.';
+import { FieldDefinition, DesolidObjectTypeDef } from '../../schema';
 import { NexusInputFieldConfig } from 'nexus/dist/core';
 
 export class WhereUniqueInput extends Input {
-    constructor(model: Model) {
+    constructor(model: DesolidObjectTypeDef) {
         super(model, `${model.name}WhereUniqueInput`);
     }
     public get fields() {
         // only ID & unique fields
-        return this.model.definition.fields.filter((field) => field.type == 'ID' || field.directives.unique);
+        return this.model.fields.filter((field) => field.type == 'ID' || field.directives.unique);
     }
     protected configField(field: FieldDefinition): NexusInputFieldConfig<string, string> {
         return {
