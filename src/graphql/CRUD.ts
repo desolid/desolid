@@ -14,7 +14,7 @@ import { Includeable } from 'sequelize/types';
 export interface FindArgs {
     where: any;
     orderBy: string;
-    skip: number;
+    offset: number;
     limit: number;
 }
 
@@ -59,7 +59,7 @@ export class CRUD {
             args: {
                 where: this.inputs.where.toArg(false),
                 orderBy: this.inputs.orderBy,
-                skip: intArg(),
+                offset: intArg(),
                 limit: intArg(),
             },
             resolve: this.find.bind(this),
@@ -106,7 +106,7 @@ export class CRUD {
     }
 
     /**
-     * 
+     *
      * @param fields
      * @todo handle where on relations: https://stackoverflow.com/a/36391912/2179157
      */
@@ -135,7 +135,11 @@ export class CRUD {
 
     private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        // return this.model.createOne({ ...data });
+        const record = await this.model.datasource.create(data);
+        return this.model.datasource.findByPk(record[this.model.datasource.primaryKeyAttribute], {
+            attributes,
+            include,
+        });
     }
 
     private async createMany(root: any, { data }: { data: any[] }, context: any, info: GraphQLResolveInfo) {
@@ -166,20 +170,24 @@ export class CRUD {
         // return { count: await this.model.delete(where) };
     }
 
-    private async find(root: any, { where, orderBy, skip, limit }: FindArgs, context: any, info: GraphQLResolveInfo) {
+    private async find(root: any, { where, orderBy, offset, limit }: FindArgs, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        return await this.model.datasource.findAll({
-            attributes,
+        return this.model.datasource.findAll({
             where: this.inputs.where.parse(where),
             order: this.inputs.orderBy.parse(orderBy),
-            limit,
-            offset: skip,
+            attributes,
             include,
+            limit,
+            offset,
         });
     }
 
     private async findOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        // return await this.model.findOne(select, { ...where });
+        return this.model.datasource.findOne({
+            where: this.inputs.where.parse(where),
+            attributes,
+            include,
+        });
     }
 }
