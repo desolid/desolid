@@ -1,6 +1,6 @@
 import Desolid from './Desolid';
 
-(async function() {
+async function main() {
     // try {
     const desolid = new Desolid('./test');
     await desolid.start();
@@ -8,4 +8,6 @@ import Desolid from './Desolid';
     //     console.log(error);
     //     throw error;
     // }
-})();
+};
+
+main();

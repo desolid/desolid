@@ -16,7 +16,7 @@ export class GraphQLAPI {
 
     constructor(protected config: GraphQLAPIConfig, modelTypeDefs: DesolidObjectTypeDef[]) {
         modelTypeDefs.forEach((typeDef: DesolidObjectTypeDef) => {
-            this.cruds[typeDef.name] = new CRUD(typeDef);
+            this.cruds.set(typeDef.name, new CRUD(typeDef));
         });
     }
 
@@ -24,10 +24,10 @@ export class GraphQLAPI {
         return makeSchema({
             types: [
                 queryType({
-                    definition: (t) => this.cruds.forEach(crud => crud.generateQuery(t)),
+                    definition: (t) => this.cruds.forEach((crud) => crud.generateQuery(t)),
                 }),
                 mutationType({
-                    definition: (t) => this.cruds.forEach(crud => crud.generateMutation(t)),
+                    definition: (t) => this.cruds.forEach((crud) => crud.generateMutation(t)),
                 }),
             ],
             outputs,
@@ -35,12 +35,11 @@ export class GraphQLAPI {
     }
 
     public async start() {
-        this.server = new GraphQLServer({
-            schema: this.generateSchema({
-                // typegen: __dirname + '/generated/typings.ts',
-                // schema: __dirname + '/generated/schema.graphql',
-            }),
+        const schema = this.generateSchema({
+            // typegen: __dirname + '/generated/typings.ts',
+            // schema: __dirname + '/generated/schema.graphql',
         });
+        this.server = new GraphQLServer({ schema });
         await this.server.start({
             port: process.env.PORT || this.config.port || 3000,
         });
