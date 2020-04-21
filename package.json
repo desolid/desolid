@@ -9,12 +9,13 @@
         "dev": "nodemon -e ts -w ./src -x npm start",
         "build": "tsc -d",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-        "release:patch": "standard-version && git push --tags",
-        "release:minor": "standard-version --release-as minor && git push --tags",
-        "release:major": "standard-version --release-as major && git push --tags"
+        "release:patch": "standard-version --release-as patch && git push && git push --tags",
+        "release:minor": "standard-version --release-as minor && git push && git push --tags",
+        "release:major": "standard-version --release-as major && git push && git push --tags"
     },
     "devDependencies": {
         "@types/fs-extra": "^8.1.0",
+        "@types/lodash": "^4.14.150",
         "nodemon": "^2.0.2",
         "prettier": "^1.19.1",
         "standard-version": "^7.1.0",
@@ -30,6 +31,7 @@
         "graphql-upload": "^10.0.0",
         "graphql-yoga": "^1.18.3",
         "js-yaml": "^3.13.1",
+        "lodash": "^4.17.15",
         "nexus": "^0.12.0-rc.13",
         "pluralize": "^8.0.0",
         "sequelize": "^5.21.6",

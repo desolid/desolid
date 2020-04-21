@@ -1,4 +1,3 @@
-import { DesolidObjectTypeDef, FieldDefinition } from '../schema';
 import {
     ModelAttributes,
     ModelAttributeColumnOptions,
@@ -12,13 +11,10 @@ import {
     DATE,
     ModelCtor,
 } from 'sequelize';
-
-export type RelationType = 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many';
+import { TypeDefinition, FieldDefinition } from '../schema';
 
 export class ModelDefinition {
-    private relations: { with: string; type: RelationType }[] = [];
-
-    constructor(private typeDef: DesolidObjectTypeDef) {}
+    constructor(private typeDef: TypeDefinition) {}
 
     public get name() {
         return this.typeDef.name;
@@ -84,15 +80,11 @@ export class ModelDefinition {
                     break;
             }
         } else {
-            const ref = this.typeDef.schema.dictionary.get(field.type) as DesolidObjectTypeDef;
-            switch (ref.constructor.name) {
+            const ref = field.type as TypeDefinition;
+            switch (field.type.constructor.name) {
                 case 'DesolidObjectTypeDef':
                     if (ref.isModel) {
-                        this.relations.push({
-                            with: ref.name,
-                            type: field.directives.relation?.type || field.config.list ? 'one-to-many' : 'one-to-one',
-                        });
-                        return undefined;
+                        return;
                     } else {
                         column.type = JSON;
                     }
@@ -114,24 +106,20 @@ export class ModelDefinition {
 
     public associate(models: { [key: string]: ModelCtor<any> }) {
         const left = models[this.name];
-        this.relations.forEach((relation) => {
-            const right = models[relation.with];
+        this.typeDef.relations.forEach(({ relation, name }) => {
+            const right = models[relation.model.name];
             switch (relation.type) {
                 case 'one-to-one':
-                    left.hasOne(right, { constraints: false });
-                    right.hasOne(left, { constraints: false });
+                    left.hasOne(right, { as: name, constraints: false });
                     break;
                 case 'one-to-many':
-                    left.hasOne(right, { constraints: false });
-                    right.belongsTo(left, { constraints: false });
+                    left.hasOne(right, { as: name, constraints: false });
                     break;
                 case 'many-to-one':
-                    left.belongsTo(right, { constraints: false });
-                    right.hasOne(left, { constraints: false });
+                    left.belongsTo(right, { as: name, constraints: false });
                     break;
                 case 'many-to-many':
-                    left.hasMany(right, { constraints: false });
-                    right.hasMany(left, { constraints: false });
+                    left.hasMany(right, { as: name, constraints: false });
                     break;
             }
         });

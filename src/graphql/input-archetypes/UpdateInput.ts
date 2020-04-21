@@ -1,9 +1,9 @@
 import { NexusInputFieldConfig } from 'nexus/dist/core';
 import { Input } from '.';
-import { DesolidObjectTypeDef, FieldDefinition } from '../../schema';
+import { TypeDefinition, FieldDefinition } from '../../schema';
 
 export class UpdateInput extends Input {
-    constructor(model: DesolidObjectTypeDef) {
+    constructor(model: TypeDefinition) {
         super(model, `${model.name}UpdateInput`);
     }
 

@@ -1,10 +1,9 @@
 import { NexusInputFieldConfig } from 'nexus/dist/core';
+import { TypeDefinition,FieldDefinition } from 'src/schema';
 import { Input } from '.';
-import { FieldDefinition } from '..';
-import { DesolidObjectTypeDef } from '../../schema';
 
 export class CreateInput extends Input {
-    constructor(protected readonly model: DesolidObjectTypeDef) {
+    constructor(protected readonly model: TypeDefinition) {
         super(model, `${model.name}CreateInput`);
     }
 

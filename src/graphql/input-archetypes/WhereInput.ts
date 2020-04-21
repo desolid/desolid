@@ -1,14 +1,13 @@
 import { Input } from '.';
-import { FieldDefinition } from '..';
 import { NexusInputFieldConfig } from 'nexus/dist/core';
-import { searchableScalars as stringScalars, DesolidObjectTypeDef } from '../../schema';
+import { TypeDefinition, FieldDefinition } from 'src/schema';
 import { WhereOptions, Op } from 'sequelize';
 
 /**
  * @todo include all possibe where operators
  */
 export class WhereInput extends Input {
-    constructor(model: DesolidObjectTypeDef) {
+    constructor(model: TypeDefinition) {
         super(model, `${model.name}WhereInput`);
     }
 
@@ -77,16 +76,16 @@ export class WhereInput extends Input {
                 config: { nullable: true, list: [true] },
             } as FieldDefinition);
         });
-        const scalarOperators = ['eq', 'ne'];
-        if (stringScalars.indexOf(field.type) >= 0) {
-            scalarOperators.push('startsWith', 'endsWith', 'substring');
+        const operators = ['eq', 'ne'];
+        if (field.isString) {
+            operators.push('startsWith', 'endsWith', 'substring');
         } else if (field.type != 'ID') {
-            scalarOperators.push('lt', 'lte', 'gt', 'gte');
+            operators.push('lt', 'lte', 'gt', 'gte');
         }
         if (field.config.nullable) {
-            scalarOperators.push('isNull');
+            operators.push('isNull');
         }
-        scalarOperators.forEach((operator) => {
+        operators.forEach((operator) => {
             fields.push({
                 name: `${field.name}_${operator}`,
                 type: operator != 'isNull' ? field.type : 'Boolean',

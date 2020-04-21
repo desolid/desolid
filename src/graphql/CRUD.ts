@@ -2,7 +2,7 @@ import { ObjectDefinitionBlock, intArg } from 'nexus/dist/core';
 import { GraphQLResolveInfo } from 'graphql';
 import * as pluralize from 'pluralize';
 import { CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from './input-archetypes';
-import { DesolidObjectTypeDef } from '../schema';
+import { TypeDefinition } from '../schema';
 import {
     parseResolveInfo,
     simplifyParsedResolveInfoFragmentWithType,
@@ -40,7 +40,7 @@ export class CRUD {
         orderBy: OrderBy;
     } = {} as any;
 
-    constructor(private model: DesolidObjectTypeDef) {
+    constructor(private model: TypeDefinition) {
         this.inputs.create = new CreateInput(model);
         this.inputs.update = new UpdateInput(model);
         this.inputs.where = new WhereInput(model);
@@ -86,7 +86,7 @@ export class CRUD {
             resolve: this.updateOne.bind(this),
         });
         t.field(`updateMany${pluralize(this.model.name)}`, {
-            type: this.model.schema.dictionary.get('BatchPayload') as DesolidObjectTypeDef,
+            type: this.model.schema.dictionary.get('BatchPayload') as TypeDefinition,
             args: {
                 where: this.inputs.where.toArg(true),
                 data: this.inputs.update.toArg(true),
@@ -99,7 +99,7 @@ export class CRUD {
             resolve: this.deleteOne.bind(this),
         });
         t.field(`deleteMany${pluralize(this.model.name)}`, {
-            type: this.model.schema.dictionary.get('BatchPayload') as DesolidObjectTypeDef,
+            type: this.model.schema.dictionary.get('BatchPayload') as TypeDefinition,
             args: { where: this.inputs.where.toArg(true) },
             resolve: this.deleteMany.bind(this),
         });
@@ -116,7 +116,7 @@ export class CRUD {
         for (let [name, field] of Object.entries<SelectField>(fields)) {
             const [modelName] = Object.keys(field.fieldsByTypeName);
             if (modelName) {
-                const model = (this.model.schema.dictionary.get(modelName) as DesolidObjectTypeDef).datasource;
+                const model = (this.model.schema.dictionary.get(modelName) as TypeDefinition).datasource;
                 include.push({ model, ...this.parseSelectFields(field.fieldsByTypeName[modelName] as any) });
             } else {
                 attributes.push(name);
@@ -135,7 +135,8 @@ export class CRUD {
 
     private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        const record = await this.model.datasource.create(data);
+        // https://stackoverflow.com/a/49828917/2179157
+        const record = await this.model.datasource.create(data, { include });
         return this.model.datasource.findByPk(record[this.model.datasource.primaryKeyAttribute], {
             attributes,
             include,
@@ -184,10 +185,6 @@ export class CRUD {
 
     private async findOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        return this.model.datasource.findOne({
-            where: this.inputs.where.parse(where),
-            attributes,
-            include,
-        });
+        return this.model.datasource.findOne({ where, attributes, include });
     }
 }

@@ -122,7 +122,7 @@ scalars.push(
     }),
 );
 
-export const searchableScalars = [
+export const stringScalars = [
     // primitives
     'String',
     // standard scalars

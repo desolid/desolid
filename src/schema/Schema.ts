@@ -3,10 +3,10 @@ import * as path from 'path';
 import gql from 'graphql-tag';
 import { readFileSync } from 'fs-extra';
 import { TypeDefinitionNode, EnumTypeExtensionNode } from 'graphql';
-import { DesolidObjectTypeDef, scalars } from '.';
+import { TypeDefinition, scalars } from '.';
 
 type TypeDef =
-    | DesolidObjectTypeDef
+    | TypeDefinition
     | NexusScalarTypeDef<string>
     | NexusEnumTypeDef<string>
     | NexusInputObjectTypeDef<string>;
@@ -23,7 +23,7 @@ export class Schema {
     }
 
     public get models() {
-        return [...this.dictionary.values()].filter((typeDef: DesolidObjectTypeDef) => typeDef.isModel) as DesolidObjectTypeDef[];
+        return [...this.dictionary.values()].filter((typeDef: TypeDefinition) => typeDef.isModel) as TypeDefinition[];
     }
 
     private import(filePath: string) {
@@ -52,7 +52,7 @@ export class Schema {
                 (base.value.members as string[]).push(...definition.values.map((item) => item.name.value));
                 return;
             case 'ObjectTypeDefinition':
-                entity = new DesolidObjectTypeDef(this, definition);
+                entity = new TypeDefinition(this, definition);
         }
         this.dictionary.set(entity.name, entity);
         return entity;

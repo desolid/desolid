@@ -1,10 +1,7 @@
-import { makeSchema, queryType, mutationType, intArg } from 'nexus';
-import { ObjectDefinitionBlock } from 'nexus/dist/core';
+import { makeSchema, queryType, mutationType } from 'nexus';
 import { GraphQLServer } from 'graphql-yoga';
-import { Schema } from '.';
-import { OrderBy, Input, CreateInput, UpdateInput, WhereInput, WhereUniqueInput } from '.';
 import { CRUD } from './CRUD';
-import { DesolidObjectTypeDef } from '../schema';
+import { TypeDefinition } from 'src/schema';
 
 export interface GraphQLAPIConfig {
     port: number;
@@ -14,8 +11,8 @@ export class GraphQLAPI {
     private server: GraphQLServer;
     private cruds = new Map<string, CRUD>();
 
-    constructor(protected config: GraphQLAPIConfig, modelTypeDefs: DesolidObjectTypeDef[]) {
-        modelTypeDefs.forEach((typeDef: DesolidObjectTypeDef) => {
+    constructor(protected config: GraphQLAPIConfig, modelTypeDefs: TypeDefinition[]) {
+        modelTypeDefs.forEach((typeDef: TypeDefinition) => {
             this.cruds.set(typeDef.name, new CRUD(typeDef));
         });
     }

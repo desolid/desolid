@@ -1,9 +1,9 @@
 import { Enum } from '.';
-import { DesolidObjectTypeDef } from 'src/schema';
+import { TypeDefinition } from 'src/schema';
 import { Order } from 'sequelize';
 
 export class OrderBy extends Enum {
-    constructor(protected readonly model: DesolidObjectTypeDef) {
+    constructor(protected readonly model: TypeDefinition) {
         super(`${model.name}OrderBy`, [
             ...model.fields.map((field) => `${field.name}_ASC`),
             ...model.fields.map((field) => `${field.name}_DESC`),

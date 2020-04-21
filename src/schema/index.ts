@@ -1,3 +1,5 @@
 export * from './Schema';
 export * from './scalars';
-export * from './DesolidObjectTypeDef';
+export * from './TypeDefinition';
+export * from './FieldDefinition';
+export * from './DirectiveDefinition';

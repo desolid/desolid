@@ -12,7 +12,7 @@ import {
     JSON,
     ModelCtor,
 } from 'sequelize';
-import { Schema, DesolidObjectTypeDef } from '../schema';
+import { Schema, TypeDefinition } from '../schema';
 import { ModelDefinition } from './ModelDefinition';
 
 export type DatabaseConfig = Options;
@@ -20,9 +20,9 @@ export type DatabaseConfig = Options;
 export class Database {
     private readonly connection: Sequelize;
     private modelDefinitions: ModelDefinition[] = [];
-    constructor(protected config: DatabaseConfig, modelTypeDefs: DesolidObjectTypeDef[]) {
+    constructor(protected config: DatabaseConfig, modelTypeDefs: TypeDefinition[]) {
         this.connection = new Sequelize(this.config);
-        modelTypeDefs.forEach((typeDef: DesolidObjectTypeDef) => {
+        modelTypeDefs.forEach((typeDef: TypeDefinition) => {
             const definition = new ModelDefinition(typeDef);
             typeDef.datasource = this.connection.define(definition.name, definition.attributes, definition.options) as ModelCtor<any>;
             this.modelDefinitions.push(definition);
