@@ -5,14 +5,14 @@ import { readFileSync } from 'fs-extra';
 import { TypeDefinitionNode, EnumTypeExtensionNode } from 'graphql';
 import { TypeDefinition, scalars } from '.';
 
-type TypeDef =
+export type EntityDefinition =
     | TypeDefinition
     | NexusScalarTypeDef<string>
     | NexusEnumTypeDef<string>
     | NexusInputObjectTypeDef<string>;
 
 export class Schema {
-    public readonly dictionary = new Map<string, TypeDef>();
+    public readonly dictionary = new Map<string, EntityDefinition>();
     /**
      * @param root root desolid directory
      */
@@ -35,7 +35,7 @@ export class Schema {
         if (this.dictionary.get(definition.name.value) && definition.kind != 'EnumTypeExtension') {
             throw new Error(`Conflict on "${definition.name.value}" !`);
         }
-        let entity: TypeDef;
+        let entity: EntityDefinition;
         switch (definition.kind) {
             case 'ScalarTypeDefinition':
                 throw new Error(`Scalar Difinition ("${definition.name.value}") Forbidden !`);

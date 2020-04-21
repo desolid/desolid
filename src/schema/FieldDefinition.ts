@@ -2,9 +2,9 @@ import { FieldDefinitionNode, TypeNode } from 'graphql';
 import { FieldOutConfig } from 'nexus/dist/core';
 import { DataType } from 'sequelize/types';
 import * as _ from 'lodash';
-import { Scalar, DirectiveDefinition, scalarTypes, stringScalars, TypeDefinition } from '.';
+import { Scalar, DirectiveDefinition, scalarTypes, stringScalars, TypeDefinition, EntityDefinition } from '.';
 
-export type FieldType = Scalar | 'Enum' | 'Object' | 'Relation';
+export type FieldType = Scalar;
 
 export type FieldDirectives =
     | 'authorization'
@@ -47,12 +47,12 @@ export class FieldDefinition {
         if (this.isScalar) {
             return this._type;
         } else {
-            return this.owner.schema.dictionary.get(this._type) as TypeDefinition;
+            return this.owner.schema.dictionary.get(this._type as string) as TypeDefinition;
         }
     }
 
     public get isString() {
-        return stringScalars.indexOf(this._type) >= 0;
+        return stringScalars.indexOf(this._type as string) >= 0;
     }
 
     public get relation() {
