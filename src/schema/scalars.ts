@@ -1,7 +1,6 @@
-import { scalarType } from 'nexus';
 import { GraphQLUpload } from 'graphql-upload';
 import * as StandardScalars from 'graphql-scalars';
-import { NexusScalarTypeDef } from 'nexus/dist/core';
+import { NexusScalarTypeDef, scalarType } from '@nexus/schema/dist/core';
 
 export type Scalar =
     // primitives

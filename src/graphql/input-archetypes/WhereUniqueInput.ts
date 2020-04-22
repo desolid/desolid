@@ -1,6 +1,6 @@
 import { Input } from '.';
 import { FieldDefinition, TypeDefinition } from '../../schema';
-import { NexusInputFieldConfig } from 'nexus/dist/core';
+import { NexusInputFieldConfig } from '@nexus/schema/dist/core';
 
 export class WhereUniqueInput extends Input {
     constructor(model: TypeDefinition) {

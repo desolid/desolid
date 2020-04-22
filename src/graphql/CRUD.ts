@@ -1,4 +1,4 @@
-import { ObjectDefinitionBlock, intArg } from 'nexus/dist/core';
+import { ObjectDefinitionBlock, intArg } from '@nexus/schema/dist/core';
 import { GraphQLResolveInfo } from 'graphql';
 import * as pluralize from 'pluralize';
 import { CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from './input-archetypes';
@@ -86,7 +86,7 @@ export class CRUD {
             resolve: this.updateOne.bind(this),
         });
         t.field(`updateMany${pluralize(this.model.name)}`, {
-            type: this.model.schema.dictionary.get('BatchPayload') as TypeDefinition,
+            type: this.model.schema.get('BatchPayload'),
             args: {
                 where: this.inputs.where.toArg(true),
                 data: this.inputs.update.toArg(true),
@@ -99,7 +99,7 @@ export class CRUD {
             resolve: this.deleteOne.bind(this),
         });
         t.field(`deleteMany${pluralize(this.model.name)}`, {
-            type: this.model.schema.dictionary.get('BatchPayload') as TypeDefinition,
+            type: this.model.schema.get('BatchPayload'),
             args: { where: this.inputs.where.toArg(true) },
             resolve: this.deleteMany.bind(this),
         });
@@ -116,7 +116,7 @@ export class CRUD {
         for (let [name, field] of Object.entries<SelectField>(fields)) {
             const [modelName] = Object.keys(field.fieldsByTypeName);
             if (modelName) {
-                const model = (this.model.schema.dictionary.get(modelName) as TypeDefinition).datasource;
+                const model = this.model.schema.get(modelName).datasource;
                 include.push({ model, ...this.parseSelectFields(field.fieldsByTypeName[modelName] as any) });
             } else {
                 attributes.push(name);

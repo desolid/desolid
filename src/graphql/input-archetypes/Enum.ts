@@ -1,4 +1,4 @@
-import { NexusEnumTypeDef } from 'nexus/dist/core';
+import { NexusEnumTypeDef } from '@nexus/schema/dist/core';
 
 export class Enum extends NexusEnumTypeDef<string> {
     constructor(name: string, members: string[]) {

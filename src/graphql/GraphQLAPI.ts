@@ -1,7 +1,7 @@
-import { makeSchema, queryType, mutationType } from 'nexus';
+import { makeSchema, queryType, mutationType } from '@nexus/schema/dist/core';
 import { GraphQLServer } from 'graphql-yoga';
 import { CRUD } from './CRUD';
-import { TypeDefinition } from 'src/schema';
+import { TypeDefinition, scalars } from '../schema';
 
 export interface GraphQLAPIConfig {
     port: number;
@@ -20,6 +20,7 @@ export class GraphQLAPI {
     private generateSchema(outputs: any) {
         return makeSchema({
             types: [
+                ...scalars,
                 queryType({
                     definition: (t) => this.cruds.forEach((crud) => crud.generateQuery(t)),
                 }),

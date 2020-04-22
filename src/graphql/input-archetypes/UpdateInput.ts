@@ -1,4 +1,4 @@
-import { NexusInputFieldConfig } from 'nexus/dist/core';
+import { NexusInputFieldConfig } from '@nexus/schema/dist/core';
 import { Input } from '.';
 import { TypeDefinition, FieldDefinition } from '../../schema';
 

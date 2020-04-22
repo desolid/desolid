@@ -1,5 +1,5 @@
 import { FieldDefinitionNode, TypeNode } from 'graphql';
-import { FieldOutConfig } from 'nexus/dist/core';
+import { FieldOutConfig } from '@nexus/schema/dist/core';
 import { DataType } from 'sequelize/types';
 import * as _ from 'lodash';
 import { Scalar, DirectiveDefinition, scalarTypes, stringScalars, TypeDefinition, EntityDefinition } from '.';
@@ -36,7 +36,7 @@ export class FieldDefinition {
         this._type = encodedFieldType.replace(/[!\]]/g, '') as FieldType;
         this.name = definition.name.value;
         this.description = definition.description?.value;
-        this.isScalar = scalarTypes.indexOf(this.type as Scalar) >= 0;
+        this.isScalar = scalarTypes.indexOf(this._type as Scalar) >= 0;
         this.config = {
             nullable: !/!$/.test(encodedFieldType),
             list: list ? list.map((item) => /^!/.test(item)) : false,
@@ -47,7 +47,7 @@ export class FieldDefinition {
         if (this.isScalar) {
             return this._type;
         } else {
-            return this.owner.schema.dictionary.get(this._type as string) as TypeDefinition;
+            return this.owner.schema.get(this._type as string);
         }
     }
 
@@ -71,7 +71,7 @@ export class FieldDefinition {
             type = this.config.list ? 'many-to-many' : 'many-to-one';
         }
         return {
-            model: meOnTheRight.owner,
+            model: right,
             type,
         };
     }

@@ -1,4 +1,4 @@
-import { NexusScalarTypeDef, NexusEnumTypeDef, enumType, NexusInputObjectTypeDef } from 'nexus/dist/core';
+import { NexusScalarTypeDef, NexusEnumTypeDef, enumType, NexusInputObjectTypeDef } from '@nexus/schema/dist/core';
 import * as path from 'path';
 import gql from 'graphql-tag';
 import { readFileSync } from 'fs-extra';
@@ -24,6 +24,10 @@ export class Schema {
 
     public get models() {
         return [...this.dictionary.values()].filter((typeDef: TypeDefinition) => typeDef.isModel) as TypeDefinition[];
+    }
+
+    public get<T = TypeDefinition>(name: string) {
+        return (this.dictionary.get(name) as any) as T;
     }
 
     private import(filePath: string) {

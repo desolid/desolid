@@ -1,5 +1,5 @@
 import { ObjectTypeDefinitionNode } from 'graphql';
-import { FieldOutConfig, NexusObjectTypeDef, NexusObjectTypeConfig, ObjectDefinitionBlock } from 'nexus/dist/core';
+import { FieldOutConfig, NexusObjectTypeDef, NexusObjectTypeConfig, ObjectDefinitionBlock } from '@nexus/schema/dist/core';
 import { Schema, FieldDefinition, DirectiveDefinition } from '.';
 import { ModelCtor } from 'sequelize/types';
 

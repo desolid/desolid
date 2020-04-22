@@ -13,7 +13,7 @@ import {
 } from 'sequelize';
 import { TypeDefinition, FieldDefinition } from '../schema';
 
-export class ModelDefinition {
+export class Model {
     constructor(private typeDef: TypeDefinition) {}
 
     public get name() {
@@ -82,9 +82,16 @@ export class ModelDefinition {
         } else {
             const ref = field.type as TypeDefinition;
             switch (field.type.constructor.name) {
-                case 'DesolidObjectTypeDef':
+                case 'TypeDefinition':
                     if (ref.isModel) {
-                        return;
+                        if (field.config.list) {
+                            // A `one to many` or `many to many` relation
+                            return;
+                        } else {
+                            // The FOREIGN_KEY
+                            // A `one to one` or `many to one` relation
+                            column.type = INTEGER;
+                        }
                     } else {
                         column.type = JSON;
                     }
@@ -104,22 +111,26 @@ export class ModelDefinition {
         return column;
     }
 
+    private joinTableNameStrategy(right: string, left: string) {
+        return [right, left].sort().join('_');
+    }
+
     public associate(models: { [key: string]: ModelCtor<any> }) {
         const left = models[this.name];
         this.typeDef.relations.forEach(({ relation, name }) => {
             const right = models[relation.model.name];
             switch (relation.type) {
                 case 'one-to-one':
-                    left.hasOne(right, { as: name, constraints: false });
+                    left.belongsTo(right, { foreignKey: name });
                     break;
                 case 'one-to-many':
-                    left.hasOne(right, { as: name, constraints: false });
+                    left.hasMany(right);
                     break;
                 case 'many-to-one':
-                    left.belongsTo(right, { as: name, constraints: false });
+                    left.belongsTo(right, { foreignKey: name });
                     break;
                 case 'many-to-many':
-                    left.hasMany(right, { as: name, constraints: false });
+                    left.belongsToMany(right, { through: this.joinTableNameStrategy(right.name, left.name) });
                     break;
             }
         });

@@ -1,5 +1,5 @@
 import { Input } from '.';
-import { NexusInputFieldConfig } from 'nexus/dist/core';
+import { NexusInputFieldConfig } from '@nexus/schema/dist/core';
 import { TypeDefinition, FieldDefinition } from 'src/schema';
 import { WhereOptions, Op } from 'sequelize';
 
