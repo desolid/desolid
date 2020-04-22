@@ -105,17 +105,25 @@ scalars.push(scalarType(GraphQLUpload));
 scalars.push(
     scalarType({
         name: 'Password',
-        description: 'TODO: describe',
+        description: '@todo describe',
+        /**
+         * @todo implement
+         */
         serialize(value) {
-            /* Todo */
             debugger;
         },
+
+        /**
+         * @todo implement
+         */
         parseValue(value) {
-            /* Todo */
             debugger;
         },
+
+        /**
+         * @todo implement
+         */
         parseLiteral(value) {
-            /* Todo */
             debugger;
         },
     }),

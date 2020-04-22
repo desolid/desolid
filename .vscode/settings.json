@@ -1,0 +1,8 @@
+{
+    "todo-tree.general.tags": [
+        "@todo"
+    ],
+    "todo-tree.regex.regex": "\\*\\s*($TAGS)",
+    "todo-tree.highlights.enabled": false,
+    "todo-tree.tree.labelFormat": "${after}"
+}

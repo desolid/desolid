@@ -36,7 +36,7 @@ export class Model {
         }, {});
     }
     /**
-     *
+     * 
      * @param field
      * @todo handle custom `createdAt` & `updatedAt`
      */

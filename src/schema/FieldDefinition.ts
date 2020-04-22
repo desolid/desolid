@@ -26,6 +26,12 @@ export class FieldDefinition {
     directives: { [key in FieldDirectives]: any } = {} as any;
     config: FieldOutConfig<any, any>;
 
+    /**
+     * 
+     * @param definition 
+     * @param owner 
+     * @todo separate the logic to atomic methods
+     */
     constructor(definition: FieldDefinitionNode, public readonly owner: TypeDefinition) {
         const encodedFieldType = this.encodeFieldType(definition);
         const list = encodedFieldType.match(/[\w!]\]/g);
@@ -55,6 +61,9 @@ export class FieldDefinition {
         return stringScalars.indexOf(this._type as string) >= 0;
     }
 
+    /**
+     * @todo could be property, not attribute
+     */
     public get relation() {
         if (this.isScalar || !this.owner.isModel) return undefined;
         const right = this.type as TypeDefinition;
