@@ -124,7 +124,8 @@ scalars.push(
          * @todo implement
          */
         parseLiteral(value) {
-            debugger;
+            // debugger;
+            return true;
         },
     }),
 );

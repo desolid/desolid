@@ -1,15 +1,16 @@
 import { ObjectDefinitionBlock, intArg } from '@nexus/schema/dist/core';
 import { GraphQLResolveInfo } from 'graphql';
 import * as pluralize from 'pluralize';
-import { CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from './input-archetypes';
-import { TypeDefinition } from '../schema';
+import * as _ from 'lodash';
 import {
     parseResolveInfo,
     simplifyParsedResolveInfoFragmentWithType,
     ResolveTree,
     FieldsByTypeName,
 } from 'graphql-parse-resolve-info';
-import { Includeable } from 'sequelize/types';
+import { Includeable, Op } from 'sequelize';
+import { CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from './input-archetypes';
+import { TypeDefinition, FieldDefinition } from '../schema';
 
 export interface FindArgs {
     where: any;
@@ -133,10 +134,63 @@ export class CRUD {
         return this.parseSelectFields(fields);
     }
 
+    private async validateRelationInputs(attributes) {
+        await Promise.all(
+            this.model.relations.map(async (field) => {
+                const input = attributes[field.name];
+                if (input) {
+                    if (field.config.list) {
+                        const records = await field.relation.model.datasource.findAll({
+                            where: { id: { [Op.in]: input } },
+                            attributes: ['id'],
+                        });
+                        (input as string[]).forEach((id) => {
+                            if (!_.find(records, { id: parseInt(id) })) {
+                                throw new Error(`Not found the ${field.relation.model.name} with [id:'${id}'].`);
+                            }
+                        });
+                    } else {
+                        const record = await field.relation.model.datasource.findByPk(input);
+                        if (!record) {
+                            throw new Error(`Not found the ${field.relation.model.name} with [id:'${input}'].`);
+                        }
+                    }
+                }
+            }),
+        );
+    }
+
+    private async createRelations(record, attributes) {
+        const fieldsToRelationTable = this.model.relations.filter((relation) => !relation.databaseType);
+        await Promise.all(
+            fieldsToRelationTable.map(async (field) => {
+                const input: string[] = attributes[field.name];
+                if (input) {
+                    const relationTable = this.model.datasource.sequelize.models[field.relationTableName];
+                    const entries = input.map((id) => {
+                        return {
+                            [`${field.owner.datasource.name}Id`]: record.id,
+                            [`${field.relation.model.datasource.name}Id`]: id,
+                        };
+                    });
+                    const result = await relationTable.bulkCreate(entries);
+                }
+            }),
+        );
+    }
+
     private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
-        const { attributes, include } = this.parseResolveInfo(info);
         // https://stackoverflow.com/a/49828917/2179157
-        const record = await this.model.datasource.create(data, { include });
+        // https://stackoverflow.com/a/55765249/2179157
+        // https://medium.com/@tonyangelo9707/many-to-many-associations-using-sequelize-941f0b6ac102
+        const { attributes, include } = this.parseResolveInfo(info);
+        // 1- Validate relations exist
+        await this.validateRelationInputs(data);
+        // 2- create the record
+        const record = await this.model.datasource.create(data);
+        // 3- create relations
+        await this.createRelations(record, data);
+        // 4- return the query
         return this.model.datasource.findByPk(record[this.model.datasource.primaryKeyAttribute], {
             attributes,
             include,

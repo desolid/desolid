@@ -25,11 +25,12 @@ export class FieldDefinition {
     description: string;
     directives: { [key in FieldDirectives]: any } = {} as any;
     config: FieldOutConfig<any, any>;
+    relationTableName: string = undefined;
 
     /**
-     * 
-     * @param definition 
-     * @param owner 
+     *
+     * @param definition
+     * @param owner
      * @todo separate the logic to atomic methods
      */
     constructor(definition: FieldDefinitionNode, public readonly owner: TypeDefinition) {

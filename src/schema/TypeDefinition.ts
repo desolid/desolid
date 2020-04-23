@@ -1,5 +1,10 @@
 import { ObjectTypeDefinitionNode } from 'graphql';
-import { FieldOutConfig, NexusObjectTypeDef, NexusObjectTypeConfig, ObjectDefinitionBlock } from '@nexus/schema/dist/core';
+import {
+    FieldOutConfig,
+    NexusObjectTypeDef,
+    NexusObjectTypeConfig,
+    ObjectDefinitionBlock,
+} from '@nexus/schema/dist/core';
 import { Schema, FieldDefinition, DirectiveDefinition } from '.';
 import { ModelCtor } from 'sequelize/types';
 
@@ -27,7 +32,7 @@ export class TypeDefinition extends NexusObjectTypeDef<string> {
     directives: { [key in TypeDirectives]: any } = {} as any;
     // Will set on the database constructor
     datasource: ModelCtor<any> = undefined;
-
+    
     constructor(public schema: Schema, private readonly definition: ObjectTypeDefinitionNode) {
         super(definition.name.value, undefined);
         this.fields = definition.fields.map((field) => new FieldDefinition(field, this));

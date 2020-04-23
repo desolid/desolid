@@ -36,7 +36,7 @@ export class Model {
         }, {});
     }
     /**
-     * 
+     *
      * @param field
      * @todo handle custom `createdAt` & `updatedAt`
      */
@@ -86,6 +86,7 @@ export class Model {
                     if (ref.isModel) {
                         if (field.config.list) {
                             // A `one to many` or `many to many` relation
+                            field.databaseType = null;
                             return;
                         } else {
                             // The FOREIGN_KEY
@@ -117,20 +118,21 @@ export class Model {
 
     public associate(models: { [key: string]: ModelCtor<any> }) {
         const left = models[this.name];
-        this.typeDef.relations.forEach(({ relation, name }) => {
-            const right = models[relation.model.name];
-            switch (relation.type) {
+        this.typeDef.relations.forEach((field) => {
+            const right = models[field.relation.model.name];
+            switch (field.relation.type) {
                 case 'one-to-one':
-                    left.belongsTo(right, { foreignKey: name });
+                    left.belongsTo(right, { foreignKey: field.name });
                     break;
                 case 'one-to-many':
                     left.hasMany(right);
                     break;
                 case 'many-to-one':
-                    left.belongsTo(right, { foreignKey: name });
+                    left.belongsTo(right, { foreignKey: field.name });
                     break;
                 case 'many-to-many':
-                    left.belongsToMany(right, { through: this.joinTableNameStrategy(right.name, left.name) });
+                    field.relationTableName = this.joinTableNameStrategy(right.name, left.name);
+                    left.belongsToMany(right, { through: field.relationTableName });
                     break;
             }
         });

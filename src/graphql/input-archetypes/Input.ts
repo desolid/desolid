@@ -19,12 +19,15 @@ export abstract class Input extends NexusInputObjectTypeDef<string> {
     public get fields() {
         return this.model.fields;
     }
+    /**
+     *
+     * @param t
+     * @todo `create` or `connect` on relations
+     */
     private definition(t: InputDefinitionBlock<string>) {
         this.fields.forEach((field) => {
-            const ref = field.type as TypeDefinition;
             t.field(field.name, {
-                // @todo create or connect on relations
-                type: field.isScalar ? field.type : ref && ref.isModel ? 'ID' : ref,
+                type: field.relation ? 'ID' : field.type,
                 required: !field.config.nullable,
                 list: field.config.list,
                 ...this.configField(field),
