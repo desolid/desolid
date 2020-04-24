@@ -1,5 +1,5 @@
 type BatchPayload {
-    count: Long
+    count: Int
 }
 
 enum UserGroup {

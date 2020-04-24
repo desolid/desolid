@@ -147,13 +147,12 @@ export class CRUD {
 
     private async updateOne(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        // await this.model.datasource.update(data, where);
-        // return this.model.datasource.findOne(undefined, where);
+        return this.model.updateOne(where /** WhereUniqueInput */, data, attributes, include);
     }
 
     private async updateMany(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        // return { count: await this.model.datasource.update(data, where) };
+        return this.model.updateMany(this.inputs.where.parse(where) /** WhereInput */, data, attributes, include);
     }
 
     private async deleteOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {

@@ -67,6 +67,9 @@ export class Model {
         );
     }
 
+    /**
+     * @todo handle create/connect on relations
+     */
     public async createOne(input: any, attributes: string[], include: IncludeOptions[]) {
         // https://stackoverflow.com/a/49828917/2179157
         // https://stackoverflow.com/a/55765249/2179157
@@ -85,18 +88,19 @@ export class Model {
     }
 
     /**
-     * 
-     * @param inputs 
-     * @param attributes 
-     * @param include 
-     * 
+     *
+     * @param inputs
+     * @param attributes
+     * @param include
+     *
+     * @todo handle create/connect on relations
      * @todo could be more quick by bulk relation creatation
      */
     public async createMany(inputs: any[], attributes: string[], include: IncludeOptions[]) {
         // 1- validate relations exist
         await Promise.all(inputs.map((input) => this.validateAssosiationInputs(input)));
         // 2- create the records
-        const records: any[] = await this.datasource.bulkCreate(inputs);
+        const records: any[] = await this.datasource.bulkCreate(inputs, { returning: ['id'] });
         // 3- create relations
         await Promise.all(records.map((record, index) => this.createRelations(record, inputs[index])));
         // 4- return the query
@@ -107,6 +111,28 @@ export class Model {
             attributes,
             include,
         });
+    }
+
+    /**
+     * @todo handle update on relations: create,connect,delete
+     */
+    public async updateOne(where: any, input: any, attributes: string[], include: IncludeOptions[]) {
+        // 1- validate relations exist
+        // await this.validateAssosiationInputs(input);
+        // 2- create the record
+        const [affectedRows] = await this.datasource.update(input, { where });
+        // 3- create relations
+        // await this.createRelations(record, input);
+        // 4- return the query
+        return this.datasource.findOne({ where, attributes, include });
+    }
+
+    /**
+     * @todo handle update on relations: create,connect,delete
+     */
+    public async updateMany(where: any, input: any, attributes: string[], include: IncludeOptions[]) {
+        const [affectedRows] = await this.datasource.update(input, { where });
+        return { count: affectedRows };
     }
 
     public async findAll(
