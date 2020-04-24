@@ -6,7 +6,6 @@ import {
     ObjectDefinitionBlock,
 } from '@nexus/schema/dist/core';
 import { Schema, FieldDefinition, DirectiveDefinition } from '.';
-import { Model } from '../database';
 
 export type TypeDirectives = 'model' | 'authorization';
 
@@ -30,9 +29,7 @@ export class TypeDefinition extends NexusObjectTypeDef<string> {
     config = new ObjectTypeConfig(this);
     fields: FieldDefinition[] = undefined;
     directives: { [key in TypeDirectives]: any } = {} as any;
-    // Will set on the database constructor
-    model: Model = undefined;
-    
+
     constructor(public schema: Schema, private readonly definition: ObjectTypeDefinitionNode) {
         super(definition.name.value, undefined);
         this.fields = definition.fields.map((field) => new FieldDefinition(field, this));

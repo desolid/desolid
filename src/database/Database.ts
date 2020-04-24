@@ -19,12 +19,12 @@ export type DatabaseConfig = Options;
 
 export class Database {
     private readonly connection: Sequelize;
-    private readonly models: Model[] = [];
-    
+    public readonly models = new Map<string, Model>();
+
     constructor(protected config: DatabaseConfig, modelTypeDefs: TypeDefinition[]) {
         this.connection = new Sequelize(this.config);
         modelTypeDefs.forEach((typeDefinition: TypeDefinition) => {
-            this.models.push(new Model(this.connection, typeDefinition));
+            this.models.set(typeDefinition.name, new Model(this.connection, typeDefinition));
         });
         this.models.forEach((model) => model.schema.associate(this.connection.models));
     }

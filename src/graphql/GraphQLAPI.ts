@@ -1,7 +1,8 @@
 import { makeSchema, queryType, mutationType } from '@nexus/schema/dist/core';
 import { GraphQLServer } from 'graphql-yoga';
-import { CRUD } from './CRUD';
 import { TypeDefinition, scalars } from '../schema';
+import { Model } from '../database';
+import { CRUD } from '.';
 
 export interface GraphQLAPIConfig {
     port: number;
@@ -11,9 +12,9 @@ export class GraphQLAPI {
     private server: GraphQLServer;
     private cruds = new Map<string, CRUD>();
 
-    constructor(protected config: GraphQLAPIConfig, modelTypeDefs: TypeDefinition[]) {
-        modelTypeDefs.forEach((typeDef: TypeDefinition) => {
-            this.cruds.set(typeDef.name, new CRUD(typeDef));
+    constructor(protected config: GraphQLAPIConfig, models: Map<string, Model>) {
+        models.forEach((model) => {
+            this.cruds.set(model.name, new CRUD(model));
         });
     }
 

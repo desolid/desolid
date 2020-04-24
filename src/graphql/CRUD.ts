@@ -8,9 +8,9 @@ import {
     ResolveTree,
     FieldsByTypeName,
 } from 'graphql-parse-resolve-info';
-import { Op, IncludeOptions } from 'sequelize';
-import { CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from './input-archetypes';
-import { TypeDefinition } from '../schema';
+import { IncludeOptions } from 'sequelize';
+import { CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from '.';
+import { Model } from '../database';
 
 export interface FindArgs {
     where: any;
@@ -33,7 +33,7 @@ export interface SelectAttributes {
  * @todo select relations
  */
 export class CRUD {
-    private inputs: {
+    private readonly inputs: {
         create: CreateInput;
         update: UpdateInput;
         where: WhereInput;
@@ -41,22 +41,22 @@ export class CRUD {
         orderBy: OrderBy;
     } = {} as any;
 
-    constructor(private typeDefinition: TypeDefinition) {
-        this.inputs.create = new CreateInput(typeDefinition);
-        this.inputs.update = new UpdateInput(typeDefinition);
-        this.inputs.where = new WhereInput(typeDefinition);
-        this.inputs.whereUnique = new WhereUniqueInput(typeDefinition);
-        this.inputs.orderBy = new OrderBy(typeDefinition);
+    constructor(private model: Model) {
+        this.inputs.create = new CreateInput(model.typeDefinition);
+        this.inputs.update = new UpdateInput(model.typeDefinition);
+        this.inputs.where = new WhereInput(model.typeDefinition);
+        this.inputs.whereUnique = new WhereUniqueInput(model.typeDefinition);
+        this.inputs.orderBy = new OrderBy(model.typeDefinition);
     }
 
     public generateQuery(t: ObjectDefinitionBlock<'Query'>) {
-        t.field(this.typeDefinition.name.toLowerCase(), {
-            type: this.typeDefinition,
+        t.field(this.model.name.toLowerCase(), {
+            type: this.model.typeDefinition,
             args: { where: this.inputs.whereUnique.toArg(true) },
             resolve: this.findOne.bind(this),
         });
-        t.list.field(pluralize(this.typeDefinition.name.toLowerCase()), {
-            type: this.typeDefinition,
+        t.list.field(pluralize(this.model.name.toLowerCase()), {
+            type: this.model.typeDefinition,
             args: {
                 where: this.inputs.where.toArg(false),
                 orderBy: this.inputs.orderBy,
@@ -68,39 +68,39 @@ export class CRUD {
     }
 
     public generateMutation(t: ObjectDefinitionBlock<'Mutation'>) {
-        t.field(`create${this.typeDefinition.name}`, {
-            type: this.typeDefinition,
+        t.field(`create${this.model.name}`, {
+            type: this.model.typeDefinition,
             args: { data: this.inputs.create.toArg(true) },
             resolve: this.createOne.bind(this),
         });
-        t.list.field(`createMany${this.typeDefinition.name}`, {
-            type: this.typeDefinition,
+        t.list.field(`createMany${this.model.name}`, {
+            type: this.model.typeDefinition,
             args: { data: this.inputs.create.toArg(true, [true]) },
             resolve: this.createMany.bind(this),
         });
-        t.field(`update${this.typeDefinition.name}`, {
-            type: this.typeDefinition,
+        t.field(`update${this.model.name}`, {
+            type: this.model.typeDefinition,
             args: {
                 where: this.inputs.whereUnique.toArg(true),
                 data: this.inputs.update.toArg(true),
             },
             resolve: this.updateOne.bind(this),
         });
-        t.field(`updateMany${pluralize(this.typeDefinition.name)}`, {
-            type: this.typeDefinition.schema.get('BatchPayload'),
+        t.field(`updateMany${pluralize(this.model.name)}`, {
+            type: this.model.typeDefinition.schema.get('BatchPayload'),
             args: {
                 where: this.inputs.where.toArg(true),
                 data: this.inputs.update.toArg(true),
             },
             resolve: this.updateMany.bind(this),
         });
-        t.field(`delete${this.typeDefinition.name}`, {
-            type: this.typeDefinition,
+        t.field(`delete${this.model.name}`, {
+            type: this.model.typeDefinition,
             args: { where: this.inputs.whereUnique.toArg(true) },
             resolve: this.deleteOne.bind(this),
         });
-        t.field(`deleteMany${pluralize(this.typeDefinition.name)}`, {
-            type: this.typeDefinition.schema.get('BatchPayload'),
+        t.field(`deleteMany${pluralize(this.model.name)}`, {
+            type: this.model.typeDefinition.schema.get('BatchPayload'),
             args: { where: this.inputs.where.toArg(true) },
             resolve: this.deleteMany.bind(this),
         });
@@ -117,13 +117,11 @@ export class CRUD {
         const include: IncludeOptions[] = [];
         for (let [name, attribute] of Object.entries<SelectAttributes>(select)) {
             const [modelName] = Object.keys(attribute.fieldsByTypeName);
-            if (modelName) {
-                const options = {
+            if (modelName && this.model.datasource.associations[attribute.name]) {
+                include.push({
+                    association: attribute.name,
                     ...this.parseSelectAttributes(attribute.fieldsByTypeName[modelName] as any),
-                } as IncludeOptions;
-                options.model = this.typeDefinition.schema.get(modelName).model.datasource;
-                options.as = attribute.name;
-                include.push(options);
+                });
             } else {
                 attributes.push(name);
             }
@@ -132,16 +130,14 @@ export class CRUD {
     }
 
     private parseResolveInfo(info: GraphQLResolveInfo) {
-        const { fields } = simplifyParsedResolveInfoFragmentWithType(
-            parseResolveInfo(info) as ResolveTree,
-            info.returnType,
+        return this.parseSelectAttributes(
+            simplifyParsedResolveInfoFragmentWithType(parseResolveInfo(info) as ResolveTree, info.returnType).fields,
         );
-        return this.parseSelectAttributes(fields);
     }
 
     private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        return this.typeDefinition.model.createOne(data, attributes, include);
+        return this.model.createOne(data, attributes, include);
     }
 
     private async createMany(root: any, { data }: { data: any[] }, context: any, info: GraphQLResolveInfo) {
@@ -174,7 +170,7 @@ export class CRUD {
 
     private async find(root: any, { where, orderBy, offset, limit }: FindArgs, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        return this.typeDefinition.model.findAll(
+        return this.model.findAll(
             this.inputs.where.parse(where),
             attributes,
             include,
@@ -186,6 +182,11 @@ export class CRUD {
 
     private async findOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        return this.typeDefinition.model.findOne(where, attributes, include);
+        const result = await this.model.findOne(where, attributes, include);
+        if (!result) {
+            throw new Error(`Not found.`);
+        } else {
+            return result;
+        }
     }
 }

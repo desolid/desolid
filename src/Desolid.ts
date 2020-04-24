@@ -10,15 +10,15 @@ export interface DesolidConfig {
 }
 
 export default class Desolid {
-    protected config: DesolidConfig;
-    protected database: Database;
-    protected api: GraphQLAPI;
-    protected schema: Schema;
+    protected readonly config: DesolidConfig;
+    protected readonly database: Database;
+    protected readonly api: GraphQLAPI;
+    protected readonly schema: Schema;
     constructor(public readonly path: string) {
         this.config = yaml.safeLoad(readFileSync(`${path}/desolid.yaml`, { encoding: 'utf8' }));
         this.schema = new Schema(path);
         this.database = new Database(this.config.database, this.schema.models);
-        this.api = new GraphQLAPI(this.config.api, this.schema.models);
+        this.api = new GraphQLAPI(this.config.api, this.database.models);
     }
     
     public async start() {

@@ -15,20 +15,20 @@ import {
 import { TypeDefinition, FieldDefinition } from '../schema';
 
 export class ModelSchema {
-    constructor(public readonly typeDef: TypeDefinition) {}
+    constructor(public readonly typeDefinition: TypeDefinition) {}
 
     public get name() {
-        return this.typeDef.name;
+        return this.typeDefinition.name;
     }
 
     public get options(): ModelOptions {
         return {
-            comment: this.typeDef.description,
+            comment: this.typeDefinition.description,
         };
     }
 
     public get attributes(): ModelAttributes {
-        return this.typeDef.fields.reduce<{ [column: string]: ModelAttributeColumnOptions }>((columns, field) => {
+        return this.typeDefinition.fields.reduce<{ [column: string]: ModelAttributeColumnOptions }>((columns, field) => {
             const column = this.fieldToColumn(field);
             if (column) {
                 columns[field.name] = column;
@@ -119,7 +119,7 @@ export class ModelSchema {
 
     public associate(models: { [key: string]: ModelCtor<any> }) {
         const left = models[this.name];
-        this.typeDef.relations.forEach((field) => {
+        this.typeDefinition.relations.forEach((field) => {
             const right = models[field.relation.typeDefinition.name];
             switch (field.relation.type) {
                 case 'one-to-one':

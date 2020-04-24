@@ -16,6 +16,10 @@ export class Model {
         typeDefinition.model = this;
     }
 
+    public get name() {
+        return this.schema.name;
+    }
+
     private async createRelations(record, attributes) {
         const multiAssosiations = Object.values(this.datasource.associations).filter(
             (assossiation) => assossiation.isMultiAssociation,
