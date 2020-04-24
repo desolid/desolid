@@ -27,7 +27,7 @@ export abstract class Input extends NexusInputObjectTypeDef<string> {
     private definition(t: InputDefinitionBlock<string>) {
         this.fields.forEach((field) => {
             t.field(field.name, {
-                type: field.relation ? 'ID' : field.type,
+                type: field.relation ? 'Int' : field.type,
                 required: !field.config.nullable,
                 list: field.config.list,
                 ...this.configField(field),

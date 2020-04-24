@@ -139,78 +139,9 @@ export class CRUD {
         return this.parseSelectAttributes(fields);
     }
 
-    private async validateRelationInputs(attributes) {
-        await Promise.all(
-            this.typeDefinition.relations.map(async (field) => {
-                const input = attributes[field.name];
-                if (input) {
-                    if (field.config.list) {
-                        const records = await field.relation.typeDefinition.model.datasource.findAll({
-                            where: { id: { [Op.in]: input } },
-                            attributes: ['id'],
-                        });
-                        (input as string[]).forEach((id) => {
-                            if (!_.find(records, { id: parseInt(id) })) {
-                                throw new Error(
-                                    `Not found the ${field.relation.typeDefinition.name} with [id:'${id}'].`,
-                                );
-                            }
-                        });
-                    } else {
-                        const record = await field.relation.typeDefinition.model.datasource.findByPk(input);
-                        if (!record) {
-                            throw new Error(
-                                `Not found the ${field.relation.typeDefinition.name} with [id:'${input}'].`,
-                            );
-                        }
-                        attributes[`${field.name}Id`] = input;
-                        delete attributes[field.name];
-                    }
-                }
-            }),
-        );
-    }
-
-    private async createRelations(record, attributes) {
-        const fieldsToRelationTable = this.typeDefinition.relations.filter((relation) => !relation.databaseType);
-        await Promise.all(
-            fieldsToRelationTable.map(async (field) => {
-                const input: string[] = attributes[field.name];
-                if (input) {
-                    const relationTable = this.typeDefinition.model.datasource.sequelize.models[
-                        field.relationTableName
-                    ];
-                    const entries = input.map((id) => {
-                        return {
-                            [`${field.owner.model.datasource.name}Id`]: record.id,
-                            [`${field.relation.typeDefinition.model.datasource.name}Id`]: id,
-                        };
-                    });
-                    const result = await relationTable.bulkCreate(entries);
-                }
-            }),
-        );
-    }
-
     private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
-        // https://stackoverflow.com/a/49828917/2179157
-        // https://stackoverflow.com/a/55765249/2179157
-        // https://medium.com/@tonyangelo9707/many-to-many-associations-using-sequelize-941f0b6ac102
         const { attributes, include } = this.parseResolveInfo(info);
-        // 1- Validate relations exist
-        await this.validateRelationInputs(data);
-        // 2- create the record
-        const record = await this.typeDefinition.model.datasource.create(data);
-        // 3- create relations
-        await this.createRelations(record, data);
-        // 4- return the query
-        return this.typeDefinition.model.datasource.findByPk(
-            record[this.typeDefinition.model.datasource.primaryKeyAttribute],
-            {
-                attributes,
-                include,
-            },
-        );
+        return this.typeDefinition.model.createOne(data, attributes, include);
     }
 
     private async createMany(root: any, { data }: { data: any[] }, context: any, info: GraphQLResolveInfo) {
@@ -241,39 +172,20 @@ export class CRUD {
         // return { count: await this.model.datasource.delete(where) };
     }
 
-    private formResult(result) {
-        const output = {} as any;
-        for (let [key, value] of Object.entries<SelectAttributes>(result)) {
-            const path = key.split('.');
-            if (path.length == 1) {
-                output[path[0]] = value;
-            } else {
-                output[path[0]] = {
-                    [output[path[1]]]: value,
-                };
-            }
-        }
-        return result;
-    }
-
     private async find(root: any, { where, orderBy, offset, limit }: FindArgs, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        return this.typeDefinition.model.datasource
-            .findAll({
-                where: this.inputs.where.parse(where),
-                order: this.inputs.orderBy.parse(orderBy),
-                attributes,
-                include,
-                limit,
-                offset,
-            })
-            .then((res: any[]) => res.map((item) => this.formResult(item)));
+        return this.typeDefinition.model.findAll(
+            this.inputs.where.parse(where),
+            attributes,
+            include,
+            this.inputs.orderBy.parse(orderBy),
+            limit,
+            offset,
+        );
     }
 
     private async findOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        return this.typeDefinition.model.datasource
-            .findOne({ where, attributes, include })
-            .then((res) => this.formResult(res));
+        return this.typeDefinition.model.findOne(where, attributes, include);
     }
 }
