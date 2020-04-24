@@ -30,7 +30,7 @@ export interface SelectAttributes {
 }
 
 /**
- * @todo select relations
+ * @todo finish CRUDS
  */
 export class CRUD {
     private readonly inputs: {
@@ -142,7 +142,7 @@ export class CRUD {
 
     private async createMany(root: any, { data }: { data: any[] }, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        // return this.model.datasource.createMany(data);
+        return this.model.createMany(data, attributes, include);
     }
 
     private async updateOne(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {

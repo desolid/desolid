@@ -13,20 +13,19 @@ export class Model {
             this.schema.attributes,
             this.schema.options,
         ) as ModelCtor<any>;
-        typeDefinition.model = this;
     }
 
     public get name() {
         return this.schema.name;
     }
 
-    private async createRelations(record, attributes) {
+    private async createRelations(record, inputs) {
         const multiAssosiations = Object.values(this.datasource.associations).filter(
             (assossiation) => assossiation.isMultiAssociation,
         );
         return await Promise.all(
             multiAssosiations.map(async (assosiation: BelongsToMany) => {
-                const input: string[] = attributes[assosiation.as];
+                const input: string[] = inputs[assosiation.as];
                 if (input) {
                     const entries = input.map((id) => {
                         return {
@@ -40,18 +39,18 @@ export class Model {
         );
     }
 
-    private async validateAssosiationInputs(attributes) {
+    private async validateAssosiationInputs(inputs) {
         await Promise.all(
             Object.values(this.datasource.associations).map(async (assosiation) => {
-                const input = attributes[assosiation.as];
+                const input = inputs[assosiation.as];
                 if (input) {
                     if (assosiation.isSingleAssociation) {
                         const record = await assosiation.target.findByPk(input);
                         if (!record) {
                             throw new Error(`Not found the '${assosiation.target.name}' where { id: '${input}' }.`);
                         }
-                        attributes[assosiation.foreignKey] = input;
-                        delete attributes[assosiation.as];
+                        inputs[assosiation.foreignKey] = input;
+                        delete inputs[assosiation.as];
                     } else {
                         const records = await assosiation.target.findAll({
                             where: { id: { [Op.in]: input } },
@@ -68,18 +67,43 @@ export class Model {
         );
     }
 
-    public async createOne(data: any, attributes: string[], include: IncludeOptions[]) {
+    public async createOne(input: any, attributes: string[], include: IncludeOptions[]) {
         // https://stackoverflow.com/a/49828917/2179157
         // https://stackoverflow.com/a/55765249/2179157
         // https://medium.com/@tonyangelo9707/many-to-many-associations-using-sequelize-941f0b6ac102
         // 1- validate relations exist
-        await this.validateAssosiationInputs(data);
+        await this.validateAssosiationInputs(input);
         // 2- create the record
-        const record = await this.typeDefinition.model.datasource.create(data);
+        const record = await this.datasource.create(input);
         // 3- create relations
-        await this.createRelations(record, data);
+        await this.createRelations(record, input);
         // 4- return the query
         return this.datasource.findByPk(record[this.datasource.primaryKeyAttribute], {
+            attributes,
+            include,
+        });
+    }
+
+    /**
+     * 
+     * @param inputs 
+     * @param attributes 
+     * @param include 
+     * 
+     * @todo could be more quick by bulk relation creatation
+     */
+    public async createMany(inputs: any[], attributes: string[], include: IncludeOptions[]) {
+        // 1- validate relations exist
+        await Promise.all(inputs.map((input) => this.validateAssosiationInputs(input)));
+        // 2- create the records
+        const records: any[] = await this.datasource.bulkCreate(inputs);
+        // 3- create relations
+        await Promise.all(records.map((record, index) => this.createRelations(record, inputs[index])));
+        // 4- return the query
+        return this.datasource.findAll({
+            where: {
+                id: records.map((record) => record.id),
+            },
             attributes,
             include,
         });
