@@ -6,7 +6,7 @@ import {
     ObjectDefinitionBlock,
 } from '@nexus/schema/dist/core';
 import { Schema, FieldDefinition, DirectiveDefinition } from '.';
-import { ModelCtor } from 'sequelize/types';
+import { Model } from '../database';
 
 export type TypeDirectives = 'model' | 'authorization';
 
@@ -31,7 +31,7 @@ export class TypeDefinition extends NexusObjectTypeDef<string> {
     fields: FieldDefinition[] = undefined;
     directives: { [key in TypeDirectives]: any } = {} as any;
     // Will set on the database constructor
-    datasource: ModelCtor<any> = undefined;
+    model: Model = undefined;
     
     constructor(public schema: Schema, private readonly definition: ObjectTypeDefinitionNode) {
         super(definition.name.value, undefined);

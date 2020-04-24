@@ -81,7 +81,7 @@ export class FieldDefinition {
             type = this.config.list ? 'many-to-many' : 'many-to-one';
         }
         return {
-            model: right,
+            typeDefinition: right,
             type,
         };
     }

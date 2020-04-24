@@ -19,25 +19,17 @@ export type DatabaseConfig = Options;
 
 export class Database {
     private readonly connection: Sequelize;
-    private modelDefinitions: Model[] = [];
+    private readonly models: Model[] = [];
+    
     constructor(protected config: DatabaseConfig, modelTypeDefs: TypeDefinition[]) {
         this.connection = new Sequelize(this.config);
-        modelTypeDefs.forEach((typeDef: TypeDefinition) => {
-            const definition = new Model(typeDef);
-            typeDef.datasource = this.connection.define(definition.name, definition.attributes, definition.options) as ModelCtor<any>;
-            this.modelDefinitions.push(definition);
+        modelTypeDefs.forEach((typeDefinition: TypeDefinition) => {
+            this.models.push(new Model(this.connection, typeDefinition));
         });
-        this.modelDefinitions.forEach((definition) => {
-            definition.associate(this.connection.models);
-        });
-    }
-
-    public get models() {
-        return this.connection.models;
+        this.models.forEach((model) => model.schema.associate(this.connection.models));
     }
 
     public async start() {
         await this.connection.sync();
-
     }
 }
