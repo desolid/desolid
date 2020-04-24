@@ -8,9 +8,10 @@ import {
     ResolveTree,
     FieldsByTypeName,
 } from 'graphql-parse-resolve-info';
-import { Includeable, Op } from 'sequelize';
+import { Includeable, Op, IncludeOptions } from 'sequelize';
 import { CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from './input-archetypes';
 import { TypeDefinition, FieldDefinition } from '../schema';
+import { removeSync } from 'fs-extra';
 
 export interface FindArgs {
     where: any;
@@ -19,8 +20,8 @@ export interface FindArgs {
     limit: number;
 }
 
-export interface SelectField {
-    fields: {};
+export interface SelectAttributes {
+    attributes: {};
     name: string;
     alias: string;
     args: {
@@ -108,17 +109,27 @@ export class CRUD {
 
     /**
      *
-     * @param fields
+     * @param select
      * @todo handle where on relations: https://stackoverflow.com/a/36391912/2179157
+     *          https://gist.github.com/zcaceres/83b554ee08726a734088d90d455bc566#customized-include-with-alias-and-where
      */
-    private parseSelectFields(fields: { [key: string]: SelectField }) {
+    private parseSelectAttributes(select: { [key: string]: SelectAttributes }) {
         const attributes: string[] = [];
-        const include: Includeable[] = [];
-        for (let [name, field] of Object.entries<SelectField>(fields)) {
-            const [modelName] = Object.keys(field.fieldsByTypeName);
+        const include: IncludeOptions[] = [];
+        for (let [name, attribute] of Object.entries<SelectAttributes>(select)) {
+            const [modelName] = Object.keys(attribute.fieldsByTypeName);
             if (modelName) {
-                const model = this.model.schema.get(modelName).datasource;
-                include.push({ model, ...this.parseSelectFields(field.fieldsByTypeName[modelName] as any) });
+                const options = {
+                    ...this.parseSelectAttributes(attribute.fieldsByTypeName[modelName] as any),
+                } as IncludeOptions;
+                // const field = _.find(this.model.relations, { name: attribute.name });
+                // if (field.relationTableName) {
+                options.model = this.model.schema.get(modelName).datasource;
+                options.as = attribute.name;
+                // } else {
+                //     options.association = attribute.name;
+                // }
+                include.push(options);
             } else {
                 attributes.push(name);
             }
@@ -131,7 +142,7 @@ export class CRUD {
             parseResolveInfo(info) as ResolveTree,
             info.returnType,
         );
-        return this.parseSelectFields(fields);
+        return this.parseSelectAttributes(fields);
     }
 
     private async validateRelationInputs(attributes) {
@@ -154,6 +165,8 @@ export class CRUD {
                         if (!record) {
                             throw new Error(`Not found the ${field.relation.model.name} with [id:'${input}'].`);
                         }
+                        attributes[`${field.name}Id`] = input;
+                        delete attributes[field.name];
                     }
                 }
             }),
@@ -225,20 +238,37 @@ export class CRUD {
         // return { count: await this.model.delete(where) };
     }
 
+    private formResult(result) {
+        const output = {} as any;
+        for (let [key, value] of Object.entries<SelectAttributes>(result)) {
+            const path = key.split('.');
+            if (path.length == 1) {
+                output[path[0]] = value;
+            } else {
+                output[path[0]] = {
+                    [output[path[1]]]: value,
+                };
+            }
+        }
+        return result;
+    }
+
     private async find(root: any, { where, orderBy, offset, limit }: FindArgs, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        return this.model.datasource.findAll({
-            where: this.inputs.where.parse(where),
-            order: this.inputs.orderBy.parse(orderBy),
-            attributes,
-            include,
-            limit,
-            offset,
-        });
+        return this.model.datasource
+            .findAll({
+                where: this.inputs.where.parse(where),
+                order: this.inputs.orderBy.parse(orderBy),
+                attributes,
+                include,
+                limit,
+                offset,
+            })
+            .then((res: any[]) => res.map((item) => this.formResult(item)));
     }
 
     private async findOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        return this.model.datasource.findOne({ where, attributes, include });
+        return this.model.datasource.findOne({ where, attributes, include }).then((res) => this.formResult(res));
     }
 }

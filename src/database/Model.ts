@@ -87,12 +87,12 @@ export class Model {
                         if (field.config.list) {
                             // A `one to many` or `many to many` relation
                             field.databaseType = null;
-                            return;
                         } else {
                             // The FOREIGN_KEY
                             // A `one to one` or `many to one` relation
-                            column.type = INTEGER;
+                            field.databaseType = INTEGER;
                         }
+                        return;
                     } else {
                         column.type = JSON;
                     }
@@ -128,11 +128,11 @@ export class Model {
                     left.hasMany(right);
                     break;
                 case 'many-to-one':
-                    left.belongsTo(right, { foreignKey: field.name });
+                    left.belongsTo(right, { as: field.name });
                     break;
                 case 'many-to-many':
                     field.relationTableName = this.joinTableNameStrategy(right.name, left.name);
-                    left.belongsToMany(right, { through: field.relationTableName });
+                    left.belongsToMany(right, { through: field.relationTableName, as: field.name });
                     break;
             }
         });
