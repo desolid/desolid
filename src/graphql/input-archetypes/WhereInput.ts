@@ -7,13 +7,12 @@ import { WhereOptions, Op } from 'sequelize';
  * @todo include all possibe where operators
  */
 export class WhereInput extends Input {
-    
-    public static getObjectName(model: TypeDefinition) {
-        return `${model.name}WhereInput`;
+    public static getObjectName(typeDefinition: TypeDefinition) {
+        return `${typeDefinition.name}WhereInput`;
     }
 
-    constructor(model: TypeDefinition) {
-        super(model, WhereInput.getObjectName(model));
+    constructor(typeDefinition: TypeDefinition) {
+        super(typeDefinition, WhereInput.getObjectName(typeDefinition));
     }
 
     public get fields() {

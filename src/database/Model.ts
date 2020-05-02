@@ -134,7 +134,19 @@ export class Model {
         });
     }
 
-    public async deleteOne() {}
+    public async deleteOne(where: any, attributes?: string[], include?: IncludeOptions[]) {
+        const entry = await this.findOne(where, attributes, include);
+        if (!entry) {
+            throw new Error(`Not found the '${this.name}' where ${JSON.stringify(where)}.`);
+        }
+        await this.datasource.destroy({ where });
+        return entry;
+    }
+
+    public async deleteMany(where: any) {
+        const affectedRows = await this.datasource.destroy({ where });
+        return { count: affectedRows };
+    }
 
     /**
      * @todo 1: handle update on relations: create,connect,delete

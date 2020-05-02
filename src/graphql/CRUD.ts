@@ -174,14 +174,12 @@ export class CRUD {
 
     private async deleteOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        // const entry = await this.model.datasource.findOne(undefined, where);
-        // await this.model.datasource.delete(where);
-        // return entry;
+        return this.model.deleteOne(where, attributes, include);
     }
 
     private async deleteMany(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
-        const { attributes, include } = this.parseResolveInfo(info);
-        // return { count: await this.model.datasource.delete(where) };
+        // const { attributes, include } = this.parseResolveInfo(info);
+        return this.model.deleteMany(this.inputs.where.parse(where));
     }
 
     private async find(root: any, { where, orderBy, offset, limit }: FindArgs, context: any, info: GraphQLResolveInfo) {
