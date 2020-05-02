@@ -157,18 +157,22 @@ export class Model {
     /**
      * @todo 1: handle update on relations: create,connect,delete
      */
-    public async updateMany(where: any, input: any, attributes: string[], include: IncludeOptions[]) {
+    public async updateMany(where: any, input: any, attributes: string[], include: IncludeOptions[], records: any[]) {
+        // 1- create the record
         const [affectedRows] = await this.datasource.update(input, { where });
+        // 2- create relations
+        await Promise.all(records.map((record) => this.updateAssosiations(record, input)));
+        // 3- return the query
         return { count: affectedRows };
     }
 
     public async findAll(
         where: any,
-        attributes: string[],
-        include: IncludeOptions[],
-        order: Order,
-        limit: number,
-        offset: number,
+        attributes?: string[],
+        include?: IncludeOptions[],
+        order?: Order,
+        limit?: number,
+        offset?: number,
     ) {
         return this.datasource.findAll({
             where,
@@ -177,10 +181,10 @@ export class Model {
             include,
             limit,
             offset,
-        });
+        }) as any[];
     }
 
-    public async findOne(where: any, attributes: string[], include: IncludeOptions[]) {
+    public async findOne(where: any, attributes?: string[], include?: IncludeOptions[]) {
         return this.datasource.findOne({ where, attributes, include });
     }
 }

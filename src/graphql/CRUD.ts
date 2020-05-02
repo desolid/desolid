@@ -161,7 +161,15 @@ export class CRUD {
 
     private async updateMany(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        return this.model.updateMany(this.inputs.where.parse(where) /** WhereInput */, data, attributes, include);
+        const records = await this.model.findAll(where, ['id']);
+        await Promise.all(records.map((record) => this.inputs.update.validate(data, record)));
+        return this.model.updateMany(
+            this.inputs.where.parse(where) /** WhereInput */,
+            data,
+            attributes,
+            include,
+            records,
+        );
     }
 
     private async deleteOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
