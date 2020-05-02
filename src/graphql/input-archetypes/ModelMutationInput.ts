@@ -23,14 +23,4 @@ export abstract class ModelMutationInput extends Input {
     protected getFieldNameFromAssosiation(assosiation: Association<any, any>) {
         return assosiation.isSingleAssociation ? assosiation.foreignKey : assosiation.as;
     }
-
-    protected async validateAsosations(input: any) {
-        const assosiations = Object.values(this.model.datasource.associations);
-        await Promise.all(
-            assosiations.map(async (assosiation) => {
-                const fieldName = this.getFieldNameFromAssosiation(assosiation);
-                await this.model.assosiationExists(input[fieldName], assosiation);
-            }),
-        );
-    }
 }

@@ -39,7 +39,38 @@ export class Model {
         );
     }
 
-    public async assosiationExists(value: number | number[], assosiation: Association<any, any>) {
+    private async updateAssosiations(record, inputs) {
+        const multiAssosiations = Object.values(this.datasource.associations).filter(
+            (assossiation) => assossiation.isMultiAssociation,
+        );
+        return await Promise.all(
+            multiAssosiations.map(async (assosiation: BelongsToMany) => {
+                const { add, remove } = inputs[assosiation.as] as { add: number[]; remove: number[] };
+                if (add) {
+                    const entries = add.map((id) => {
+                        return {
+                            [assosiation.identifier]: record.id,
+                            [assosiation.otherKey]: id,
+                        };
+                    });
+                    await (assosiation as any).throughModel.bulkCreate(entries);
+                }
+                if (remove) {
+                    const entries = remove.map((id) => {
+                        return {
+                            [assosiation.identifier]: record.id,
+                            [assosiation.otherKey]: id,
+                        };
+                    });
+                    await ((assosiation as any).throughModel as ModelCtor<any>).destroy({
+                        where: { [Op.or]: entries },
+                    });
+                }
+            }),
+        );
+    }
+
+    public async assosiationSideExists(value: number | number[], assosiation: Association<any, any>) {
         if (value) {
             if (assosiation.isSingleAssociation) {
                 const record = await assosiation.target.findByPk(value as number);
@@ -56,6 +87,7 @@ export class Model {
                         throw new Error(`Not found the '${assosiation.target.name}' where { id: '${id}' }.`);
                     }
                 });
+                // @todo chck trough table here
             }
         }
     }
@@ -107,11 +139,17 @@ export class Model {
     /**
      * @todo 1: handle update on relations: create,connect,delete
      */
-    public async updateOne(where: any, input: any, attributes: string[], include: IncludeOptions[]) {
+    public async updateOne(
+        where: any,
+        input: any,
+        attributes: string[],
+        include: IncludeOptions[],
+        record: { id: number },
+    ) {
         // 1- create the record
         const [affectedRows] = await this.datasource.update(input, { where });
         // 2- create relations
-        // await this.createRelations(record, input);
+        await this.updateAssosiations(record, input);
         // 3- return the query
         return this.datasource.findOne({ where, attributes, include });
     }

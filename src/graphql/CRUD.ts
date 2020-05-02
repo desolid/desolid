@@ -154,7 +154,9 @@ export class CRUD {
 
     private async updateOne(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        return this.model.updateOne(where /** WhereUniqueInput */, data, attributes, include);
+        const record = await this.model.findOne(where, ['id'], []);
+        await this.inputs.update.validate(data, record);
+        return this.model.updateOne(where /** WhereUniqueInput */, data, attributes, include, record);
     }
 
     private async updateMany(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {
