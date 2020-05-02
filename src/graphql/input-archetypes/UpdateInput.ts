@@ -1,21 +1,21 @@
 import { NexusInputFieldConfig } from '@nexus/schema/dist/core';
-import { Input } from '.';
+import { Input, UpdateManyRelationsInput } from '.';
 import { TypeDefinition, FieldDefinition } from '../../schema';
+import { Model } from '../../database';
 
 /**
- * 
+ *
  * @todo handle update on relations: create,connect,delete
  */
 export class UpdateInput extends Input {
-    constructor(model: TypeDefinition) {
-        super(model, `${model.name}UpdateInput`);
+    constructor(private readonly model: Model) {
+        super(model.typeDefinition, `${model.name}UpdateInput`);
     }
 
     public get fields() {
         // remove forbidden fields
-        return this.model.fields.filter(
-            (field) =>
-                field.type != 'ID' && !field.directives.createdAt && !field.directives.updatedAt && !field.relation,
+        return this.typeDfinition.fields.filter(
+            (field) => field.type != 'ID' && !field.directives.createdAt && !field.directives.updatedAt,
         );
     }
 
@@ -23,8 +23,19 @@ export class UpdateInput extends Input {
      *
      * @todo handle file upload
      */
-    protected configField(field: FieldDefinition): NexusInputFieldConfig<string, string> {
+    protected getFieldConfig(field: FieldDefinition): NexusInputFieldConfig<string, string> {
+        let type;
+        if (field.relation) {
+            if (field.config.list) {
+                type = UpdateManyRelationsInput;
+            } else {
+                type = 'Int';
+            }
+        } else {
+            type = field.type;
+        }
         return {
+            type,
             required: false,
         } as NexusInputFieldConfig<string, string>;
     }

@@ -1,26 +1,16 @@
-import { NexusInputFieldConfig } from '@nexus/schema/dist/core';
-import { TypeDefinition,FieldDefinition } from 'src/schema';
-import { Input } from '.';
+import { ModelMutationInput } from '.';
+import { Model } from 'src/database';
 
-export class CreateInput extends Input {
-    constructor(protected readonly model: TypeDefinition) {
-        super(model, `${model.name}CreateInput`);
+export class CreateOneInput extends ModelMutationInput {
+    public static getObjectName(model: Model) {
+        return `${model.name}CreateOneInput`;
     }
 
-    public get fields() {
-        // remove auto fill fields
-        return this.model.fields.filter(
-            (field) => !field.directives.createdAt && !field.directives.updatedAt,
-        );
+    constructor(model: Model) {
+        super(model, CreateOneInput.getObjectName(model));
     }
 
-    /**
-     *
-     * @todo handle file upload
-     */
-    protected configField(field: FieldDefinition): NexusInputFieldConfig<string, string> {
-        return {
-            required: field.type == 'ID' ? false : !field.config.nullable,
-        } as NexusInputFieldConfig<string, string>;
+    public async validate(input: any) {
+        await this.validateAsosations(input);
     }
 }

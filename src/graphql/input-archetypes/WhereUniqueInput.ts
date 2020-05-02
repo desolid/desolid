@@ -3,15 +3,19 @@ import { FieldDefinition, TypeDefinition } from '../../schema';
 import { NexusInputFieldConfig } from '@nexus/schema/dist/core';
 
 export class WhereUniqueInput extends Input {
+    public static getObjectName(model: TypeDefinition) {
+        return `${model.name}WhereUniqueInput`;
+    }
+
     constructor(model: TypeDefinition) {
-        super(model, `${model.name}WhereUniqueInput`);
+        super(model, WhereUniqueInput.getObjectName(model));
     }
     public get fields() {
         // only ID & unique fields
-        return this.model.fields.filter((field) => field.type == 'ID' || field.directives.unique);
+        return this.typeDfinition.fields.filter((field) => field.type == 'ID' || field.directives.unique);
     }
 
-    protected configField(field: FieldDefinition): NexusInputFieldConfig<string, string> {
+    protected getFieldConfig(field: FieldDefinition): NexusInputFieldConfig<string, string> {
         return {
             required: false,
         } as NexusInputFieldConfig<string, string>;

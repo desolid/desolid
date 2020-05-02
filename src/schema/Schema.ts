@@ -1,4 +1,10 @@
-import { NexusScalarTypeDef, NexusEnumTypeDef, enumType, NexusInputObjectTypeDef } from '@nexus/schema/dist/core';
+import {
+    NexusScalarTypeDef,
+    NexusEnumTypeDef,
+    enumType,
+    NexusInputObjectTypeDef,
+    inputObjectType,
+} from '@nexus/schema/dist/core';
 import * as path from 'path';
 import gql from 'graphql-tag';
 import { readFileSync } from 'fs-extra';
@@ -41,9 +47,6 @@ export class Schema {
         }
         let entity: EntityDefinition;
         switch (definition.kind) {
-            case 'ScalarTypeDefinition':
-                throw new Error(`Scalar Difinition ("${definition.name.value}") Forbidden !`);
-                break;
             case 'EnumTypeDefinition':
                 entity = enumType({
                     name: definition.name.value,
@@ -57,6 +60,9 @@ export class Schema {
                 return;
             case 'ObjectTypeDefinition':
                 entity = new TypeDefinition(this, definition);
+                break;
+            default:
+                throw new Error(`Forbidden ${definition.kind}: "${definition.name.value}"`);
         }
         this.dictionary.set(entity.name, entity);
         return entity;

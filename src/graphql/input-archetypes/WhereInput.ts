@@ -7,12 +7,17 @@ import { WhereOptions, Op } from 'sequelize';
  * @todo include all possibe where operators
  */
 export class WhereInput extends Input {
+    
+    public static getObjectName(model: TypeDefinition) {
+        return `${model.name}WhereInput`;
+    }
+
     constructor(model: TypeDefinition) {
-        super(model, `${model.name}WhereInput`);
+        super(model, WhereInput.getObjectName(model));
     }
 
     public get fields() {
-        return this.model.fields.reduce((output, field) => {
+        return this.typeDfinition.fields.reduce((output, field) => {
             if (field.isScalar) {
                 output.push(...this.genrateFieldOperators(field));
             }
@@ -49,7 +54,7 @@ export class WhereInput extends Input {
         return { [Op.and]: expressions } as WhereOptions;
     }
 
-    protected configField(field: FieldDefinition): NexusInputFieldConfig<string, string> {
+    protected getFieldConfig(field: FieldDefinition): NexusInputFieldConfig<string, string> {
         return {
             required: false,
         } as NexusInputFieldConfig<string, string>;

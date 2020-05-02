@@ -9,7 +9,7 @@ import {
     FieldsByTypeName,
 } from 'graphql-parse-resolve-info';
 import { IncludeOptions } from 'sequelize';
-import { CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from '.';
+import { CreateOneInput as CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from '.';
 import { Model } from '../database';
 
 export interface FindArgs {
@@ -42,8 +42,8 @@ export class CRUD {
     } = {} as any;
 
     constructor(private model: Model) {
-        this.inputs.create = new CreateInput(model.typeDefinition);
-        this.inputs.update = new UpdateInput(model.typeDefinition);
+        this.inputs.create = new CreateInput(model);
+        this.inputs.update = new UpdateInput(model);
         this.inputs.where = new WhereInput(model.typeDefinition);
         this.inputs.whereUnique = new WhereUniqueInput(model.typeDefinition);
         this.inputs.orderBy = new OrderBy(model.typeDefinition);
@@ -73,11 +73,13 @@ export class CRUD {
             args: { data: this.inputs.create.toArg(true) },
             resolve: this.createOne.bind(this),
         });
+
         t.list.field(`createMany${this.model.name}`, {
             type: this.model.typeDefinition,
             args: { data: this.inputs.create.toArg(true, [true]) },
             resolve: this.createMany.bind(this),
         });
+
         t.field(`update${this.model.name}`, {
             type: this.model.typeDefinition,
             args: {
@@ -86,6 +88,7 @@ export class CRUD {
             },
             resolve: this.updateOne.bind(this),
         });
+
         t.field(`updateMany${pluralize(this.model.name)}`, {
             type: this.model.typeDefinition.schema.get('BatchPayload'),
             args: {
@@ -94,11 +97,13 @@ export class CRUD {
             },
             resolve: this.updateMany.bind(this),
         });
+
         t.field(`delete${this.model.name}`, {
             type: this.model.typeDefinition,
             args: { where: this.inputs.whereUnique.toArg(true) },
             resolve: this.deleteOne.bind(this),
         });
+
         t.field(`deleteMany${pluralize(this.model.name)}`, {
             type: this.model.typeDefinition.schema.get('BatchPayload'),
             args: { where: this.inputs.where.toArg(true) },
@@ -137,11 +142,13 @@ export class CRUD {
 
     private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
+        await this.inputs.create.validate(data);
         return this.model.createOne(data, attributes, include);
     }
 
     private async createMany(root: any, { data }: { data: any[] }, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
+        await Promise.all(data.map((item) => this.inputs.create.validate(item)));
         return this.model.createMany(data, attributes, include);
     }
 

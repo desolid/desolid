@@ -1,4 +1,4 @@
-import { Sequelize, ModelCtor, IncludeOptions, Order, Op, BelongsToMany } from 'sequelize';
+import { Sequelize, ModelCtor, IncludeOptions, Order, Op, BelongsToMany, Association } from 'sequelize';
 import * as _ from 'lodash';
 import { ModelSchema } from '.';
 import { TypeDefinition } from '../schema';
@@ -19,7 +19,7 @@ export class Model {
         return this.schema.name;
     }
 
-    private async createRelations(record, inputs) {
+    private async createAssosiations(record, inputs) {
         const multiAssosiations = Object.values(this.datasource.associations).filter(
             (assossiation) => assossiation.isMultiAssociation,
         );
@@ -39,32 +39,25 @@ export class Model {
         );
     }
 
-    private async validateAssosiationInputs(inputs) {
-        await Promise.all(
-            Object.values(this.datasource.associations).map(async (assosiation) => {
-                const input = inputs[assosiation.as];
-                if (input) {
-                    if (assosiation.isSingleAssociation) {
-                        const record = await assosiation.target.findByPk(input);
-                        if (!record) {
-                            throw new Error(`Not found the '${assosiation.target.name}' where { id: '${input}' }.`);
-                        }
-                        inputs[assosiation.foreignKey] = input;
-                        delete inputs[assosiation.as];
-                    } else {
-                        const records = await assosiation.target.findAll({
-                            where: { id: { [Op.in]: input } },
-                            attributes: ['id'],
-                        });
-                        (input as string[]).forEach((id) => {
-                            if (!_.find(records, { id: id })) {
-                                throw new Error(`Not found the '${assosiation.target.name}' where { id: '${id}' }.`);
-                            }
-                        });
-                    }
+    public async assosiationExists(value: number | number[], assosiation: Association<any, any>) {
+        if (value) {
+            if (assosiation.isSingleAssociation) {
+                const record = await assosiation.target.findByPk(value as number);
+                if (!record) {
+                    throw new Error(`Not found the '${assosiation.target.name}' where { id: '${value}' }.`);
                 }
-            }),
-        );
+            } else {
+                const records = await assosiation.target.findAll({
+                    where: { id: { [Op.in]: value } },
+                    attributes: ['id'],
+                });
+                (value as number[]).forEach((id) => {
+                    if (!_.find(records, { id: id })) {
+                        throw new Error(`Not found the '${assosiation.target.name}' where { id: '${id}' }.`);
+                    }
+                });
+            }
+        }
     }
 
     /**
@@ -74,13 +67,11 @@ export class Model {
         // https://stackoverflow.com/a/49828917/2179157
         // https://stackoverflow.com/a/55765249/2179157
         // https://medium.com/@tonyangelo9707/many-to-many-associations-using-sequelize-941f0b6ac102
-        // 1- validate relations exist
-        await this.validateAssosiationInputs(input);
-        // 2- create the record
+        // 1- create the record
         const record = await this.datasource.create(input);
-        // 3- create relations
-        await this.createRelations(record, input);
-        // 4- return the query
+        // 2- create relations
+        await this.createAssosiations(record, input);
+        // 3- return the query
         return this.datasource.findByPk(record[this.datasource.primaryKeyAttribute], {
             attributes,
             include,
@@ -93,17 +84,15 @@ export class Model {
      * @param attributes
      * @param include
      *
-     * @todo handle create/connect on relations
+     * @todo 1: handle create/connect on relations
      * @todo could be more quick by bulk relation creatation
      */
     public async createMany(inputs: any[], attributes: string[], include: IncludeOptions[]) {
-        // 1- validate relations exist
-        await Promise.all(inputs.map((input) => this.validateAssosiationInputs(input)));
-        // 2- create the records
+        // 1- create the records
         const records: any[] = await this.datasource.bulkCreate(inputs, { returning: ['id'] });
-        // 3- create relations
-        await Promise.all(records.map((record, index) => this.createRelations(record, inputs[index])));
-        // 4- return the query
+        // 2- create relations
+        await Promise.all(records.map((record, index) => this.createAssosiations(record, inputs[index])));
+        // 3- return the query
         return this.datasource.findAll({
             where: {
                 id: records.map((record) => record.id),
@@ -113,22 +102,22 @@ export class Model {
         });
     }
 
+    public async deleteOne() {}
+
     /**
-     * @todo handle update on relations: create,connect,delete
+     * @todo 1: handle update on relations: create,connect,delete
      */
     public async updateOne(where: any, input: any, attributes: string[], include: IncludeOptions[]) {
-        // 1- validate relations exist
-        // await this.validateAssosiationInputs(input);
-        // 2- create the record
+        // 1- create the record
         const [affectedRows] = await this.datasource.update(input, { where });
-        // 3- create relations
+        // 2- create relations
         // await this.createRelations(record, input);
-        // 4- return the query
+        // 3- return the query
         return this.datasource.findOne({ where, attributes, include });
     }
 
     /**
-     * @todo handle update on relations: create,connect,delete
+     * @todo 1: handle update on relations: create,connect,delete
      */
     public async updateMany(where: any, input: any, attributes: string[], include: IncludeOptions[]) {
         const [affectedRows] = await this.datasource.update(input, { where });
