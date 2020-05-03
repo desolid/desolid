@@ -3,3 +3,4 @@ database:
     storage: 'databse.sqlite'
 api:
     port: 3000
+    secret: 'secret'

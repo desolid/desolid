@@ -19,9 +19,11 @@ class ObjectTypeConfig implements NexusObjectTypeConfig<string> {
     }
 
     public definition(t: ObjectDefinitionBlock<string>) {
-        this.typedef.fields.forEach((field) =>
-            t.field(field.name, { ...field.config, type: field.type } as FieldOutConfig<any, any>),
-        );
+        this.typedef.fields.forEach((field) => {
+            if (field.type != 'Password') {
+                t.field(field.name, { ...field.config, type: field.type } as FieldOutConfig<any, any>);
+            }
+        });
     }
 }
 

@@ -2,6 +2,11 @@ type BatchPayload {
     count: Int
 }
 
+type AuthenticationPayload {
+    user: User
+    token: String!
+}
+
 enum UserGroup {
     """
     System Administrator
@@ -37,7 +42,6 @@ type User
     createdAt: DateTime! @createdAt
     updatedAt: DateTime! @updatedAt
     email: EmailAddress! @unique
-    phone: PhoneNumber @unique
     password: Password! @validation(length: { min: 12, max: 25 })
     group: UserGroup!
     name: String!

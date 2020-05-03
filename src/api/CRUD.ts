@@ -49,7 +49,7 @@ export class CRUD {
         this.inputs.orderBy = new OrderBy(model.typeDefinition);
     }
 
-    public generateQuery(t: ObjectDefinitionBlock<'Query'>) {
+    public generateQueries(t: ObjectDefinitionBlock<'Query'>) {
         t.field(this.model.name.toLowerCase(), {
             type: this.model.typeDefinition,
             args: { where: this.inputs.whereUnique.toArg(true) },
@@ -67,7 +67,7 @@ export class CRUD {
         });
     }
 
-    public generateMutation(t: ObjectDefinitionBlock<'Mutation'>) {
+    public generateMutations(t: ObjectDefinitionBlock<'Mutation'>) {
         t.field(`create${this.model.name}`, {
             type: this.model.typeDefinition,
             args: { data: this.inputs.create.toArg(true) },

@@ -1,6 +1,8 @@
 import { GraphQLUpload } from 'graphql-upload';
 import * as StandardScalars from 'graphql-scalars';
+import * as md5 from 'md5';
 import { NexusScalarTypeDef, scalarType } from '@nexus/schema/dist/core';
+import { StringValueNode } from 'graphql';
 
 export type Scalar =
     // primitives
@@ -105,12 +107,13 @@ scalars.push(scalarType(GraphQLUpload));
 scalars.push(
     scalarType({
         name: 'Password',
-        description: '@todo describe',
+        description: '`MD5` encrypted password',
         /**
-         * @todo implement
+         * Value sent to the client
+         * @param value 
          */
         serialize(value) {
-            debugger;
+            throw new Error('Password could not pass to the client.');
         },
 
         /**
@@ -118,14 +121,11 @@ scalars.push(
          */
         parseValue(value) {
             debugger;
+            return value;
         },
 
-        /**
-         * @todo implement
-         */
-        parseLiteral(value) {
-            // debugger;
-            return true;
+        parseLiteral({ value }: StringValueNode) {
+            return md5(value);
         },
     }),
 );
