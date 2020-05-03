@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs-extra';
 import * as yaml from 'js-yaml';
 import { DatabaseConfig, Database } from './database';
-import { GraphQLAPIConfig, GraphQLAPI } from './graphql';
+import { GraphQLAPIConfig, GraphQLAPI } from './api';
 import { Schema } from './schema';
 
 export interface DesolidConfig {
