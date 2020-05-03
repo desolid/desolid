@@ -9,7 +9,15 @@ import {
     FieldsByTypeName,
 } from 'graphql-parse-resolve-info';
 import { IncludeOptions } from 'sequelize';
-import { CreateOneInput as CreateInput, UpdateInput, WhereInput, WhereUniqueInput, OrderBy } from '.';
+import {
+    CreateInput,
+    UpdateInput,
+    WhereInput,
+    WhereUniqueInput,
+    OrderBy,
+    Authorization,
+    AuthorizationCategory,
+} from '.';
 import { Model } from '../database';
 
 export interface FindArgs {
@@ -20,10 +28,10 @@ export interface FindArgs {
 }
 
 export interface SelectAttributes {
-    attributes: {};
+    attributes?: {};
     name: string;
-    alias: string;
-    args: {
+    alias?: string;
+    args?: {
         [str: string]: any;
     };
     fieldsByTypeName: FieldsByTypeName;
@@ -33,6 +41,7 @@ export interface SelectAttributes {
  * @todo finish CRUDS
  */
 export class CRUD {
+    private authorization: Authorization;
     private readonly inputs: {
         create: CreateInput;
         update: UpdateInput;
@@ -42,6 +51,7 @@ export class CRUD {
     } = {} as any;
 
     constructor(private model: Model) {
+        this.authorization = new Authorization(model.typeDefinition);
         this.inputs.create = new CreateInput(model);
         this.inputs.update = new UpdateInput(model);
         this.inputs.where = new WhereInput(model.typeDefinition);
@@ -134,34 +144,50 @@ export class CRUD {
         return { attributes, include };
     }
 
-    private parseResolveInfo(info: GraphQLResolveInfo) {
-        return this.parseSelectAttributes(
-            simplifyParsedResolveInfoFragmentWithType(parseResolveInfo(info) as ResolveTree, info.returnType).fields,
-        );
+    private parseResolveInfo(info: GraphQLResolveInfo, extraSelect?: { [key: string]: SelectAttributes }) {
+        const select = simplifyParsedResolveInfoFragmentWithType(parseResolveInfo(info) as ResolveTree, info.returnType)
+            .fields;
+        return this.parseSelectAttributes(_.merge(select, extraSelect));
     }
 
     private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
+        this.authorization.create(context.user);
         await this.inputs.create.validate(data);
         return this.model.createOne(data, attributes, include);
     }
 
     private async createMany(root: any, { data }: { data: any[] }, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
+        this.authorization.create(context.user);
         await Promise.all(data.map((item) => this.inputs.create.validate(item)));
         return this.model.createMany(data, attributes, include);
     }
 
     private async updateOne(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        const record = await this.model.findOne(where, ['id'], []);
+        // We have to fetch attributes which we need on the authorization flow too
+        const preflighAttributes = this.parseSelectAttributes(
+            this.authorization.getSelectOf(AuthorizationCategory.UPDATE),
+        );
+        preflighAttributes.attributes.push('id');
+        const record = await this.model.findOne(where, preflighAttributes.attributes, preflighAttributes.include);
+        this.authorization.update(context.user, record);
         await this.inputs.update.validate(data, record);
         return this.model.updateOne(where /** WhereUniqueInput */, data, attributes, include, record);
     }
 
     private async updateMany(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        const records = await this.model.findAll(where, ['id']);
+        // We have to fetch attributes which we need on the authorization flow too
+        const preflighAttributes = this.parseSelectAttributes(
+            this.authorization.getSelectOf(AuthorizationCategory.UPDATE),
+        );
+        preflighAttributes.attributes.push('id');
+        const records = await this.model.findAll(where, preflighAttributes.attributes, preflighAttributes.include);
+        records.forEach((record) => {
+            this.authorization.update(context.user, record);
+        });
         await Promise.all(records.map((record) => this.inputs.update.validate(data, record)));
         return this.model.updateMany(
             this.inputs.where.parse(where) /** WhereInput */,
@@ -173,18 +199,42 @@ export class CRUD {
     }
 
     private async deleteOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
-        const { attributes, include } = this.parseResolveInfo(info);
-        return this.model.deleteOne(where, attributes, include);
+        // We have to fetch attributes which we need on the authorization flow too
+        const { attributes, include } = this.parseResolveInfo(
+            info,
+            this.authorization.getSelectOf(AuthorizationCategory.DELETE),
+        );
+        const record = await this.model.findOne(where, attributes, include);
+        if (record) {
+            this.authorization.delete(context.user, record);
+        } else {
+            throw new Error(`Not found the '${this.model.name}' where ${JSON.stringify(where)}.`);
+        }
+        await this.model.deleteOne(where, attributes, include);
+        return record;
     }
 
     private async deleteMany(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
         // const { attributes, include } = this.parseResolveInfo(info);
+        // We have to fetch attributes which we need on the authorization flow too
+        const preflighAttributes = this.parseSelectAttributes(
+            this.authorization.getSelectOf(AuthorizationCategory.UPDATE),
+        );
+        preflighAttributes.attributes.push('id');
+        const records = await this.model.findAll(where, preflighAttributes.attributes, preflighAttributes.include);
+        records.forEach((record) => {
+            this.authorization.delete(context.user, record);
+        });
         return this.model.deleteMany(this.inputs.where.parse(where));
     }
 
     private async find(root: any, { where, orderBy, offset, limit }: FindArgs, context: any, info: GraphQLResolveInfo) {
-        const { attributes, include } = this.parseResolveInfo(info);
-        return this.model.findAll(
+        // We have to fetch attributes which we need on the authorization flow too
+        const { attributes, include } = this.parseResolveInfo(
+            info,
+            this.authorization.getSelectOf(AuthorizationCategory.READ),
+        );
+        const records = await this.model.findAll(
             this.inputs.where.parse(where),
             attributes,
             include,
@@ -192,15 +242,24 @@ export class CRUD {
             limit,
             offset,
         );
+        records.forEach((record) => {
+            this.authorization.read(context.user, record);
+        });
+        return records;
     }
 
     private async findOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {
-        const { attributes, include } = this.parseResolveInfo(info);
-        const result = await this.model.findOne(where, attributes, include);
-        if (!result) {
+        // We have to fetch attributes which we need on the authorization flow too
+        const { attributes, include } = this.parseResolveInfo(
+            info,
+            this.authorization.getSelectOf(AuthorizationCategory.READ),
+        );
+        const record = await this.model.findOne(where, attributes, include);
+        if (!record) {
             throw new Error(`Not found.`);
         } else {
-            return result;
+            this.authorization.read(context.user, record);
+            return record;
         }
     }
 }

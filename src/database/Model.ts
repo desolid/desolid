@@ -3,6 +3,12 @@ import * as _ from 'lodash';
 import { ModelSchema } from '.';
 import { TypeDefinition } from '../schema';
 
+export interface Record {
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 export class Model {
     public readonly datasource: ModelCtor<any>;
     public readonly schema: ModelSchema;
@@ -135,12 +141,7 @@ export class Model {
     }
 
     public async deleteOne(where: any, attributes?: string[], include?: IncludeOptions[]) {
-        const entry = await this.findOne(where, attributes, include);
-        if (!entry) {
-            throw new Error(`Not found the '${this.name}' where ${JSON.stringify(where)}.`);
-        }
-        await this.datasource.destroy({ where });
-        return entry;
+        return await this.datasource.destroy({ where });
     }
 
     public async deleteMany(where: any) {

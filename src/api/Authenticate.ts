@@ -3,6 +3,8 @@ import { Model } from '../database';
 import * as jwt from 'jsonwebtoken';
 import { arg, ObjectDefinitionBlock, NexusObjectTypeDef } from '@nexus/schema/dist/core';
 import { GraphQLResolveInfo } from 'graphql';
+
+
 export class Authenticate {
     constructor(private readonly model: Model, private readonly secret: string) {
         this.secret = this.secret || 'secret';

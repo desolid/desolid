@@ -1,13 +1,13 @@
 import { ModelMutationInput } from '.';
 import { Model } from 'src/database';
 
-export class CreateOneInput extends ModelMutationInput {
+export class CreateInput extends ModelMutationInput {
     public static getObjectName(model: Model) {
         return `${model.name}CreateInput`;
     }
 
     constructor(model: Model) {
-        super(model, CreateOneInput.getObjectName(model));
+        super(model, CreateInput.getObjectName(model));
     }
 
     private async validateAssosiations(input: any) {

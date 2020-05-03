@@ -107,7 +107,7 @@ scalars.push(scalarType(GraphQLUpload));
 scalars.push(
     scalarType({
         name: 'Password',
-        description: '`MD5` encrypted password',
+        description: 'Password hash',
         /**
          * Value sent to the client
          * @param value 

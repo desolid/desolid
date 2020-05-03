@@ -9,19 +9,19 @@ This is a description of a Post
 type Post
     @model
     @authorization(
-        READ: "$this.published || $user.group = Editor || $user.id = $this.author"
-        CREATE: "$user.group in [Editor, Author]"
-        UPDATE: "$user.group = Editor || $user.id = $this.author"
-        DELETE: "$user.group = Editor || $user.id = $this.author"
+        READ: [Admin, Editor, "{{published}} || $user.id == {{author.id}}"]
+        CREATE: [Admin, Editor, Author]
+        UPDATE: [Admin, Editor, "$user.id == {{author.id}}"]
+        DELETE: [Admin, Editor, "!{{published}} && $user.id == {{author.id}}"] #
     ) {
     id: ID!
-    createdAt: DateTime! @createdAt
-    updatedAt: DateTime! @updatedAt
-    author: User! @relation(type: "many-to-one")
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    author: User!
     title: String!
     content: String!
-    published: Boolean! @default(value: false) @authorization(READ: "$user.group in [Editor, Author]")
-    categories: [Category] @relation(type: "many-to-many")
+    published: Boolean!
+    categories: [Category]
 }
 
 """
@@ -30,14 +30,13 @@ This is a description of a Category
 type Category
     @model
     @authorization(
-        READ: "true"
-        CREATE: "$user.group = Editor"
-        UPDATE: "$user.group = Editor"
-        DELETE: "$user.group = Editor"
+        CREATE: [Admin, Editor]
+        UPDATE: [Admin, Editor]
+        DELETE: [Admin, Editor] #
     ) {
     id: ID!
-    createdAt: DateTime! @createdAt
-    updatedAt: DateTime! @updatedAt
+    createdAt: DateTime!
+    updatedAt: DateTime!
     name: String!
-    posts: [Post] @relation(type: "many-to-many")
+    posts: [Post]
 }

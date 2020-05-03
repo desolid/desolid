@@ -8,8 +8,6 @@ export type FieldType = Scalar;
 
 export type FieldDirectives =
     | 'authorization'
-    | 'createdAt'
-    | 'updatedAt'
     | 'default'
     | 'upload'
     | 'unique'

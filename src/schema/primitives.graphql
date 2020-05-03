@@ -12,37 +12,41 @@ enum UserGroup {
     System Administrator
     """
     Admin
-    """
-    Authenticated User
-    """
-    User
 }
 
-type File @model {
+"""
+Base File Model
+"""
+type File
+    @model
+    @authorization(
+        CREATE: [Admin]
+        UPDATE: [Admin]
+        DELETE: [Admin] #
+    ) {
     id: ID!
-    createdAt: DateTime! @createdAt
-    updatedAt: DateTime! @updatedAt
+    createdAt: DateTime!
+    updatedAt: DateTime!
     name: String!
     mimeType: String!
     path: String! @unique
 }
 
 """
-This is a description of a User
+Base User Model
 """
 type User
     @model
     @authorization(
-        READ: "$user.group = Editor || $user.id = $this.id"
-        CREATE: "true"
-        UPDATE: "$user.group = Editor || $user.id = $this.id"
-        DELETE: "$user.group = Editor || $user.id = $this.id"
+        READ: [Admin, "$user.id == {{id}}"]
+        UPDATE: [Admin, "$user.id == {{id}}"]
+        DELETE: [Admin] #
     ) {
     id: ID!
-    createdAt: DateTime! @createdAt
-    updatedAt: DateTime! @updatedAt
+    createdAt: DateTime!
+    updatedAt: DateTime!
     email: EmailAddress! @unique
-    password: Password! @validation(length: { min: 12, max: 25 })
+    password: Password!
     group: UserGroup!
     name: String!
     family: String!
