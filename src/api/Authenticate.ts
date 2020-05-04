@@ -4,7 +4,6 @@ import * as jwt from 'jsonwebtoken';
 import { arg, ObjectDefinitionBlock, NexusObjectTypeDef } from '@nexus/schema/dist/core';
 import { GraphQLResolveInfo } from 'graphql';
 
-
 export class Authenticate {
     constructor(private readonly model: Model, private readonly secret: string) {
         this.secret = this.secret || 'secret';
@@ -32,6 +31,7 @@ export class Authenticate {
     }
 
     private async _middleware(resolve, root, args, context, info) {
+        context.user = {};
         try {
             const token = jwt.verify(context.request.get('Authorization'), this.secret) as {
                 id: string;

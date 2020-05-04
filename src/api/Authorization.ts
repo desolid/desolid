@@ -70,12 +70,14 @@ export class Authorization {
             condition.attributes.forEach((attribute) => {
                 body = body.replace(`{{${attribute}}}`, `$record.${attribute}`);
             });
-            const needsAuthentication = _.includes(body, '$user.');
+            // const needsAuthentication = _.includes(body, '$user.');
             condition.function = function($user: User, $record: Record) {
-                if (!$user && needsAuthentication) {
-                    return false;
-                } else {
+                try {
                     return eval(body);
+                } catch (error) {
+                    throw new Error(
+                        `Failed executing ${category} Authorization condition: ["${condition.attributes}"] of ${this.typeDefinition.name} model. Error: ${error.message}`,
+                    );
                 }
             };
         }
