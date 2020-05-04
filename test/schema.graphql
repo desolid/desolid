@@ -10,8 +10,8 @@ type Post
     @model
     @authorization(
         READ: [Admin, Editor, "{{published}} || $user.id == {{author.id}}"]
-        CREATE: [Admin, Editor, Author]
-        UPDATE: [Admin, Editor, "$user.id == {{author.id}}"]
+        CREATE: [Admin, Editor, "$user.group == 'Author' && !$input.published"]
+        UPDATE: [Admin, Editor, "$user.id == {{author.id}} && !$input.published"]
         DELETE: [Admin, Editor, "!{{published}} && $user.id == {{author.id}}"] #
     ) {
     id: ID!

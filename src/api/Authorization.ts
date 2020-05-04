@@ -19,7 +19,7 @@ interface User {
 interface AuthorizationCondition {
     select: { [key: string]: SelectAttributes };
     attributes: string[];
-    function: ($user: User, $record: Record) => boolean;
+    function: ($user: User, $record: Record, $input?: any) => boolean;
 }
 
 export class Authorization {
@@ -47,14 +47,16 @@ export class Authorization {
 
     private parseCondition(rule: string, category: AuthorizationCategory) {
         const attributes = rule.match(/{{[{]?(.*?)[}]?}}/g)?.map((item) => item.replace(/[{}]/g, '')) || [];
+        const isByGroup = attributes.length == 0;
         if (category != AuthorizationCategory.CREATE && !_.includes(attributes, 'id')) {
+            // `id` is needed for error reporting, that on which record user doesn't have permission
             attributes.push('id');
         }
         const condition = {
             attributes,
             select: this.attributesToSelect(category, attributes),
         } as AuthorizationCondition;
-        if (condition.attributes.length <= 1) {
+        if (isByGroup) {
             // Use group based conditions
             condition.function = function($user: User) {
                 if ($user) {
@@ -70,13 +72,21 @@ export class Authorization {
             condition.attributes.forEach((attribute) => {
                 body = body.replace(`{{${attribute}}}`, `$record.${attribute}`);
             });
+            let func;
+            try {
+                func = Function(`"use strict"; return ( function ($user, $record, $input) { return ${body}; } );`)();
+            } catch (error) {
+                throw new Error(
+                    `Failed compiling ${category} Authorization condition: \`${rule}\` of ${this.typeDefinition.name} model. ${error.message}.`,
+                );
+            }
             // const needsAuthentication = _.includes(body, '$user.');
-            condition.function = function($user: User, $record: Record) {
+            condition.function = ($user: User, $record: Record, $input?: any) => {
                 try {
-                    return eval(body);
+                    return func($user, $record, $input);
                 } catch (error) {
                     throw new Error(
-                        `Failed executing ${category} Authorization condition: ["${condition.attributes}"] of ${this.typeDefinition.name} model. Error: ${error.message}`,
+                        `Failed executing ${category} Authorization condition: \`${rule}\` of ${this.typeDefinition.name} model. ${error.message}.`,
                     );
                 }
             };
@@ -84,10 +94,10 @@ export class Authorization {
         return condition;
     }
 
-    private authorize(category: AuthorizationCategory, user: User, record: Record) {
+    private authorize(category: AuthorizationCategory, user: User, record: Record, input?: any) {
         if (
             !this.categories[category].reduce((output, condition) => {
-                output = output || condition.function(user, record);
+                output = output || condition.function(user, record, input);
                 return output;
             }, false)
         ) {
@@ -158,16 +168,16 @@ export class Authorization {
         }, {} as { [key: string]: SelectAttributes });
     }
 
-    create(user: User) {
-        this.authorize(AuthorizationCategory.CREATE, user, undefined);
+    create(user: User, input: any) {
+        this.authorize(AuthorizationCategory.CREATE, user, undefined, input);
     }
 
     read(user: User, record: Record) {
         this.authorize(AuthorizationCategory.READ, user, record);
     }
 
-    update(user: User, record: Record) {
-        this.authorize(AuthorizationCategory.UPDATE, user, record);
+    update(user: User, record: Record, input: any) {
+        this.authorize(AuthorizationCategory.UPDATE, user, record, input);
     }
 
     delete(user: User, record: Record) {

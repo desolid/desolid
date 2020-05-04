@@ -152,14 +152,16 @@ export class CRUD {
 
     private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        this.authorization.create(context.user);
+        this.authorization.create(context.user, data);
         await this.inputs.create.validate(data);
         return this.model.createOne(data, attributes, include);
     }
 
     private async createMany(root: any, { data }: { data: any[] }, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
-        this.authorization.create(context.user);
+        data.forEach((input) => {
+            this.authorization.create(context.user, input);
+        });
         await Promise.all(data.map((item) => this.inputs.create.validate(item)));
         return this.model.createMany(data, attributes, include);
     }
@@ -172,7 +174,7 @@ export class CRUD {
         );
         preflighAttributes.attributes.push('id');
         const record = await this.model.findOne(where, preflighAttributes.attributes, preflighAttributes.include);
-        this.authorization.update(context.user, record);
+        this.authorization.update(context.user, record, data);
         await this.inputs.update.validate(data, record);
         return this.model.updateOne(where /** WhereUniqueInput */, data, attributes, include, record);
     }
@@ -186,7 +188,7 @@ export class CRUD {
         preflighAttributes.attributes.push('id');
         const records = await this.model.findAll(where, preflighAttributes.attributes, preflighAttributes.include);
         records.forEach((record) => {
-            this.authorization.update(context.user, record);
+            this.authorization.update(context.user, record, data);
         });
         await Promise.all(records.map((record) => this.inputs.update.validate(data, record)));
         return this.model.updateMany(
