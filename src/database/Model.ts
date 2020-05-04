@@ -101,7 +101,7 @@ export class Model {
     /**
      * @todo handle create/connect on relations
      */
-    public async createOne(input: any, attributes: string[], include: IncludeOptions[]) {
+    public async createOne(input: any, attributes?: string[], include?: IncludeOptions[]) {
         // https://stackoverflow.com/a/49828917/2179157
         // https://stackoverflow.com/a/55765249/2179157
         // https://medium.com/@tonyangelo9707/many-to-many-associations-using-sequelize-941f0b6ac102

@@ -38,6 +38,7 @@ Base User Model
 type User
     @model
     @authorization(
+        CREATE: [Admin]
         READ: [Admin, "$user.id == {{id}}"]
         UPDATE: [Admin, "$user.id == {{id}}"]
         DELETE: [Admin] #
@@ -49,6 +50,5 @@ type User
     password: Password!
     group: UserGroup!
     name: String!
-    family: String!
     avatar: File @upload(accept: "imagee/*", size: { max: "5MB", min: "10KB" })
 }

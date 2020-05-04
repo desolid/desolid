@@ -26,6 +26,27 @@ export class Authenticate {
         });
     }
 
+    public generateMutations(t: ObjectDefinitionBlock<'Query'>) {
+        t.field('signup', {
+            type: this.model.typeDefinition.schema.dictionary.get('AuthenticationPayload') as NexusObjectTypeDef<any>,
+            args: {
+                name: arg({
+                    type: 'String',
+                    required: true,
+                }),
+                email: arg({
+                    type: 'String',
+                    required: true,
+                }),
+                password: arg({
+                    type: 'Password',
+                    required: true,
+                }),
+            },
+            resolve: this.signup.bind(this),
+        });
+    }
+
     public get middleware() {
         return this._middleware.bind(this);
     }
@@ -42,6 +63,14 @@ export class Authenticate {
             // return new AuthenticationError('Not authorised');
         }
         return resolve(root, args, context, info);
+    }
+
+    private async signup(root: any, { name, email, password }, context: any, info: GraphQLResolveInfo) {
+        const user = await this.model.createOne({ name, email, password });
+        return {
+            user,
+            token: jwt.sign({ id: user.id, email }, this.secret, { algorithm: 'HS256' }),
+        };
     }
 
     private async signin(root: any, { email, password }, context: any, info: GraphQLResolveInfo) {

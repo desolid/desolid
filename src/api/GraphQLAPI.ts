@@ -32,7 +32,10 @@ export class GraphQLAPI {
                     },
                 }),
                 mutationType({
-                    definition: (t) => this.cruds.forEach((crud) => crud.generateMutations(t)),
+                    definition: (t) => {
+                        this.authenticate.generateMutations(t);
+                        this.cruds.forEach((crud) => crud.generateMutations(t))
+                    },
                 }),
             ],
             outputs,

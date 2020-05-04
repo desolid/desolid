@@ -10,8 +10,10 @@ export enum AuthorizationCategory {
     DELETE = 'DELETE',
 }
 
-interface User {
+export interface User {
     id: number;
+    name: string;
+    family: string;
     email: string;
     group: 'string';
 }
