@@ -66,7 +66,7 @@ export class Authenticate {
     }
 
     private async signup(root: any, { name, email, password }, context: any, info: GraphQLResolveInfo) {
-        const user = await this.model.createOne({ name, email, password });
+        const user = await this.model.createOne({ name, email, password, group: 'User' });
         return {
             user,
             token: jwt.sign({ id: user.id, email }, this.secret, { algorithm: 'HS256' }),

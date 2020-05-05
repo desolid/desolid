@@ -11,7 +11,7 @@ export abstract class ModelMutationInput extends Input {
     public get fields() {
         // remove auto fill fields
         return this.typeDfinition.fields.filter(
-            (field) => field.type != 'ID' && !field.directives.createdAt && !field.directives.updatedAt,
+            (field) => field.type != 'ID' && field.name != 'createdAt' && field.name != 'updatedAt',
         );
     }
 
@@ -21,6 +21,6 @@ export abstract class ModelMutationInput extends Input {
     }
 
     protected getFieldNameFromAssosiation(assosiation: Association<any, any>) {
-        return assosiation.isSingleAssociation ? assosiation.foreignKey : assosiation.as;
+        return assosiation.isSingleAssociation && assosiation.target.name != 'File' ? assosiation.foreignKey : assosiation.as;
     }
 }

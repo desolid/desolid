@@ -22,11 +22,20 @@ export abstract class Input extends NexusInputObjectTypeDef<string> {
     /**
      *
      * @param t
+     * @todo handle files
      */
     private definition(t: InputDefinitionBlock<string>) {
         this.fields.forEach((field) => {
+            let type = field.type;
+            if (field.relation) {
+                if (field.relation.typeDefinition.name == 'File') {
+                    type = 'Upload';
+                } else {
+                    type = 'Int';
+                }
+            }
             t.field(this.getFieldName(field), {
-                type: field.relation ? 'Int' : (field.type as any),
+                type,
                 required: !field.config.nullable,
                 list: field.config.list,
                 ...this.getFieldConfig(field),

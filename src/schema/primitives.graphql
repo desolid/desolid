@@ -12,6 +12,10 @@ enum UserGroup {
     System Administrator
     """
     Admin
+    """
+    Authenticated User
+    """
+    User
 }
 
 """

@@ -19,6 +19,7 @@ import {
     AuthorizationCategory,
 } from '.';
 import { Model } from '../database';
+import { Storage } from '../storage';
 
 export interface FindArgs {
     where: any;
@@ -50,7 +51,7 @@ export class CRUD {
         orderBy: OrderBy;
     } = {} as any;
 
-    constructor(private model: Model) {
+    constructor(private readonly model: Model, private readonly storage: Storage) {
         this.authorization = new Authorization(model.typeDefinition);
         this.inputs.create = new CreateInput(model);
         this.inputs.update = new UpdateInput(model);
@@ -150,7 +151,7 @@ export class CRUD {
         return this.parseSelectAttributes(_.merge(select, extraSelect));
     }
 
-    private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
+    private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {        
         const { attributes, include } = this.parseResolveInfo(info);
         this.authorization.create(context.user, data);
         await this.inputs.create.validate(data);

@@ -4,3 +4,30 @@ database:
 api:
     port: 3000
     secret: 'secret'
+storage:
+    pattern: '${YYYY}/${MM}/${DD}/${UUID}.${EXT}'
+    # pattern: '${YYYY}/${MM}/${DD}/${FILENAME}-${EPOCH}.${EXT}'
+
+    driver: 'local'
+    # driver: 's3'
+    # driver: 'gcs'
+    config:
+        root: '.'
+
+        # # AWS
+        # key: 'AWS_S3_KEY'
+        # secret: 'AWS_S3_SECRET'
+        # region: 'AWS_S3_REGION'
+        # bucket: 'AWS_S3_BUCKET'
+
+        # # Space
+        # driver: 's3'
+        # key: 'SPACES_KEY'
+        # secret: 'SPACES_SECRET'
+        # endpoint: 'SPACES_ENDPOINT'
+        # bucket: 'SPACES_BUCKET'
+        # region: 'SPACES_REGION'
+            
+        # # Google cloud storage
+        # keyFilename: 'GCS_KEY'
+        # bucket: 'GCS_BUCKET'

@@ -2,6 +2,7 @@ import { makeSchema, queryType, mutationType } from '@nexus/schema/dist/core';
 import { GraphQLServer } from 'graphql-yoga';
 import { scalars } from '../schema';
 import { Model } from '../database';
+import { Storage } from '../storage';
 import { CRUD, Authenticate } from '.';
 
 export interface GraphQLAPIConfig {
@@ -14,10 +15,10 @@ export class GraphQLAPI {
     private cruds = new Map<string, CRUD>();
     private authenticate: Authenticate;
 
-    constructor(protected config: GraphQLAPIConfig, models: Map<string, Model>) {
+    constructor(protected readonly config: GraphQLAPIConfig, models: Map<string, Model>, storage: Storage) {
         this.authenticate = new Authenticate(models.get('User'), this.config.secret);
         models.forEach((model) => {
-            this.cruds.set(model.name, new CRUD(model));
+            this.cruds.set(model.name, new CRUD(model, storage));
         });
     }
 
@@ -34,7 +35,7 @@ export class GraphQLAPI {
                 mutationType({
                     definition: (t) => {
                         this.authenticate.generateMutations(t);
-                        this.cruds.forEach((crud) => crud.generateMutations(t))
+                        this.cruds.forEach((crud) => crud.generateMutations(t));
                     },
                 }),
             ],
