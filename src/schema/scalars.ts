@@ -1,8 +1,8 @@
-import { GraphQLUpload } from 'graphql-upload';
+// import { GraphQLUpload } from 'graphql-upload';
 import * as StandardScalars from 'graphql-scalars';
 import * as md5 from 'md5';
 import { NexusScalarTypeDef, scalarType } from '@nexus/schema/dist/core';
-import { StringValueNode } from 'graphql';
+import { StringValueNode, ScalarLeafsRule } from 'graphql';
 
 export type Scalar =
     // primitives
@@ -103,7 +103,10 @@ export const scalars = Object.keys(StandardScalars)
     })
     .filter((scalar) => scalar);
 
-scalars.push(scalarType(GraphQLUpload));
+// scalars.push(scalarType(GraphQLUpload));
+scalars.push(scalarType({
+    name: 'Upload',
+} as any));
 scalars.push(
     scalarType({
         name: 'Password',

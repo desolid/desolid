@@ -1,8 +1,8 @@
-import { DirectiveNode, StringValueNode, ValueNode } from 'graphql';
+import { DirectiveNode, ValueNode } from 'graphql';
 
 export class DirectiveDefinition {
-    name: string;
-    arguments: { [key: string]: any };
+    public readonly name: string;
+    public readonly arguments: any;
     constructor(directive: DirectiveNode) {
         this.name = directive.name.value;
         this.arguments = directive.arguments.reduce((output, argument) => {
@@ -10,6 +10,7 @@ export class DirectiveDefinition {
             return output;
         }, {});
     }
+
     private parseValue(value: ValueNode) {
         switch (value.kind) {
             case 'ListValue':

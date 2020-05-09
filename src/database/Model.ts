@@ -1,7 +1,8 @@
 import { Sequelize, ModelCtor, IncludeOptions, Order, Op, BelongsToMany, Association } from 'sequelize';
 import * as _ from 'lodash';
 import { ModelSchema } from '.';
-import { TypeDefinition } from '../schema';
+import { TypeDefinition, FieldDirectives, FieldDefinition } from 'src/schema';
+import { MapX } from 'src/utils';
 
 export interface Record {
     id: number;
@@ -12,6 +13,9 @@ export interface Record {
 export class Model {
     public readonly datasource: ModelCtor<any>;
     public readonly schema: ModelSchema;
+    public readonly relations: MapX<string, FieldDefinition>;
+    public readonly files: MapX<string, FieldDefinition>;
+
     constructor(database: Sequelize, public readonly typeDefinition: TypeDefinition) {
         this.schema = new ModelSchema(typeDefinition);
         this.datasource = database.define(
@@ -19,6 +23,10 @@ export class Model {
             this.schema.attributes,
             this.schema.options,
         ) as ModelCtor<any>;
+        this.relations = typeDefinition.fields.filter(
+            (field) => !field.isScalar && (field.type as TypeDefinition).isModel,
+        );
+        this.files = this.relations.filter((field) => field.typeName == 'File');
     }
 
     public get name() {

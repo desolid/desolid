@@ -1,9 +1,9 @@
 import { NexusInputFieldConfig } from '@nexus/schema/dist/core';
 import * as _ from 'lodash';
 import { ModelMutationInput, UpdateManyRelationsInput } from '.';
-import { FieldDefinition } from '../../schema';
-import { Model } from '../../database';
-import { Association, BelongsToMany, ModelCtor } from 'sequelize';
+import { FieldDefinition } from 'src/schema';
+import { Model } from 'src/database';
+import { BelongsToMany, ModelCtor } from 'sequelize';
 
 /**
  *
@@ -23,9 +23,9 @@ export class UpdateInput extends ModelMutationInput {
      * @todo handle file upload
      */
     protected getFieldConfig(field: FieldDefinition): NexusInputFieldConfig<string, string> {
-        let type: any = field.type;
+        let type: any = field.typeName;
         let list: any = field.config.list;
-        if (field.relation) {
+        if (field.relationType) {
             if (field.config.list) {
                 type = UpdateManyRelationsInput;
                 list = false;

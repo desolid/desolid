@@ -1,29 +1,30 @@
 import { FieldDefinitionNode, TypeNode } from 'graphql';
 import { FieldOutConfig } from '@nexus/schema/dist/core';
-import { DataType } from 'sequelize/types';
 import * as _ from 'lodash';
-import { Scalar, DirectiveDefinition, scalarTypes, stringScalars, TypeDefinition, EntityDefinition } from '.';
+import { Scalar, DirectiveDefinition, scalarTypes, stringScalars, TypeDefinition } from '.';
+import { MapX } from 'src/utils';
+
+export interface UploadDirectiveArguments {
+    accept: string[];
+    size: { max: number; min: number };
+}
+
+export type FieldDirectiveArguments = UploadDirectiveArguments | void;
 
 export type FieldType = Scalar;
 
-export type FieldDirectives =
-    | 'authorization'
-    | 'default'
-    | 'upload'
-    | 'unique'
-    | 'validation';
+export type FieldDirectives = 'authorization' | 'default' | 'upload' | 'unique' | 'validation';
 
 export type RelationType = 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many';
 
 export class FieldDefinition {
-    private _type: FieldType;
-    name: string;
-    databaseType: DataType;
-    isScalar: boolean;
-    description: string;
-    directives: { [key in FieldDirectives]: any } = {} as any;
-    config: FieldOutConfig<any, any>;
-    relationTableName: string = undefined;
+    public readonly typeName: string;
+    public readonly name: string;
+    public readonly isScalar: boolean;
+    public readonly isString: boolean;
+    public readonly description: string;
+    public readonly directives = new MapX<FieldDirectives, FieldDirectiveArguments>();
+    public readonly config: FieldOutConfig<any, any>;
 
     /**
      *
@@ -33,15 +34,16 @@ export class FieldDefinition {
      */
     constructor(definition: FieldDefinitionNode, public readonly owner: TypeDefinition) {
         const encodedFieldType = this.encodeFieldType(definition);
+        this.typeName = encodedFieldType.replace(/[!\]]/g, '') as FieldType;
         const list = encodedFieldType.match(/[\w!]\]/g);
-        definition.directives.forEach((item) => {
-            const summary = new DirectiveDefinition(item);
-            this.directives[summary.name] = summary.arguments;
-        });
-        this._type = encodedFieldType.replace(/[!\]]/g, '') as FieldType;
         this.name = definition.name.value;
         this.description = definition.description?.value;
-        this.isScalar = scalarTypes.indexOf(this._type as Scalar) >= 0;
+        this.isScalar = scalarTypes.indexOf(this.typeName as Scalar) >= 0;
+        this.isString = stringScalars.indexOf(this.typeName as string) >= 0;
+        definition.directives.forEach((item) => {
+            const summary = new DirectiveDefinition(item);
+            this.directives.set(summary.name as FieldDirectives, summary.arguments);
+        });
         this.config = {
             nullable: !/!$/.test(encodedFieldType),
             list: list ? list.map((item) => /^!/.test(item)) : false,
@@ -50,38 +52,36 @@ export class FieldDefinition {
 
     public get type() {
         if (this.isScalar) {
-            return this._type;
+            return this.typeName;
         } else {
-            return this.owner.schema.get(this._type as string);
+            const type = this.owner.schema.dictionary.get(this.typeName);
+            if (type) {
+                return type;
+            } else {
+                throw new Error(`Getting Type "${this.typeName}" before initial deffinitions gathering.`);
+            }
         }
     }
 
-    public get isString() {
-        return stringScalars.indexOf(this._type as string) >= 0;
-    }
-
-    /**
-     * @todo could be property, not attribute
-     */
-    public get relation() {
-        if (this.isScalar || !this.owner.isModel) return undefined;
+    public get relationType() {
         const right = this.type as TypeDefinition;
-        if (!right.isModel) return undefined;
-        const meOnTheRight = _.find(right.fields, { type: this.owner }) as FieldDefinition;
-        let type: RelationType;
+        if (this.isScalar || !right.isModel) return undefined;
+        const meOnTheRight = right.fields.find({ type: this.owner });
+        let relationType: RelationType;
         if (meOnTheRight) {
             if (this.config.list) {
-                type = meOnTheRight.config.list ? 'many-to-many' : 'many-to-one';
+                relationType = meOnTheRight.config.list ? 'many-to-many' : 'many-to-one';
             } else {
-                type = meOnTheRight.config.list ? 'one-to-many' : 'one-to-one';
+                relationType = meOnTheRight.config.list ? 'one-to-many' : 'one-to-one';
             }
         } else {
-            type = this.config.list ? 'many-to-many' : 'many-to-one';
+            relationType = this.config.list ? 'many-to-many' : 'many-to-one';
         }
-        return {
-            typeDefinition: right,
-            type,
-        };
+        return relationType;
+    }
+
+    public get isToOneRelation() {
+        return /-to-one$/.test(this.relationType);
     }
 
     private encodeFieldType(field: FieldDefinitionNode | TypeNode): string {

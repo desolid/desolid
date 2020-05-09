@@ -10,6 +10,7 @@ import gql from 'graphql-tag';
 import { readFileSync } from 'fs-extra';
 import { TypeDefinitionNode, EnumTypeExtensionNode } from 'graphql';
 import { TypeDefinition, scalars } from '.';
+import { MapX } from 'src/utils';
 
 export type EntityDefinition =
     | TypeDefinition
@@ -18,18 +19,16 @@ export type EntityDefinition =
     | NexusInputObjectTypeDef<string>;
 
 export class Schema {
-    public readonly dictionary = new Map<string, EntityDefinition>();
+    public readonly dictionary = new MapX<string, EntityDefinition>();
+    public readonly models: MapX<string, TypeDefinition>;
     /**
      * @param root root desolid directory
      */
     constructor(root: string) {
-        scalars.forEach((scalar) => this.dictionary.set(scalar.name, scalar));
+        this.dictionary.importArray(scalars, 'name')
         this.import(path.join(__dirname, 'primitives.graphql'));
         this.import(`${root}/schema.graphql`);
-    }
-
-    public get models() {
-        return [...this.dictionary.values()].filter((typeDef: TypeDefinition) => typeDef.isModel) as TypeDefinition[];
+        this.models = this.dictionary.search({ isModel: true }) as MapX<string, TypeDefinition>;
     }
 
     public get<T = TypeDefinition>(name: string) {

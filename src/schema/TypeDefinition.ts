@@ -6,6 +6,7 @@ import {
     ObjectDefinitionBlock,
 } from '@nexus/schema/dist/core';
 import { Schema, FieldDefinition, DirectiveDefinition } from '.';
+import { MapX } from 'src/utils';
 
 export type TypeDirectives = 'model' | 'authorization';
 
@@ -20,36 +21,32 @@ class ObjectTypeConfig implements NexusObjectTypeConfig<string> {
 
     public definition(t: ObjectDefinitionBlock<string>) {
         this.typedef.fields.forEach((field) => {
-            if (field.type != 'Password') {
-                t.field(field.name, { ...field.config, type: field.type } as FieldOutConfig<any, any>);
+            if (field.typeName != 'Password') {
+                t.field(field.name, { ...field.config, type: field.typeName } as FieldOutConfig<any, any>);
             }
         });
     }
 }
 
 export class TypeDefinition extends NexusObjectTypeDef<string> {
-    config = new ObjectTypeConfig(this);
-    fields: FieldDefinition[] = undefined;
-    directives: { [key in TypeDirectives]: any } = {} as any;
+    public readonly config = new ObjectTypeConfig(this);
+    public readonly fields = new MapX<string, FieldDefinition>(); //{} as { [key: string]: FieldDefinition };
+    public readonly directives = new MapX<TypeDirectives, any>();
+    public readonly isModel: boolean;
 
     constructor(public schema: Schema, private readonly definition: ObjectTypeDefinitionNode) {
         super(definition.name.value, undefined);
-        this.fields = definition.fields.map((field) => new FieldDefinition(field, this));
+        definition.fields.forEach((field) => {
+            this.fields.set(field.name.value, new FieldDefinition(field, this));
+        });
         definition.directives.forEach((item) => {
             const directive = new DirectiveDefinition(item);
-            this.directives[directive.name] = directive.arguments;
+            this.directives.set(directive.name as TypeDirectives, directive.arguments);
         });
+        this.isModel = this.directives.has('model');
     }
 
     public get description() {
         return this.definition.description?.value;
-    }
-
-    public get isModel() {
-        return this.directives.model ? true : false;
-    }
-
-    public get relations() {
-        return this.fields.filter((field) => field.relation);
     }
 }

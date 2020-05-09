@@ -10,7 +10,11 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "strict": false,
-    "incremental": true
+    "incremental": true,
+    "skipLibCheck": true,
+    "paths": {
+      "src/*": ["./src/*"]
+    }
   },
   "exclude": ["node_modules", "dist"]
 }

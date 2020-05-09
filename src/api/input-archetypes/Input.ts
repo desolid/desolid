@@ -1,5 +1,5 @@
 import { NexusInputObjectTypeDef, InputDefinitionBlock, NexusInputFieldConfig, arg } from '@nexus/schema/dist/core';
-import { TypeDefinition, FieldDefinition, FieldType } from '../../schema';
+import { TypeDefinition, FieldDefinition } from 'src/schema';
 
 export abstract class Input extends NexusInputObjectTypeDef<string> {
     constructor(protected readonly typeDfinition: TypeDefinition, name: string) {
@@ -27,8 +27,8 @@ export abstract class Input extends NexusInputObjectTypeDef<string> {
     private definition(t: InputDefinitionBlock<string>) {
         this.fields.forEach((field) => {
             let type = field.type;
-            if (field.relation) {
-                if (field.relation.typeDefinition.name == 'File') {
+            if (field.relationType) {
+                if (field.typeName == 'File') {
                     type = 'Upload';
                 } else {
                     type = 'Int';

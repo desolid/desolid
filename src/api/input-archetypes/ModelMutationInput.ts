@@ -11,7 +11,7 @@ export abstract class ModelMutationInput extends Input {
     public get fields() {
         // remove auto fill fields
         return this.typeDfinition.fields.filter(
-            (field) => field.type != 'ID' && field.name != 'createdAt' && field.name != 'updatedAt',
+            (field) => field.typeName != 'ID' && field.name != 'createdAt' && field.name != 'updatedAt',
         );
     }
 

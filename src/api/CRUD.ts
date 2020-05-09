@@ -151,10 +151,18 @@ export class CRUD {
         return this.parseSelectAttributes(_.merge(select, extraSelect));
     }
 
-    private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {        
+    private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
         this.authorization.create(context.user, data);
         await this.inputs.create.validate(data);
+        // saving fils
+        const uploadInputs = this.model.files.filter((field) => data[field.name]);
+        await Promise.all(
+            uploadInputs.map(async (field) => {
+                data[`${field.name}Id`] = await this.storage.save(data[field.name]);
+                delete data[field.name];
+            }),
+        );
         return this.model.createOne(data, attributes, include);
     }
 

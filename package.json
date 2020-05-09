@@ -5,8 +5,9 @@
     "author": "Sajjad Shirazy <shirazy.sajjad@gmail.com>",
     "license": "MIT",
     "scripts": {
-        "start": "ts-node src/server.ts",
-        "dev": "nodemon -e ts -w ./src -x npm start",
+        "preinstall": "npx npm-force-resolutions",
+        "start": "ts-node -r tsconfig-paths/register ./src/server.ts",
+        "dev": "nodemon",
         "build": "tsc -d",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "release:patch": "standard-version --release-as patch && git push && git push --tags",
@@ -19,9 +20,11 @@
         "@types/lodash": "^4.14.150",
         "@types/md5": "^2.2.0",
         "nodemon": "^2.0.2",
+        "npm-force-resolutions": "0.0.3",
         "prettier": "^1.19.1",
         "standard-version": "^7.1.0",
         "ts-node": "^7.0.1",
+        "tsconfig-paths": "^3.9.0",
         "typescript": "^3.8.3"
     },
     "dependencies": {
@@ -33,7 +36,6 @@
         "graphql-parse-resolve-info": "^4.5.0",
         "graphql-scalars": "^1.0.7",
         "graphql-tag": "^2.10.3",
-        "graphql-upload": "^10.0.0",
         "graphql-yoga": "^1.18.3",
         "js-yaml": "^3.13.1",
         "jsonwebtoken": "^8.5.1",
@@ -41,6 +43,11 @@
         "md5": "^2.2.1",
         "pluralize": "^8.0.0",
         "sequelize": "^5.21.6",
-        "sqlite3": "^4.1.1"
+        "sqlite3": "^4.2.0",
+        "stream-to-promise": "^2.2.0",
+        "uuid": "^8.0.0"
+    },
+    "resolutions": {
+        "graphql-upload": "^10.0.0"
     }
 }

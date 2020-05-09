@@ -1,21 +1,29 @@
-import { makeSchema, queryType, mutationType } from '@nexus/schema/dist/core';
+import { makeSchema, queryType, mutationType, asNexusMethod } from '@nexus/schema/dist/core';
 import { GraphQLServer } from 'graphql-yoga';
-import { scalars } from '../schema';
-import { Model } from '../database';
-import { Storage } from '../storage';
+import { scalars } from 'src/schema';
+import { Model } from 'src/database';
+import { Storage } from 'src/storage';
 import { CRUD, Authenticate } from '.';
+import { MapX } from 'src/utils';
 
 export interface GraphQLAPIConfig {
     port: number;
     secret: string;
+    upload: {
+        maxFileSize: number;
+    };
 }
 
 export class GraphQLAPI {
     private server: GraphQLServer;
-    private cruds = new Map<string, CRUD>();
+    private cruds = new MapX<string, CRUD>();
     private authenticate: Authenticate;
 
-    constructor(protected readonly config: GraphQLAPIConfig, models: Map<string, Model>, storage: Storage) {
+    constructor(
+        protected readonly config: GraphQLAPIConfig,
+        models: MapX<string, Model>,
+        private readonly storage: Storage,
+    ) {
         this.authenticate = new Authenticate(models.get('User'), this.config.secret);
         models.forEach((model) => {
             this.cruds.set(model.name, new CRUD(model, storage));
@@ -50,11 +58,15 @@ export class GraphQLAPI {
         });
         this.server = new GraphQLServer({
             schema,
-            middlewares: [this.authenticate.middleware],
+            middlewares: [this.authenticate.middleware, this.storage.middleware],
             context: (req) => ({ ...req }),
         });
+        const maxFileSize = this.config.upload?.maxFileSize || 64;
         await this.server.start({
             port: process.env.PORT || this.config.port || 3000,
+            uploads: {
+                maxFileSize: maxFileSize * Math.pow(1024, 2), //MB
+            },
         });
         console.log(`Server is running on http://localhost:${this.server.options.port}`);
     }

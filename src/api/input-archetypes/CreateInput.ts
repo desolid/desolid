@@ -13,10 +13,12 @@ export class CreateInput extends ModelMutationInput {
     private async validateAssosiations(input: any) {
         const assosiations = Object.values(this.model.datasource.associations);
         await Promise.all(
-            assosiations.map(async (assosiation) => {
-                const fieldName = this.getFieldNameFromAssosiation(assosiation);
-                await this.model.assosiationSideExists(input[fieldName], assosiation);
-            }),
+            assosiations
+                .filter((assosiation) => assosiation.target.name != 'File')
+                .map(async (assosiation) => {
+                    const fieldName = this.getFieldNameFromAssosiation(assosiation);
+                    await this.model.assosiationSideExists(input[fieldName], assosiation);
+                }),
         );
     }
 

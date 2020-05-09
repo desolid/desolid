@@ -1,5 +1,5 @@
 import { Input } from '.';
-import { FieldDefinition, TypeDefinition } from '../../schema';
+import { FieldDefinition, TypeDefinition } from 'src/schema';
 import { NexusInputFieldConfig } from '@nexus/schema/dist/core';
 
 export class WhereUniqueInput extends Input {
@@ -12,7 +12,7 @@ export class WhereUniqueInput extends Input {
     }
     public get fields() {
         // only ID & unique fields
-        return this.typeDfinition.fields.filter((field) => field.type == 'ID' || field.directives.unique);
+        return this.typeDfinition.fields.filter((field) => field.typeName == 'ID' || field.directives.get('unique'));
     }
 
     protected getFieldConfig(field: FieldDefinition): NexusInputFieldConfig<string, string> {

@@ -1,7 +1,8 @@
 import { Input } from '.';
 import { NexusInputFieldConfig } from '@nexus/schema/dist/core';
-import { TypeDefinition, FieldDefinition } from 'src/schema';
 import { WhereOptions, Op } from 'sequelize';
+import { TypeDefinition, FieldDefinition } from 'src/schema';
+import { MapX } from 'src/utils';
 
 /**
  * @todo include all possibe where operators
@@ -18,7 +19,7 @@ export class WhereInput extends Input {
     public get fields() {
         return this.typeDfinition.fields.reduce((output, field) => {
             if (field.isScalar) {
-                output.push(...this.genrateFieldOperators(field));
+                output.merge(this.genrateFieldOperators(field));
             }
             return output;
         }, this.booleanOperatorFields);
@@ -60,22 +61,28 @@ export class WhereInput extends Input {
     }
 
     private get booleanOperatorFields() {
-        return [
-            {
-                name: 'OR',
-                type: this.name,
-                isScalar: false,
-                config: { nullable: true, list: [true] },
-            },
-        ] as FieldDefinition[];
+        const output = new MapX<string, FieldDefinition>();
+        output.importArray(
+            [
+                {
+                    name: 'OR',
+                    type: this.name,
+                    isScalar: false,
+                    config: { nullable: true, list: [true] },
+                } as any,
+            ],
+            'name',
+        );
+        return output;
     }
 
     private genrateFieldOperators(field: FieldDefinition) {
+        const output = new MapX<string, FieldDefinition>();
         const fields = [field];
         ['in', 'notIn'].forEach((operator) => {
             fields.push({
                 name: `${field.name}_${operator}`,
-                type: field.type,
+                typeName: field.typeName,
                 isScalar: field.isScalar,
                 config: { nullable: true, list: [true] },
             } as FieldDefinition);
@@ -83,7 +90,7 @@ export class WhereInput extends Input {
         const operators = ['eq', 'ne'];
         if (field.isString) {
             operators.push('startsWith', 'endsWith', 'substring');
-        } else if (field.type != 'ID') {
+        } else if (field.typeName != 'ID') {
             operators.push('lt', 'lte', 'gt', 'gte');
         }
         if (field.config.nullable) {
@@ -92,11 +99,12 @@ export class WhereInput extends Input {
         operators.forEach((operator) => {
             fields.push({
                 name: `${field.name}_${operator}`,
-                type: operator != 'isNull' ? field.type : 'Boolean',
+                typeName: operator != 'isNull' ? field.typeName : 'Boolean',
                 isScalar: field.isScalar,
                 config: { nullable: true },
             } as FieldDefinition);
         });
-        return fields;
+        output.importArray(fields, 'name');
+        return output;
     }
 }

@@ -9,10 +9,10 @@ import {
     FLOAT,
     BOOLEAN,
     DATE,
-    ModelCtor,
-    Model,
 } from 'sequelize';
-import { TypeDefinition, FieldDefinition } from '../schema';
+import { TypeDefinition, FieldDefinition } from 'src/schema';
+import { MapX } from 'src/utils';
+import { Model } from '.';
 
 export class ModelSchema {
     constructor(public readonly typeDefinition: TypeDefinition) {}
@@ -28,14 +28,18 @@ export class ModelSchema {
     }
 
     public get attributes(): ModelAttributes {
-        return this.typeDefinition.fields.reduce<{ [column: string]: ModelAttributeColumnOptions }>((columns, field) => {
-            const column = this.fieldToColumn(field);
-            if (column) {
-                columns[field.name] = column;
-            }
-            return columns;
-        }, {});
+        return this.typeDefinition.fields.reduce<{ [column: string]: ModelAttributeColumnOptions }>(
+            (columns, field) => {
+                const column = this.fieldToColumn(field);
+                if (column) {
+                    columns[field.name] = column;
+                }
+                return columns;
+            },
+            {},
+        );
     }
+
     /**
      *
      * @param field
@@ -44,12 +48,12 @@ export class ModelSchema {
     private fieldToColumn(field: FieldDefinition) {
         const column = {
             allowNull: field.config.nullable,
-            unique: field.directives.unique ? true : false,
-            defaultValue: field.directives.default?.value,
-            comment: field.type,
+            unique: field.directives.get('unique') ? true : false,
+            // defaultValue: field.directives.default?.value,
+            comment: field.typeName,
         } as ModelAttributeColumnOptions;
         if (field.isScalar) {
-            switch (field.type) {
+            switch (field.typeName) {
                 case 'ID':
                     column.primaryKey = true;
                     column.autoIncrement = true;
@@ -81,35 +85,30 @@ export class ModelSchema {
                     break;
             }
         } else {
-            const ref = field.type as TypeDefinition;
-            switch (field.type.constructor.name) {
-                case 'TypeDefinition':
-                    if (ref.isModel) {
-                        if (field.config.list) {
-                            // A `one to many` or `many to many` relation
-                            field.databaseType = null;
-                        } else {
-                            // The FOREIGN_KEY
-                            // A `one to one` or `many to one` relation
-                            field.databaseType = INTEGER;
-                        }
-                        return;
+            const right = field.type as TypeDefinition;
+            if (right instanceof TypeDefinition) {
+                if (right.isModel) {
+                    if (field.config.list) {
+                        // A `one to many` or `many to many` relation
                     } else {
-                        column.type = JSON;
+                        // The FOREIGN_KEY
+                        // A `one to one` or `many to one` relation
+                        column.type = INTEGER;
                     }
-                    break;
-                default:
-                    // so it's enum
-                    column.type = STRING;
-                    // column.type = this.mapColumnType('Enum');
-                    // if (column.type == 'enum') {
-                    //     column.enum = ((ref as any) as NexusEnumTypeDef<string>).value.members;
-                    // }
-                    // schema.columns[field.name] = column;
-                    break;
+                    return;
+                } else {
+                    column.type = JSON;
+                }
+            } else {
+                // so it's enum
+                column.type = STRING;
+                // column.type = this.mapColumnType('Enum');
+                // if (column.type == 'enum') {
+                //     column.enum = ((ref as any) as NexusEnumTypeDef<string>).value.members;
+                // }
+                // schema.columns[field.name] = column;
             }
         }
-        field.databaseType = column.type;
         return column;
     }
 
@@ -117,23 +116,23 @@ export class ModelSchema {
         return [right, left].sort().join('_');
     }
 
-    public associate(models: { [key: string]: ModelCtor<any> }) {
-        const left = models[this.name];
-        this.typeDefinition.relations.forEach((field) => {
-            const right = models[field.relation.typeDefinition.name];
-            switch (field.relation.type) {
+    public associate(models: MapX<string, Model>) {
+        const left = models.get(this.name);
+        left.relations.forEach((field) => {
+            const right = models.get(field.typeName);
+            switch (field.relationType) {
                 case 'one-to-one':
-                    left.belongsTo(right, { foreignKey: field.name });
+                    left.datasource.belongsTo(right.datasource, { foreignKey: field.name });
                     break;
                 case 'one-to-many':
-                    left.hasMany(right);
+                    left.datasource.hasMany(right.datasource);
                     break;
                 case 'many-to-one':
-                    left.belongsTo(right, { as: field.name });
+                    left.datasource.belongsTo(right.datasource, { as: field.name });
                     break;
                 case 'many-to-many':
-                    field.relationTableName = this.joinTableNameStrategy(right.name, left.name);
-                    left.belongsToMany(right, { through: field.relationTableName, as: field.name });
+                    const relationTableName = this.joinTableNameStrategy(right.name, left.name);
+                    left.datasource.belongsToMany(right.datasource, { through: relationTableName, as: field.name });
                     break;
             }
         });

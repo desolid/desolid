@@ -21,8 +21,8 @@ export default class Desolid {
     constructor(public readonly root: string) {
         this.config = yaml.safeLoad(readFileSync(`${root}/desolid.yaml`, { encoding: 'utf8' }));
         this.schema = new Schema(root);
-        this.storage = new Storage(this.config.storage, root);
         this.database = new Database(this.config.database, this.schema.models);
+        this.storage = new Storage(this.config.storage, root, this.database.models);
         this.api = new GraphQLAPI(this.config.api, this.database.models, this.storage);
     }
 

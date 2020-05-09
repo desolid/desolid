@@ -1,5 +1,5 @@
-import { TypeDefinition } from '../schema';
-import { Record } from '../database';
+import { TypeDefinition } from 'src/schema';
+import { Record } from 'src/database';
 import * as _ from 'lodash';
 import { SelectAttributes } from '.';
 
@@ -32,7 +32,7 @@ export class Authorization {
     }
 
     private initialize() {
-        const definition = this.typeDefinition.directives.authorization;
+        const definition = this.typeDefinition.directives.get('authorization');
         if (definition) {
             this.categories = Object.values(AuthorizationCategory).reduce((output, category) => {
                 const rules = definition[category];
@@ -97,8 +97,10 @@ export class Authorization {
     }
 
     private authorize(category: AuthorizationCategory, user: User, record: Record, input?: any) {
+        const conditions = this.categories[category];
         if (
-            !this.categories[category].reduce((output, condition) => {
+            conditions &&
+            !conditions.reduce((output, condition) => {
                 output = output || condition.function(user, record, input);
                 return output;
             }, false)
@@ -122,10 +124,11 @@ export class Authorization {
                 );
             }
             const [name, innerAttribute] = parts;
-            const field = _.find(this.typeDefinition.fields, { name });
+            const field = this.typeDefinition.fields.find({ name });
             if (field) {
-                if (field.relation) {
-                    if (_.includes(field.relation.type, 'to-one')) {
+                if (field.relationType) {
+                    if (field.isToOneRelation) {
+                        const relation = field.type as TypeDefinition;
                         output[name] = {
                             // Preventing overwriting on prev values
                             ...output[name],
@@ -134,9 +137,9 @@ export class Authorization {
                                 // Preventing overwriting on prev values
                                 ...output[name]?.fieldsByTypeName,
                                 name: name as any,
-                                [field.relation.typeDefinition.name]: {
+                                [relation.name]: {
                                     // Preventing overwriting on prev values
-                                    ...output[name]?.fieldsByTypeName[field.relation.typeDefinition.name],
+                                    ...output[name]?.fieldsByTypeName[relation.name],
                                     [innerAttribute]: {
                                         name: innerAttribute,
                                         fieldsByTypeName: {},

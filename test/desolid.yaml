@@ -4,15 +4,19 @@ database:
 api:
     port: 3000
     secret: 'secret'
+    upload:
+        maxFileSize: 64 #MB
+
 storage:
-    pattern: '${YYYY}/${MM}/${DD}/${UUID}.${EXT}'
-    # pattern: '${YYYY}/${MM}/${DD}/${FILENAME}-${EPOCH}.${EXT}'
+    # pattern: '${UUID}.${EXT}'
+    # pattern: '${YYYY}/${MM}/${DD}/${UUID}.${EXT}'
+    pattern: '/${YYYY}/${MM}/${DD}/${NAME}-${EPOCH}.${EXT}'
 
     driver: 'local'
     # driver: 's3'
     # driver: 'gcs'
     config:
-        root: '.'
+        root: './upload'
 
         # # AWS
         # key: 'AWS_S3_KEY'
