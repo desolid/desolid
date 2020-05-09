@@ -117,6 +117,12 @@ export class Storage {
             .then((res) => res.id as number);
     }
 
+    public async delete(fileId: number) {
+        const file = await this.fileModel.datasource.findByPk(fileId, { attributes: ['path'] });
+        await this.disk.delete(file.path);
+        await this.fileModel.datasource.destroy({ where: { id: fileId } });
+    }
+
     private validate(field: FieldDefinition, { filename, mimetype, buffer }: Upload) {
         const conditions = field.directives.get('upload') as UploadDirectiveArguments;
         if (conditions) {
