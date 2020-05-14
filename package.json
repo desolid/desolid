@@ -5,10 +5,10 @@
     "author": "Sajjad Shirazy <shirazy.sajjad@gmail.com>",
     "license": "MIT",
     "preferGlobal": true,
-    "main": "dist/Desolid.js",
-    "types": "dist/Desolid.d.ts",
+    "main": "./dist/Desolid.js",
+    "types": "./dist/Desolid.d.ts",
     "bin": {
-        "desolid": "src/cli"
+        "desolid": "./dist/cli.js"
     },
     "files": [
         "dist"
