@@ -17,7 +17,7 @@
         "release:patch": "standard-version --release-as patch && git push && git push --tags",
         "release:minor": "standard-version --release-as minor && git push && git push --tags",
         "release:major": "standard-version --release-as major && git push && git push --tags",
-        "publish": "npm run build"
+        "publish:npm": "npm run build && npm publish ./dist"
     },
     "devDependencies": {
         "@types/fs-extra": "^8.1.0",
