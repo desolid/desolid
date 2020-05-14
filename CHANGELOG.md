@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.16](https://github.com/desolid/desolid/compare/v0.0.15...v0.0.16) (2020-05-14)
+
+
+### Bug Fixes
+
+* Error: Cannot find module './package.json' ([463bd21](https://github.com/desolid/desolid/commit/463bd21125257b21d1ec5a0dda24eff7874b95ea))
+
 ### [0.0.15](https://github.com/desolid/desolid/compare/v0.0.14...v0.0.15) (2020-05-14)
 
 
