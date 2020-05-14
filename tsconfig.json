@@ -7,12 +7,12 @@
     "experimentalDecorators": true,
     "target": "es2017",
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "dist",
     "baseUrl": "./",
     "strict": false,
     "incremental": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true,
+    // "resolveJsonModule": true,
     "paths": {
       "src/*": ["./src/*"]
     }

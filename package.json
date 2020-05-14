@@ -5,19 +5,22 @@
     "author": "Sajjad Shirazy <shirazy.sajjad@gmail.com>",
     "license": "MIT",
     "preferGlobal": true,
-    "main": "src/Desolid.js",
+    "main": "dist/Desolid.js",
+    "types": "dist/Desolid.d.ts",
     "bin": {
         "desolid": "src/cli"
     },
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "start": "ts-node -r tsconfig-paths/register ./src/server.ts",
         "dev": "nodemon",
-        "build": "npx rimraf ./dist && tsc -d",
+        "build": "npx rimraf ./dist && tsc",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "release:patch": "standard-version --release-as patch && git push && git push --tags",
         "release:minor": "standard-version --release-as minor && git push && git push --tags",
-        "release:major": "standard-version --release-as major && git push && git push --tags",
-        "publish:npm": "npm run build && npm publish ./dist"
+        "release:major": "standard-version --release-as major && git push && git push --tags"
     },
     "devDependencies": {
         "@types/fs-extra": "^8.1.0",
