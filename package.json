@@ -20,7 +20,8 @@
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "release:patch": "standard-version --release-as patch && git push && git push --tags",
         "release:minor": "standard-version --release-as minor && git push && git push --tags",
-        "release:major": "standard-version --release-as major && git push && git push --tags"
+        "release:major": "standard-version --release-as major && git push && git push --tags",
+        "prepublish": "npm run build"
     },
     "devDependencies": {
         "@types/fs-extra": "^8.1.0",
