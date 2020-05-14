@@ -1,5 +1,5 @@
 {
-    "version": "0.0.2",
+    "version": "0.0.3",
     "name": "desolid",
     "repository": "git@github.com:desolid/desolid.git",
     "author": "Sajjad Shirazy <shirazy.sajjad@gmail.com>",
@@ -9,7 +9,8 @@
         "desolid": "./dist/cli"
     },
     "files": [
-        "./dist/src"
+        "./dist/src",
+        "package-lock.json"
     ],
     "scripts": {
         "preinstall": "npx npm-force-resolutions",
