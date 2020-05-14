@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1](https://github.com/desolid/desolid/compare/v0.1.0...v0.1.1) (2020-05-14)
+
+
+### Bug Fixes
+
+* removing path aliases ([b3c12a0](https://github.com/desolid/desolid/commit/b3c12a09b96e5f9b7387630dc45a2bc7e3e95ac5))
+* root config file ([64b7ca5](https://github.com/desolid/desolid/commit/64b7ca5eda5c36503f28d878446ba1d87200cdd3))
+
 ## [0.1.0](https://github.com/desolid/desolid/compare/v0.0.17...v0.1.0) (2020-05-14)
 
 
