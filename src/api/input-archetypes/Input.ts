@@ -1,5 +1,5 @@
 import { NexusInputObjectTypeDef, InputDefinitionBlock, NexusInputFieldConfig, arg } from '@nexus/schema/dist/core';
-import { TypeDefinition, FieldDefinition } from 'src/schema';
+import { TypeDefinition, FieldDefinition } from '../../schema';
 
 export abstract class Input extends NexusInputObjectTypeDef<string> {
     constructor(protected readonly typeDfinition: TypeDefinition, name: string) {

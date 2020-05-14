@@ -1,10 +1,10 @@
 import { makeSchema, queryType, mutationType, asNexusMethod } from '@nexus/schema/dist/core';
 import { GraphQLServer } from 'graphql-yoga';
-import { scalars } from 'src/schema';
-import { Model } from 'src/database';
-import { Storage } from 'src/storage';
+import { scalars } from '../schema';
+import { Model } from '../database';
+import { Storage } from '../storage';
 import { CRUD, Authenticate } from '.';
-import { MapX } from 'src/utils';
+import { MapX } from '../utils';
 
 export interface GraphQLAPIConfig {
     port: number;

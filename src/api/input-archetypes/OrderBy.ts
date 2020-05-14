@@ -1,5 +1,5 @@
 import { Enum } from '.';
-import { TypeDefinition } from 'src/schema';
+import { TypeDefinition } from '../../schema';
 import { Order } from 'sequelize';
 
 export class OrderBy extends Enum {

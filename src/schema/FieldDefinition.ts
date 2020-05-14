@@ -2,7 +2,7 @@ import { FieldDefinitionNode, TypeNode } from 'graphql';
 import { FieldOutConfig } from '@nexus/schema/dist/core';
 import * as _ from 'lodash';
 import { Scalar, DirectiveDefinition, scalarTypes, stringScalars, TypeDefinition } from '.';
-import { MapX } from 'src/utils';
+import { MapX } from '../utils';
 
 export interface UploadDirectiveArguments {
     accept: string[];

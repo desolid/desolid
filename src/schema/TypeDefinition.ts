@@ -6,7 +6,7 @@ import {
     ObjectDefinitionBlock,
 } from '@nexus/schema/dist/core';
 import { Schema, FieldDefinition, DirectiveDefinition } from '.';
-import { MapX } from 'src/utils';
+import { MapX } from '../utils';
 
 export type TypeDirectives = 'model' | 'authorization';
 

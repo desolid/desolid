@@ -10,8 +10,8 @@ import {
     BOOLEAN,
     DATE,
 } from 'sequelize';
-import { TypeDefinition, FieldDefinition } from 'src/schema';
-import { MapX } from 'src/utils';
+import { TypeDefinition, FieldDefinition } from '../schema';
+import { MapX } from '../utils';
 import { Model } from '.';
 
 export class ModelSchema {

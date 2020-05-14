@@ -1,5 +1,5 @@
 import { Input } from '.';
-import { FieldDefinition, TypeDefinition } from 'src/schema';
+import { FieldDefinition, TypeDefinition } from '../../schema';
 import { NexusInputFieldConfig } from '@nexus/schema/dist/core';
 
 export class WhereUniqueInput extends Input {

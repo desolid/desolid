@@ -1,5 +1,5 @@
 import { ModelMutationInput } from '.';
-import { Model } from 'src/database';
+import { Model } from '../../database';
 
 export class CreateInput extends ModelMutationInput {
     public static getObjectName(model: Model) {

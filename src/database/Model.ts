@@ -1,9 +1,9 @@
 import { Sequelize, ModelCtor, IncludeOptions, Order, Op, BelongsToMany, Association } from 'sequelize';
 import * as _ from 'lodash';
 import { ModelSchema } from '.';
-import { TypeDefinition, FieldDefinition } from 'src/schema';
-import { Storage, Upload } from 'src/storage';
-import { MapX } from 'src/utils';
+import { TypeDefinition, FieldDefinition } from '../schema';
+import { Storage, Upload } from '../storage';
+import { MapX } from '../utils';
 
 export interface Record {
     id: number;

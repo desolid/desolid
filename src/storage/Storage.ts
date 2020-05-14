@@ -4,8 +4,8 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { ValidationError } from 'apollo-server-core';
-import { MapX } from 'src/utils';
-import { TypeDefinition, UploadDirectiveArguments, FieldDefinition } from 'src/schema';
+import { MapX } from '../utils';
+import { TypeDefinition, UploadDirectiveArguments, FieldDefinition } from '../schema';
 import { GraphQLResolveInfo, GraphQLNonNull } from 'graphql';
 import {
     parseResolveInfo,

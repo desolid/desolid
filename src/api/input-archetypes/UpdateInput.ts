@@ -1,8 +1,8 @@
 import { NexusInputFieldConfig } from '@nexus/schema/dist/core';
 import * as _ from 'lodash';
 import { ModelMutationInput, UpdateManyRelationsInput } from '.';
-import { FieldDefinition } from 'src/schema';
-import { Model } from 'src/database';
+import { FieldDefinition } from '../../schema';
+import { Model } from '../../database';
 import { BelongsToMany, ModelCtor } from 'sequelize';
 
 /**

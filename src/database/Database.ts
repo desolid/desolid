@@ -1,8 +1,8 @@
 import { Options, Sequelize } from 'sequelize';
-import { TypeDefinition } from 'src/schema';
+import { TypeDefinition } from '../schema';
 import { Model } from './Model';
-import { MapX } from 'src/utils';
-import { Storage } from 'src/storage';
+import { MapX } from '../utils';
+import { Storage } from '../storage';
 
 export type DatabaseConfig = Options;
 

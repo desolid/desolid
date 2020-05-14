@@ -1,5 +1,5 @@
 import { AuthenticationError } from 'apollo-server-core';
-import { Model } from 'src/database';
+import { Model } from '../database';
 import * as jwt from 'jsonwebtoken';
 import { arg, ObjectDefinitionBlock, NexusObjectTypeDef } from '@nexus/schema/dist/core';
 import { GraphQLResolveInfo } from 'graphql';

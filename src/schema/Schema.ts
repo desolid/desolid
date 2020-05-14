@@ -10,7 +10,7 @@ import gql from 'graphql-tag';
 import { readFileSync } from 'fs-extra';
 import { TypeDefinitionNode, EnumTypeExtensionNode } from 'graphql';
 import { TypeDefinition, scalars } from '.';
-import { MapX } from 'src/utils';
+import { MapX } from '../utils';
 
 export type EntityDefinition =
     | TypeDefinition

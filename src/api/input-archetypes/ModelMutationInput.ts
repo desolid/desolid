@@ -1,5 +1,5 @@
-import { FieldDefinition } from 'src/schema';
-import { Model } from 'src/database';
+import { FieldDefinition } from '../../schema';
+import { Model } from '../../database';
 import { Input } from '.';
 import { Association } from 'sequelize';
 

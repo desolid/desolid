@@ -1,5 +1,5 @@
-import { TypeDefinition } from 'src/schema';
-import { Record } from 'src/database';
+import { TypeDefinition } from '../schema';
+import { Record } from '../database';
 import * as _ from 'lodash';
 import { SelectAttributes } from '.';
 

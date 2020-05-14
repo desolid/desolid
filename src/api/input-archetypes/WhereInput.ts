@@ -1,8 +1,8 @@
 import { Input } from '.';
 import { NexusInputFieldConfig } from '@nexus/schema/dist/core';
 import { WhereOptions, Op } from 'sequelize';
-import { TypeDefinition, FieldDefinition } from 'src/schema';
-import { MapX } from 'src/utils';
+import { TypeDefinition, FieldDefinition } from '../../schema';
+import { MapX } from '../../utils';
 
 /**
  * @todo include all possibe where operators
