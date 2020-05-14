@@ -122,7 +122,7 @@ export class Model {
             uploadInputs.map(async (field) => {
                 const { filename, mimetype, buffer } = input[field.name];
                 const path = await this.storage.save(input[field.name]);
-                input[`${field.name}Id`] = this.fileModel
+                input[`${field.name}Id`] = await this.fileModel
                     .create({
                         name: filename,
                         path,
@@ -196,7 +196,7 @@ export class Model {
     }
 
     public async deleteOne(where: any, attributes?: string[], include?: IncludeOptions[]) {
-        return await this.datasource.destroy({ where });
+        return this.datasource.destroy({ where });
     }
 
     public async deleteMany(where: any) {

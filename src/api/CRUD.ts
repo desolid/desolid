@@ -158,6 +158,14 @@ export class CRUD {
         return this.model.createOne(data, attributes, include);
     }
 
+    /**
+     * 
+     * @param root 
+     * @param param1 
+     * @param context 
+     * @param info 
+     * @todo we can check only if inputs contain files handle one by one
+     */
     private async createMany(root: any, { data }: { data: any[] }, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
         data.forEach((input) => {

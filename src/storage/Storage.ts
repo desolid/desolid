@@ -7,6 +7,12 @@ import { ValidationError } from 'apollo-server-core';
 import { MapX } from 'src/utils';
 import { TypeDefinition, UploadDirectiveArguments, FieldDefinition } from 'src/schema';
 import { GraphQLResolveInfo, GraphQLNonNull } from 'graphql';
+import {
+    parseResolveInfo,
+    simplifyParsedResolveInfoFragmentWithType,
+    ResolveTree,
+    FieldsByTypeName,
+} from 'graphql-parse-resolve-info';
 
 enum StorageDrivers {
     LOCAL = 'local',
@@ -67,17 +73,27 @@ export class Storage {
         return this._middleware.bind(this);
     }
 
+    private async processDataInput(typeDefinition: TypeDefinition, input: any) {
+        for (let [key, value] of Object.entries<any>(input)) {
+            if (value instanceof Promise) {
+                const { filename, mimetype, createReadStream } = await value;
+                const buffer: Buffer = await streamToBuffer(createReadStream());
+                input[key] = { filename, mimetype, buffer };
+                this.validate(typeDefinition.fields.get(key), input[key]);
+            }
+        }
+    }
+
     private async _middleware(resolve, root, args, context, info: GraphQLResolveInfo) {
         if (args.data) {
-            const modelName = (info.returnType as GraphQLNonNull<any>).ofType.name;
+            const resolveTree = parseResolveInfo(info) as ResolveTree;
+            const [modelName] = Object.keys(resolveTree.fieldsByTypeName);
             const typeDefinition = this.models.get(modelName);
-            for (let [key, value] of Object.entries<any>(args.data)) {
-                if (value instanceof Promise) {
-                    const { filename, mimetype, createReadStream } = await value;
-                    const buffer: Buffer = await streamToBuffer(createReadStream());
-                    args.data[key] = { filename, mimetype, buffer };
-                    this.validate(typeDefinition.fields.get(key), args.data[key]);
-                }
+            if (_.isArray(args.data)) {
+                const inputs: any[] = args.data;
+                await Promise.all(inputs.map((input) => this.processDataInput(typeDefinition, input)));
+            } else {
+                await this.processDataInput(typeDefinition, args.data);
             }
         }
         return resolve(root, args, context, info);
@@ -108,7 +124,7 @@ export class Storage {
         return path;
     }
 
-    public async delete(path:string) {
+    public async delete(path: string) {
         return this.disk.delete(path);
     }
 
