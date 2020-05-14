@@ -159,11 +159,7 @@ export class CRUD {
     }
 
     /**
-     * 
-     * @param root 
-     * @param param1 
-     * @param context 
-     * @param info 
+     *
      * @todo we can check only if inputs contain files handle one by one
      */
     private async createMany(root: any, { data }: { data: any[] }, context: any, info: GraphQLResolveInfo) {
@@ -190,6 +186,10 @@ export class CRUD {
         return this.model.updateOne(where /** WhereUniqueInput */, data, attributes, include, record);
     }
 
+    /**
+     *
+     * @todo we can check only if inputs contain files handle one by one
+     */
     private async updateMany(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
         // We have to fetch attributes which we need on the authorization flow too
@@ -202,13 +202,17 @@ export class CRUD {
             this.authorization.update(context.user, record, data);
         });
         await Promise.all(records.map((record) => this.inputs.update.validate(data, record)));
-        return this.model.updateMany(
-            this.inputs.where.parse(where) /** WhereInput */,
-            data,
-            attributes,
-            include,
-            records,
+        // we need to process items one by one to handle errors
+        return Promise.all(
+            records.map(async (item) => this.model.updateOne({ id: item.id }, data, attributes, include, item)),
         );
+        // return this.model.updateMany(
+        //     this.inputs.where.parse(where) /** WhereInput */,
+        //     data,
+        //     attributes,
+        //     include,
+        //     records,
+        // );
     }
 
     private async deleteOne(root: any, { where }: any, context: any, info: GraphQLResolveInfo) {

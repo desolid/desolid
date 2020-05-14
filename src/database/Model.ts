@@ -217,7 +217,7 @@ export class Model {
         // 0- save files
         const paths = await this.saveInputFiles(input);
         try {
-            // 1- create the record
+            // 1- update the record
             const [affectedRows] = await this.datasource.update(input, { where });
             // 2- create relations
             await this.updateAssosiations(record, input);
