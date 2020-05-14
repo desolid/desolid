@@ -1,5 +1,5 @@
 {
-    "version": "0.0.11",
+    "version": "0.0.12",
     "name": "desolid",
     "repository": "git@github.com:desolid/desolid.git",
     "author": "Sajjad Shirazy <shirazy.sajjad@gmail.com>",
@@ -17,7 +17,7 @@
         "release:patch": "standard-version --release-as patch && git push && git push --tags",
         "release:minor": "standard-version --release-as minor && git push && git push --tags",
         "release:major": "standard-version --release-as major && git push && git push --tags",
-        "publish": "npm run build && npm publish ./dist"
+        "publish": "npm run build"
     },
     "devDependencies": {
         "@types/fs-extra": "^8.1.0",
