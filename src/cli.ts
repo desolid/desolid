@@ -10,6 +10,6 @@ clear();
 console.log(chalk.green(figlet.textSync('Desolid', { horizontalLayout: 'full' })));
 program
     .version(process.env.npm_package_version)
-    .description(`Desolid: Single file BaaS\nhttps://github.com/desolid/desolid`)
+    .description(`Desolid: Single file BaaS`)
     .option('-p, --path', 'Root desolid directory')
     .parse(process.argv);
