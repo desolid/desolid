@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs-extra';
 import * as yaml from 'js-yaml';
+import * as path from 'path';
 import { DatabaseConfig, Database } from './database';
 import { GraphQLAPIConfig, GraphQLAPI } from './api';
 import { StorageConfig, Storage } from './storage';
@@ -19,7 +20,8 @@ export default class Desolid {
     protected readonly schema: Schema;
 
     constructor(public readonly root: string) {
-        this.config = yaml.safeLoad(readFileSync(`${root}/desolid.yaml`, { encoding: 'utf8' }));
+        const configFile = readFileSync(path.join(root, 'desolid.yaml'), { encoding: 'utf8' });
+        this.config = yaml.safeLoad(configFile);
         this.schema = new Schema(root);
         this.storage = new Storage(this.config.storage, root, this.schema.models);
         this.database = new Database(this.config.database, this.schema.models, this.storage);
