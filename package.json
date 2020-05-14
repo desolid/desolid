@@ -1,13 +1,10 @@
 {
-    "version": "0.0.3",
+    "version": "0.0.4",
     "name": "desolid",
     "repository": "git@github.com:desolid/desolid.git",
     "author": "Sajjad Shirazy <shirazy.sajjad@gmail.com>",
     "license": "MIT",
     "preferGlobal": true,
-    "bin": {
-        "desolid": "./dist/cli"
-    },
     "files": [
         "./dist/src",
         "package-lock.json"
@@ -16,7 +13,7 @@
         "preinstall": "npx npm-force-resolutions",
         "start": "ts-node -r tsconfig-paths/register ./src/server.ts",
         "dev": "nodemon",
-        "build": "rimraf ./dist && tsc -d",
+        "build": "rimraf ./dist && tsc -d -p .",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "release:patch": "standard-version --release-as patch && git push && git push --tags",
         "release:minor": "standard-version --release-as minor && git push && git push --tags",
