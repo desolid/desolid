@@ -214,12 +214,19 @@ export class Model {
         include: IncludeOptions[],
         record: { id: number },
     ) {
-        // 1- create the record
-        const [affectedRows] = await this.datasource.update(input, { where });
-        // 2- create relations
-        await this.updateAssosiations(record, input);
-        // 3- return the query
-        return this.datasource.findOne({ where, attributes, include });
+        // 0- save files
+        const paths = await this.saveInputFiles(input);
+        try {
+            // 1- create the record
+            const [affectedRows] = await this.datasource.update(input, { where });
+            // 2- create relations
+            await this.updateAssosiations(record, input);
+            // 3- return the query
+            return this.datasource.findOne({ where, attributes, include });
+        } catch (error) {
+            await this.deleteInputFiles(input);
+            throw error;
+        }
     }
 
     /**
