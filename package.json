@@ -4,11 +4,18 @@
     "repository": "git@github.com:desolid/desolid.git",
     "author": "Sajjad Shirazy <shirazy.sajjad@gmail.com>",
     "license": "MIT",
+    "preferGlobal": true,
+    "bin": {
+        "desolid": "./dist/cli"
+    },
+    "files": [
+        "./dist/src"
+    ],
     "scripts": {
         "preinstall": "npx npm-force-resolutions",
         "start": "ts-node -r tsconfig-paths/register ./src/server.ts",
         "dev": "nodemon",
-        "build": "tsc -d",
+        "build": "rimraf ./dist && tsc -d",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "release:patch": "standard-version --release-as patch && git push && git push --tags",
         "release:minor": "standard-version --release-as minor && git push && git push --tags",
@@ -22,6 +29,7 @@
         "nodemon": "^2.0.2",
         "npm-force-resolutions": "0.0.3",
         "prettier": "^1.19.1",
+        "rimraf": "^3.0.2",
         "standard-version": "^7.1.0",
         "ts-node": "^7.0.1",
         "tsconfig-paths": "^3.9.0",
@@ -31,6 +39,10 @@
         "@nexus/schema": "^0.13.1",
         "@slynova/flydrive": "^0.3.1",
         "apollo-server-core": "^2.12.0",
+        "chalk": "^4.0.0",
+        "clear": "^0.1.0",
+        "commander": "^5.1.0",
+        "figlet": "^1.4.0",
         "fs-extra": "^8.1.0",
         "graphql": "^14.6.0",
         "graphql-parse-resolve-info": "^4.5.0",
@@ -41,6 +53,7 @@
         "jsonwebtoken": "^8.5.1",
         "lodash": "^4.17.15",
         "md5": "^2.2.1",
+        "path": "^0.12.7",
         "pluralize": "^8.0.0",
         "sequelize": "^5.21.6",
         "sqlite3": "^4.2.0",

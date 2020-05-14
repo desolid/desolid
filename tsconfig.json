@@ -12,6 +12,7 @@
     "strict": false,
     "incremental": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "paths": {
       "src/*": ["./src/*"]
     }
