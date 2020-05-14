@@ -1,5 +1,5 @@
 {
-    "version": "0.0.10",
+    "version": "0.0.11",
     "name": "desolid",
     "repository": "git@github.com:desolid/desolid.git",
     "author": "Sajjad Shirazy <shirazy.sajjad@gmail.com>",
@@ -9,15 +9,10 @@
     "bin": {
         "desolid": "src/cli"
     },
-    "files": [
-        "src",
-        "package-lock.json"
-    ],
     "scripts": {
-        "preinstall": "npx npm-force-resolutions",
         "start": "ts-node -r tsconfig-paths/register ./src/server.ts",
         "dev": "nodemon",
-        "build": "rimraf ./dist && tsc -d",
+        "build": "npx rimraf ./dist && tsc -d",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "release:patch": "standard-version --release-as patch && git push && git push --tags",
         "release:minor": "standard-version --release-as minor && git push && git push --tags",
@@ -51,7 +46,6 @@
         "graphql-parse-resolve-info": "^4.5.0",
         "graphql-scalars": "^1.0.7",
         "graphql-tag": "^2.10.3",
-        "graphql-yoga": "^1.18.3",
         "js-yaml": "^3.13.1",
         "jsonwebtoken": "^8.5.1",
         "lodash": "^4.17.15",
@@ -62,8 +56,5 @@
         "sqlite3": "^4.2.0",
         "stream-to-promise": "^2.2.0",
         "uuid": "^8.0.0"
-    },
-    "resolutions": {
-        "graphql-upload": "^10.0.0"
     }
 }
