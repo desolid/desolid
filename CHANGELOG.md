@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.14](https://github.com/desolid/desolid/compare/v0.0.13...v0.0.14) (2020-05-14)
+
+
+### Bug Fixes
+
+* dist ([59f7de7](https://github.com/desolid/desolid/commit/59f7de7d93bb246b27f6c27689911329a55476af))
+* publish ([1ad3292](https://github.com/desolid/desolid/commit/1ad32921611e24efbfc665caf22cfb814e3a514b))
+
 ### [0.0.13](https://github.com/desolid/desolid/compare/v0.0.12...v0.0.13) (2020-05-14)
 
 ### [0.0.12](https://github.com/desolid/desolid/compare/v0.0.11...v0.0.12) (2020-05-14)
