@@ -4,7 +4,6 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { ValidationError } from 'apollo-server-core';
-import { Model } from 'src/database';
 import { MapX } from 'src/utils';
 import { TypeDefinition, UploadDirectiveArguments, FieldDefinition } from 'src/schema';
 import { GraphQLResolveInfo, GraphQLNonNull } from 'graphql';
@@ -41,10 +40,12 @@ export interface Upload {
 
 export class Storage {
     private readonly manager: StorageManager;
-    private readonly fileModel: Model;
 
-    constructor(private readonly configs: StorageConfig, root: string, private readonly models: MapX<string, Model>) {
-        this.fileModel = this.models.get('File');
+    constructor(
+        private readonly configs: StorageConfig,
+        root: string,
+        private readonly models: MapX<string, TypeDefinition>,
+    ) {
         this.configs.pattern = _.template((configs.pattern as any) as string);
         configs.config.root = path.join(root, configs.config.root);
         this.manager = new StorageManager({
@@ -69,7 +70,7 @@ export class Storage {
     private async _middleware(resolve, root, args, context, info: GraphQLResolveInfo) {
         if (args.data) {
             const modelName = (info.returnType as GraphQLNonNull<any>).ofType.name;
-            const { typeDefinition } = this.models.get(modelName);
+            const typeDefinition = this.models.get(modelName);
             for (let [key, value] of Object.entries<any>(args.data)) {
                 if (value instanceof Promise) {
                     const { filename, mimetype, createReadStream } = await value;
@@ -101,27 +102,21 @@ export class Storage {
      * @param upload
      * @returns fileId
      */
-    public async save({ filename, mimetype, buffer }: Upload) {
+    public async save({ filename, buffer }: Upload) {
         const path = this.generateFilename(filename);
         await this.disk.put(path, buffer);
-        return this.fileModel
-            .createOne(
-                {
-                    name: filename,
-                    path,
-                    mimetype,
-                    size: buffer.length,
-                },
-                ['id'],
-            )
-            .then((res) => res.id as number);
+        return path;
     }
 
-    public async delete(fileId: number) {
-        const file = await this.fileModel.datasource.findByPk(fileId, { attributes: ['path'] });
-        await this.disk.delete(file.path);
-        await this.fileModel.datasource.destroy({ where: { id: fileId } });
+    public async delete(path:string) {
+        return this.disk.delete(path);
     }
+
+    // public async delete(fileId: number) {
+    //     const file = await this.fileModel.datasource.findByPk(fileId, { attributes: ['path'] });
+    //     await this.disk.delete(file.path);
+    //     await this.fileModel.datasource.destroy({ where: { id: fileId } });
+    // }
 
     private validate(field: FieldDefinition, { filename, mimetype, buffer }: Upload) {
         const conditions = field.directives.get('upload') as UploadDirectiveArguments;

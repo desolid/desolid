@@ -151,38 +151,11 @@ export class CRUD {
         return this.parseSelectAttributes(_.merge(select, extraSelect));
     }
 
-    private async saveInputFiles(inputs) {
-        // saving files
-        const uploadInputs = this.model.files.filter((field) => inputs[field.name]);
-        await Promise.all(
-            uploadInputs.map(async (field) => {
-                inputs[`${field.name}Id`] = await this.storage.save(inputs[field.name]);
-                delete inputs[field.name];
-            }),
-        );
-    }
-
-    private async deleteInputFiles(inputs) {
-        // deleting files
-        const uploadInputs = this.model.files.filter((field) => inputs[`${field.name}Id`]);
-        await Promise.all(
-            uploadInputs.map(async (field) => {
-                await this.storage.delete(inputs[`${field.name}Id`]);
-            }),
-        );
-    }
-
     private async createOne(root: any, { data }: any, context: any, info: GraphQLResolveInfo) {
         const { attributes, include } = this.parseResolveInfo(info);
         this.authorization.create(context.user, data);
         await this.inputs.create.validate(data);
-        await this.saveInputFiles(data);
-        try {
-            return await this.model.createOne(data, attributes, include);
-        } catch (error) {
-            await this.deleteInputFiles(data);
-            throw error;
-        }
+        return this.model.createOne(data, attributes, include);
     }
 
     private async createMany(root: any, { data }: { data: any[] }, context: any, info: GraphQLResolveInfo) {
@@ -191,7 +164,9 @@ export class CRUD {
             this.authorization.create(context.user, input);
         });
         await Promise.all(data.map((item) => this.inputs.create.validate(item)));
-        return this.model.createMany(data, attributes, include);
+        // we need to process items one by one to handle errors
+        return Promise.all(data.map(async (item) => this.model.createOne(item, attributes, include)));
+        // return this.model.createMany(data, attributes, include);
     }
 
     private async updateOne(root: any, { data, where }: any, context: any, info: GraphQLResolveInfo) {

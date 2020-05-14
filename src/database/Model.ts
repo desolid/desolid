@@ -1,7 +1,8 @@
 import { Sequelize, ModelCtor, IncludeOptions, Order, Op, BelongsToMany, Association } from 'sequelize';
 import * as _ from 'lodash';
 import { ModelSchema } from '.';
-import { TypeDefinition, FieldDirectives, FieldDefinition } from 'src/schema';
+import { TypeDefinition, FieldDefinition } from 'src/schema';
+import { Storage, Upload } from 'src/storage';
 import { MapX } from 'src/utils';
 
 export interface Record {
@@ -16,7 +17,11 @@ export class Model {
     public readonly relations: MapX<string, FieldDefinition>;
     public readonly files: MapX<string, FieldDefinition>;
 
-    constructor(database: Sequelize, public readonly typeDefinition: TypeDefinition) {
+    constructor(
+        public readonly database: Sequelize,
+        public readonly typeDefinition: TypeDefinition,
+        public readonly storage: Storage,
+    ) {
         this.schema = new ModelSchema(typeDefinition);
         this.datasource = database.define(
             this.typeDefinition.name,
@@ -33,7 +38,11 @@ export class Model {
         return this.schema.name;
     }
 
-    private async createAssosiations(record, inputs) {
+    public get fileModel() {
+        return this.database.models.File;
+    }
+
+    private async createToManyAssosiations(record, inputs) {
         const multiAssosiations = Object.values(this.datasource.associations).filter(
             (assossiation) => assossiation.isMultiAssociation,
         );
@@ -106,6 +115,37 @@ export class Model {
         }
     }
 
+    private async saveInputFiles(input) {
+        // saving files
+        const uploadInputs = this.files.filter((field) => input[field.name]);
+        return Promise.all<string>(
+            uploadInputs.map(async (field) => {
+                const { filename, mimetype, buffer } = input[field.name];
+                const path = await this.storage.save(input[field.name]);
+                input[`${field.name}Id`] = this.fileModel
+                    .create({
+                        name: filename,
+                        path,
+                        mimetype,
+                        size: buffer.length,
+                    })
+                    .then((res) => res.id as number);
+                return (input[field.name].path = path);
+            }),
+        );
+    }
+
+    private async deleteInputFiles(input) {
+        // deleting files
+        const uploadInputs = this.files.filter((field) => input[field.name]);
+        return Promise.all(
+            uploadInputs.map(async (field) => {
+                await this.fileModel.destroy({ where: { id: input[`${field.name}Id`] } });
+                await this.storage.delete(input[field.name].path);
+            }),
+        );
+    }
+
     /**
      * @todo handle create/connect on relations
      */
@@ -113,15 +153,22 @@ export class Model {
         // https://stackoverflow.com/a/49828917/2179157
         // https://stackoverflow.com/a/55765249/2179157
         // https://medium.com/@tonyangelo9707/many-to-many-associations-using-sequelize-941f0b6ac102
-        // 1- create the record
-        const record = await this.datasource.create(input);
-        // 2- create relations
-        await this.createAssosiations(record, input);
-        // 3- return the query
-        return this.datasource.findByPk(record[this.datasource.primaryKeyAttribute], {
-            attributes,
-            include,
-        });
+        // 0- save files
+        const paths = await this.saveInputFiles(input);
+        try {
+            // 1- create the record
+            const record = await this.datasource.create(input);
+            // 2- create relations
+            await this.createToManyAssosiations(record, input);
+            // 3- return the query
+            return this.datasource.findByPk(record[this.datasource.primaryKeyAttribute], {
+                attributes,
+                include,
+            });
+        } catch (error) {
+            await this.deleteInputFiles(input);
+            throw error;
+        }
     }
 
     /**
@@ -137,7 +184,7 @@ export class Model {
         // 1- create the records
         const records: any[] = await this.datasource.bulkCreate(inputs, { returning: ['id'] });
         // 2- create relations
-        await Promise.all(records.map((record, index) => this.createAssosiations(record, inputs[index])));
+        await Promise.all(records.map((record, index) => this.createToManyAssosiations(record, inputs[index])));
         // 3- return the query
         return this.datasource.findAll({
             where: {
