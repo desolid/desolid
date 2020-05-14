@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.15](https://github.com/desolid/desolid/compare/v0.0.14...v0.0.15) (2020-05-14)
+
+
+### Bug Fixes
+
+* cli bin ([391804d](https://github.com/desolid/desolid/commit/391804d1eefed8fa87495fecd87a9aee3cf70e6d))
+
 ### [0.0.14](https://github.com/desolid/desolid/compare/v0.0.13...v0.0.14) (2020-05-14)
 
 
