@@ -1,5 +1,5 @@
 {
-    "version": "0.0.7",
+    "version": "0.0.8",
     "name": "desolid",
     "repository": "git@github.com:desolid/desolid.git",
     "author": "Sajjad Shirazy <shirazy.sajjad@gmail.com>",
@@ -17,7 +17,7 @@
         "preinstall": "npx npm-force-resolutions",
         "start": "ts-node -r tsconfig-paths/register ./src/server.ts",
         "dev": "nodemon",
-        "build": "rimraf ./dist && tsc -d -p .",
+        "build": "rimraf ./dist && tsc -d",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "release:patch": "standard-version --release-as patch && git push && git push --tags",
         "release:minor": "standard-version --release-as minor && git push && git push --tags",
