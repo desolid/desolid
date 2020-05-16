@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.5](https://github.com/desolid/desolid/compare/v0.2.4...v0.2.5) (2020-05-16)
+
+
+### Features
+
+* creting a root index for project ([8aabb6f](https://github.com/desolid/desolid/commit/8aabb6ff5c88dc694c54e145b831d92a3bdd531a))
+* default api config ([428d8ba](https://github.com/desolid/desolid/commit/428d8ba00d8ed76d535d2a61c3978f43b6a84208))
+* default database config ([6922daf](https://github.com/desolid/desolid/commit/6922dafa5a7311ad6dc8db380909db9ed050f1c6))
+* default Storage configs ([9b7b45f](https://github.com/desolid/desolid/commit/9b7b45ff4eb33ac5618d7788974cc0551ebadd3d))
+* logging version and descriiption on cli ([c7ba771](https://github.com/desolid/desolid/commit/c7ba771a4563f114bdc2f966e0aeea7a8cee4f90))
+* preventing to many relations with "File" ([ae9f570](https://github.com/desolid/desolid/commit/ae9f5708e12c963aca49b5c2a34c64e935ee00a2))
+
+
+### Bug Fixes
+
+* logging database connection string ([f6221ce](https://github.com/desolid/desolid/commit/f6221ce6a217eddf0193fbefc82150c869fe5be9))
+* moving cli under cli directory ([43b2606](https://github.com/desolid/desolid/commit/43b2606d8d3a8940e8f36df3a336a581b48668b5))
+
 ### [0.2.4](https://github.com/desolid/desolid/compare/v0.2.3...v0.2.4) (2020-05-16)
 
 
