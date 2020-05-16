@@ -39,9 +39,10 @@ export default class Desolid {
     }
 
     public async start() {
-        log('Connecting to Database ...');
+        log(`Connecting to database ...`);
         await this.database.start();
-        log('Starting Server ...');
+        log(`Connected to "${this.database}"`);
+        log('Starting server ...');
         await this.api.start();
         logger.profile('🚀');
     }
