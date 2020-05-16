@@ -55,13 +55,13 @@ export class Storage {
         this.config = _.merge({}, this.defaultConfig, config);
         this.filenameTemplate = _.template((this.config.pattern as any) as string);
         if (this.config.config.root) {
-            this.config.config.root = path.join(root, config.config.root);
+            this.config.config.root = path.join(root, this.config.config.root);
         }
         this.manager = new StorageManager({
             disks: {
                 main: {
-                    driver: config.driver,
-                    config: config.config,
+                    driver: this.config.driver,
+                    config: this.config.config,
                 },
             },
             default: 'main',

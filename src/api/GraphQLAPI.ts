@@ -1,5 +1,6 @@
-import { makeSchema, queryType, mutationType, asNexusMethod } from '@nexus/schema/dist/core';
+import { makeSchema, queryType, mutationType } from '@nexus/schema/dist/core';
 import { GraphQLServer } from 'graphql-yoga';
+import * as _ from 'lodash';
 import { scalars } from '../schema';
 import { Model } from '../database';
 import { Storage } from '../storage';
@@ -15,15 +16,24 @@ export interface GraphQLAPIConfig {
 }
 
 export class GraphQLAPI {
+    private readonly defaultConfig: GraphQLAPIConfig = {
+        port: 3000,
+        secret: 'secret',
+        upload: {
+            maxFileSize: 64, //MB
+        },
+    };
+    private readonly config: GraphQLAPIConfig;
+    private readonly cruds = new MapX<string, CRUD>();
+    private readonly authenticate: Authenticate;
     private server: GraphQLServer;
-    private cruds = new MapX<string, CRUD>();
-    private authenticate: Authenticate;
 
     constructor(
-        protected readonly config: GraphQLAPIConfig,
+        config: GraphQLAPIConfig,
         models: MapX<string, Model>,
         private readonly storage: Storage,
     ) {
+        this.config = _.merge({}, this.defaultConfig, config);
         this.authenticate = new Authenticate(models.get('User'), this.config.secret);
         models.forEach((model) => {
             this.cruds.set(model.name, new CRUD(model, storage));
