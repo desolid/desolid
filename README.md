@@ -1,10 +1,12 @@
-# Desolid: Single file BaaS
+# 🤖 Desolid: Single file BaaS
 
 Single file self hosted backend as a service
 
-Home page: ...
-Documentation: ...
-Blog: ...
+Home page: TODO
+
+Documentation: TODO
+
+Blog: TODO
 
 ## Features
 
