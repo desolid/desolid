@@ -7,11 +7,14 @@ import * as program from 'commander';
 import { Desolid } from '../Desolid';
 import { logger } from '../utils';
 
+const info = require('../../package.json');
+
 async function main() {
     clear();
     console.log(chalk.green(figlet.textSync('Desolid', { horizontalLayout: 'full' })));
-    console.log(process.env);
-    console.log(`V${process.env.npm_package_version}`);
+    console.log(info.description);
+    console.log(info.homepage);
+    console.log(`V${info.version} on ${process.platform}`);
     // program
     //     .version(process.env.npm_package_version)
     //     .description(process.env.npm_package_description)
