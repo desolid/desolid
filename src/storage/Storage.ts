@@ -1,4 +1,4 @@
-import { StorageManager } from '@slynova/flydrive';
+import * as StorageManager from '@slynova/flydrive';
 import * as streamToBuffer from 'stream-to-promise';
 import * as path from 'path';
 import * as _ from 'lodash';
@@ -6,13 +6,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { ValidationError } from 'apollo-server-core';
 import { MapX } from '../utils';
 import { TypeDefinition, UploadDirectiveArguments, FieldDefinition } from '../schema';
-import { GraphQLResolveInfo, GraphQLNonNull } from 'graphql';
-import {
-    parseResolveInfo,
-    simplifyParsedResolveInfoFragmentWithType,
-    ResolveTree,
-    FieldsByTypeName,
-} from 'graphql-parse-resolve-info';
+import { GraphQLResolveInfo } from 'graphql';
+import { parseResolveInfo, ResolveTree } from 'graphql-parse-resolve-info';
 
 enum StorageDrivers {
     LOCAL = 'local',
