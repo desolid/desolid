@@ -5,6 +5,7 @@ import { DatabaseConfig, Database } from './database';
 import { GraphQLAPIConfig, GraphQLAPI } from './api';
 import { StorageConfig, Storage } from './storage';
 import { Schema } from './schema';
+import { log, logger } from './utils/Logger';
 
 export interface DesolidConfig {
     api: GraphQLAPIConfig;
@@ -20,6 +21,8 @@ export default class Desolid {
     protected readonly schema: Schema;
 
     constructor(public readonly root: string) {
+        logger.profile('🚀');
+        log('Compiling Schema ...');
         const configFile = readFileSync(path.join(root, 'desolid.yaml'), { encoding: 'utf8' });
         this.config = yaml.safeLoad(configFile);
         this.schema = new Schema(root);
@@ -29,7 +32,10 @@ export default class Desolid {
     }
 
     public async start() {
+        log('Connecting to Database ...');
         await this.database.start();
+        log('Starting Server ...');
         await this.api.start();
+        logger.profile('🚀');
     }
 }

@@ -4,7 +4,7 @@ import { scalars } from '../schema';
 import { Model } from '../database';
 import { Storage } from '../storage';
 import { CRUD, Authenticate } from '.';
-import { MapX } from '../utils';
+import { MapX, log } from '../utils';
 
 export interface GraphQLAPIConfig {
     port: number;
@@ -68,6 +68,6 @@ export class GraphQLAPI {
                 maxFileSize: maxFileSize * Math.pow(1024, 2), //MB
             },
         });
-        console.log(`Server is running on http://localhost:${this.server.options.port}`);
+        log(`Server is running on http://localhost:${this.server.options.port}`);
     }
 }

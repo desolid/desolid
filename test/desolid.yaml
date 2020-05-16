@@ -1,6 +1,7 @@
 database:
     dialect: 'sqlite'
     storage: 'databse.sqlite'
+    logging: false
 api:
     port: 3000
     secret: 'secret'
