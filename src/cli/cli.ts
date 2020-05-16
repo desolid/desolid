@@ -4,7 +4,8 @@ import * as clear from 'clear';
 import * as figlet from 'figlet';
 import * as path from 'path';
 import * as program from 'commander';
-import Desolid from '../Desolid';
+import { Desolid } from '../Desolid';
+import { logger } from '../utils';
 
 async function main() {
     clear();
@@ -21,4 +22,6 @@ async function main() {
     await desolid.start();
 }
 
-main();
+main().catch((error) => {
+    logger.error(error.message);
+});

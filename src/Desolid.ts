@@ -13,7 +13,7 @@ export interface DesolidConfig {
     storage: StorageConfig;
 }
 
-export default class Desolid {
+export class Desolid {
     protected readonly config: DesolidConfig;
     protected readonly storage: Storage;
     protected readonly database: Database;

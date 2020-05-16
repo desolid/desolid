@@ -1,4 +1,4 @@
-import Desolid from './Desolid';
+import {Desolid} from './Desolid';
 
 async function main() {
     // try {
