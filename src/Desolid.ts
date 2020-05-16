@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from 'fs-extra';
 import * as yaml from 'js-yaml';
 import * as path from 'path';
+import * as _ from 'lodash';
 import { DatabaseConfig, Database } from './database';
 import { GraphQLAPIConfig, GraphQLAPI } from './api';
 import { StorageConfig, Storage } from './storage';
@@ -20,17 +21,17 @@ export class Desolid {
     protected readonly api: GraphQLAPI;
     protected readonly schema: Schema;
 
-    constructor(public readonly root: string) {
+    constructor(public readonly root: string, config?: DesolidConfig) {
         logger.profile('🚀');
         log('Compiling Schema ...');
-        this.config = this.loadConfigs() || {};
+        this.config = _.merge({}, this.loadConfig(), config);
         this.schema = new Schema(root);
         this.storage = new Storage(root, this.config.storage, this.schema.models);
         this.database = new Database(this.config.database, this.schema.models, this.storage);
         this.api = new GraphQLAPI(this.config.api, this.database.models, this.storage);
     }
 
-    private loadConfigs() {
+    private loadConfig() {
         const configFilePath = path.join(this.root, 'desolid.yaml');
         if (existsSync(configFilePath)) {
             const configFile = readFileSync(configFilePath, { encoding: 'utf8' });
