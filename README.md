@@ -1,6 +1,6 @@
-# Desolid: Minimalistic Headless CMS
+# Desolid: Single file BaaS
 
-Minimalistic Headless CMS
+Single file self hosted backend as a service
 
 ## CMS model
 

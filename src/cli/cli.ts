@@ -13,8 +13,7 @@ async function main() {
     clear();
     console.log(chalk.green(figlet.textSync('Desolid', { horizontalLayout: 'full' })));
     console.log(info.description);
-    console.log(info.homepage);
-    console.log(`V${info.version} on ${process.platform}`);
+    console.log(`🔥 v${info.version} running on ${process.platform}`);
     // program
     //     .version(process.env.npm_package_version)
     //     .description(process.env.npm_package_description)
