@@ -8,9 +8,10 @@ import {
 import * as path from 'path';
 import gql from 'graphql-tag';
 import { readFileSync } from 'fs-extra';
-import { TypeDefinitionNode, EnumTypeExtensionNode } from 'graphql';
+import { TypeDefinitionNode, EnumTypeExtensionNode, DocumentNode } from 'graphql';
 import { TypeDefinition, scalars } from '.';
 import { MapX } from '../utils';
+import { primitives } from './primitives.graphql';
 
 export type EntityDefinition =
     | TypeDefinition
@@ -25,9 +26,10 @@ export class Schema {
      * @param root root desolid directory
      */
     constructor(root: string) {
-        this.dictionary.importArray(scalars, 'name')
-        this.import(path.join(__dirname, 'primitives.graphql'));
-        this.import(`${root}/schema.graphql`);
+        this.dictionary.importArray(scalars, 'name');
+        this.import(primitives);
+        const document = this.loadDocument(path.join(root, 'schema.graphql'));
+        this.import(document);
         this.models = this.dictionary.search({ isModel: true }) as MapX<string, TypeDefinition>;
     }
 
@@ -35,8 +37,11 @@ export class Schema {
         return (this.dictionary.get(name) as any) as T;
     }
 
-    private import(filePath: string) {
-        const { definitions } = gql(readFileSync(filePath, { encoding: 'utf8' }));
+    private loadDocument(path: string) {
+        return gql(readFileSync(path, { encoding: 'utf8' }));
+    }
+
+    private import({ definitions }: DocumentNode) {
         definitions.forEach((definition) => this.importTypeDef(definition as TypeDefinitionNode));
     }
 
