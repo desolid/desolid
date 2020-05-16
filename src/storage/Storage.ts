@@ -20,16 +20,16 @@ const MB = Math.pow(1024, 2);
 // export type StorageConfig = StorageManagerSingleDiskConfig;
 
 export interface StorageConfig {
-    pattern: (values: any) => string;
+    pattern: string;
     driver: StorageDrivers;
     config: {
         root?: string; // Using on `Local` driver
-        key: string; // Using on `S3` driver
-        secret: string; // Using on `S3` driver
-        region: string; // Using on `S3` driver
-        endpoint: string; // Using on `S3` driver
-        bucket: string; // Using on `S3` & `GCS` drivers
-        keyFilename: string; // Using on `GCS` driver
+        key?: string; // Using on `S3` driver
+        secret?: string; // Using on `S3` driver
+        region?: string; // Using on `S3` driver
+        endpoint?: string; // Using on `S3` driver
+        bucket?: string; // Using on `S3` & `GCS` drivers
+        keyFilename?: string; // Using on `GCS` driver
     };
 }
 
@@ -40,15 +40,23 @@ export interface Upload {
 }
 
 export class Storage {
+    private readonly defaultConfigs: StorageConfig = {
+        pattern: '/${YYYY}/${MM}/${DD}/${NAME}-${RANDOM}.${EXT}',
+        driver: StorageDrivers.LOCAL,
+        config: {
+            root: './upload',
+        },
+    };
+    private readonly configs: StorageConfig;
     private readonly manager: StorageManager;
+    private readonly filenameTemplate: _.TemplateExecutor;
 
-    constructor(
-        private readonly configs: StorageConfig,
-        root: string,
-        private readonly models: MapX<string, TypeDefinition>,
-    ) {
-        this.configs.pattern = _.template((configs.pattern as any) as string);
-        configs.config.root = path.join(root, configs.config.root);
+    constructor(root: string, configs: StorageConfig, private readonly models: MapX<string, TypeDefinition>) {
+        this.configs = _.merge({}, configs, this.defaultConfigs);
+        this.filenameTemplate = _.template((this.configs.pattern as any) as string);
+        if (this.configs.config.root) {
+            this.configs.config.root = path.join(root, configs.config.root);
+        }
         this.manager = new StorageManager({
             disks: {
                 main: {
@@ -97,12 +105,13 @@ export class Storage {
     private generateFilename(filename: string) {
         const { name, ext } = path.parse(filename);
         const [MM, DD, YYYY] = new Date().toLocaleDateString('en-US').split('/');
-        return this.configs.pattern({
+        return this.filenameTemplate({
             EXT: ext.substr(1),
             NAME: name,
             FILENAME: filename,
             EPOCH: Date.now(),
             UUID: uuidv4(),
+            RANDOM: (Math.random() * 1000000).toFixed(),
             MM,
             DD,
             YYYY,
