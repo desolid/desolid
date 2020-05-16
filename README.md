@@ -2,143 +2,82 @@
 
 Single file self hosted backend as a service
 
-## CMS model
+Home page: ...
+Documentation: ...
+Blog: ...
 
-The CMS models using a graphql file `schema.graphql` in the root directory. here you can see a simple example:
+## Features
 
-```graphql
-enum UserGroup {
-    Admin # default
-    User # default
-    Editor
-    Author
-}
+-   GraphQL API: CRUDs
+-   Authentication & Authorization: inline definition
+-   File storage: Local and S3 support
+-   Database agnostic: SQLite, MariaDB, PostgreSQL, MS SQL Server
 
-type User
-    @model
-    @authorization(
-        READ: "$user.group = Editor || $user.id = $this.id"
-        CREATE: "true"
-        UPDATE: "$user.group = Editor || $user.id = $this.id"
-        DELETE: "$user.group = Editor || $user.id = $this.id"
-    ) {
-    id: ID! @auto
-    createdAt: DateTime! @createdAt
-    updatedAt: DateTime! @updatedAt
-    email: Email! @unique
-    phone: PhoneNumber @unique
-    password: Password! @validation(length: { min: 12, max: 25 })
-    group: UserGroup!
-    name: String!
-    family: String!
-    avatar: File @upload(accept: "imagee/*", size: { max: "5MB", min: "10KB" })
-}
+## Quick start
 
-type Post
-    @model
-    @authorization(
-        READ: "$this.published || $user.group = Editor || $user.id = $this.author"
-        CREATE: "$user.group in [Editor, Author]"
-        UPDATE: "$user.group = Editor || $user.id = $this.author"
-        DELETE: "$user.group = Editor || $user.id = $this.author"
-    ) {
-    id: ID! @auto
-    createdAt: DateTime! @createdAt
-    updatedAt: DateTime! @updatedAt
-    author: User!
-    title: String!
-    content: String!
-    published: Boolean! @default(value: false) @authorize(READ: "$user.group in [Editor, Author]")
-    categories: [Category!]!
-}
+Let's create an api for a blog service:
 
-type Category
-    @model
-    @authorization(
-        READ: "true"
-        CREATE: "$user.group = Editor"
-        UPDATE: "$user.group = Editor"
-        DELETE: "$user.group = Editor"
-    ) {
-    id: ID! @auto
-    createdAt: DateTime! @createdAt
-    updatedAt: DateTime! @updatedAt
-    name: String!
-    posts: [Post!]!
-}
-```
+1. Install NodeJS
+2. Create a desolid schema file: `schema.graphql`
 
-## Usgae
+    ```graphql
+    extend enum UserGroup {
+        Editor
+        Author
+    }
 
-@todo describe
+    type Post
+        @model
+        @authorization(
+            READ: [Admin, Editor, "{{published}} || $user.id == {{author.id}}"]
+            CREATE: [Admin, Editor, "$user.group == 'Author' && !$input.published"]
+            UPDATE: [Admin, Editor, "$user.id == {{author.id}} && !$input.published"]
+            DELETE: [Admin, Editor, "!{{published}} && $user.id == {{author.id}}"] #
+        ) {
+        id: ID!
+        createdAt: DateTime!
+        updatedAt: DateTime!
+        author: User!
+        title: String!
+        content: String!
+        published: Boolean!
+        categories: [Category]
+    }
 
-### Node
+    type Category
+        @model
+        @authorization(
+            CREATE: [Admin, Editor]
+            UPDATE: [Admin, Editor]
+            DELETE: [Admin, Editor] #
+        ) {
+        id: ID!
+        createdAt: DateTime!
+        updatedAt: DateTime!
+        name: String!
+        posts: [Post]
+    }
+    ```
 
-```bash
-npm install -g desolid
-```
+3. Run this command on your terminal
 
-### Docker
+    ```bash
+    npx desolid
+    ```
 
-#### Docker Compose
+    - Compiles the schema and creates CRUDs
+    - Creates and uses by default a SQLite database on the root `./database.sqlite`
+    - Stores files under `./upload` directory
+    - Logs errors and warnings on `./desolid.log` file
 
-## Global Variables
+4. Open http://localhost:3000/ on your browser.
 
--   `$now` refers to current DateTime
--   `$user`refers to the authenticated user
--   `$this` refers to the current model
+## Acknowledgement
 
-## Primitive Scalars
+This project is based On these cool stuffs:
 
--   ID
--   Int
--   Float
--   String
--   Boolean
-
-# Built in Scalars
-
--   Datetime
--   Password
--   PhoneNumber
--   Email
--   Json
-
-# Built in Types
-
--   Resource
--   SoftDeleteResource
-
-# Built in Models
-
--   User
--   File
-
-## Authorization
-
-Authorization describes using `@Athorization` directive. you can indicate the logic using javascript boolean operators:
-
-```graphql
-type Post
-    @model
-    @authorization(
-        READ: "$this.published || $user.group = Editor || $user.id = $this.author"
-        CREATE: "$user.group in [Editor, Author]"
-        UPDATE: "$user.group = Editor || $user.id = $this.author"
-        DELETE: "$user.group = Editor || $user.id = $this.author"
-    ) {
-    id: ID! @auto
-    createdAt: DateTime! @createdAt
-    updatedAt: DateTime! @updatedAt
-    author: User!
-    title: String!
-    content: String!
-    published: Boolean! @default(value: false) @authorize(READ: "$user.group in [Editor, Author]")
-    categories: [Category!]!
-}
-```
-
-2 variables are available in the scope:
-
--   `$user`: refers to the authenticated user
--   `$this`: refers to the current model
+-   TypeScript: https://github.com/Microsoft/TypeScript
+-   Sequlize: https://github.com/sequelize/sequelize
+-   Nexus Schema: https://github.com/graphql-nexus/schema
+-   GraphQL Yoga: https://github.com/prisma-labs/graphql-yoga
+-   FlyDrive: https://github.com/Slynova-Org/flydrive
