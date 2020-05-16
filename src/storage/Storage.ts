@@ -1,4 +1,4 @@
-import { StorageManager } from '@slynova/flydrive/src';
+import { StorageManager } from '@slynova/flydrive';
 import * as streamToBuffer from 'stream-to-promise';
 import * as path from 'path';
 import * as _ from 'lodash';
