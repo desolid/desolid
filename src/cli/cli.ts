@@ -10,7 +10,7 @@ import { logger } from '../utils';
 async function main() {
     clear();
     console.log(chalk.green(figlet.textSync('Desolid', { horizontalLayout: 'full' })));
-    console.log(process.env.npm_package_description);
+    console.log(process.env);
     console.log(`V${process.env.npm_package_version}`);
     // program
     //     .version(process.env.npm_package_version)
