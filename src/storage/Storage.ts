@@ -40,28 +40,28 @@ export interface Upload {
 }
 
 export class Storage {
-    private readonly defaultConfigs: StorageConfig = {
+    private readonly defaultConfig: StorageConfig = {
         pattern: '/${YYYY}/${MM}/${DD}/${NAME}-${RANDOM}.${EXT}',
         driver: StorageDrivers.LOCAL,
         config: {
             root: './upload',
         },
     };
-    private readonly configs: StorageConfig;
+    private readonly config: StorageConfig;
     private readonly manager: StorageManager;
     private readonly filenameTemplate: _.TemplateExecutor;
 
-    constructor(root: string, configs: StorageConfig, private readonly models: MapX<string, TypeDefinition>) {
-        this.configs = _.merge({}, configs, this.defaultConfigs);
-        this.filenameTemplate = _.template((this.configs.pattern as any) as string);
-        if (this.configs.config.root) {
-            this.configs.config.root = path.join(root, configs.config.root);
+    constructor(root: string, config: StorageConfig, private readonly models: MapX<string, TypeDefinition>) {
+        this.config = _.merge({}, this.defaultConfig, config);
+        this.filenameTemplate = _.template((this.config.pattern as any) as string);
+        if (this.config.config.root) {
+            this.config.config.root = path.join(root, config.config.root);
         }
         this.manager = new StorageManager({
             disks: {
                 main: {
-                    driver: configs.driver,
-                    config: configs.config,
+                    driver: config.driver,
+                    config: config.config,
                 },
             },
             default: 'main',
