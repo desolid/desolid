@@ -48,6 +48,9 @@ export class FieldDefinition {
             nullable: !/!$/.test(encodedFieldType),
             list: list ? list.map((item) => /^!/.test(item)) : false,
         } as FieldOutConfig<any, any>;
+        if(this.typeName == 'File' && this.config.list) {
+            throw new Error(`To many relations with "File" (on "${owner.name}" model) doesn't support yet.`)
+        }
     }
 
     public get type() {
