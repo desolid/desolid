@@ -4,12 +4,13 @@ import * as clear from 'clear';
 import * as figlet from 'figlet';
 import * as path from 'path';
 import * as program from 'commander';
-import Desolid from './Desolid';
+import Desolid from '../Desolid';
 
 async function main() {
     clear();
     console.log(chalk.green(figlet.textSync('Desolid', { horizontalLayout: 'full' })));
-
+    console.log(process.env.npm_package_description);
+    console.log(`V${process.env.npm_package_version}`);
     // program
     //     .version(process.env.npm_package_version)
     //     .description(process.env.npm_package_description)

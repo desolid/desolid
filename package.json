@@ -8,7 +8,7 @@
     "main": "./dist/Desolid.js",
     "types": "./dist/Desolid.d.ts",
     "bin": {
-        "desolid": "./dist/cli.js"
+        "desolid": "./dist/cli/cli.js"
     },
     "files": [
         "dist"
