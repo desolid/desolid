@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/desolid/desolid/compare/v0.2.1...v0.2.2) (2020-05-16)
+
+
+### Bug Fixes
+
+* TypeError: flydrive_1.StorageManager is not a constructor ([56ba5c3](https://github.com/desolid/desolid/commit/56ba5c32b71f910a69622d55fd3fe6bfbbd41416))
+
 ### [0.2.1](https://github.com/desolid/desolid/compare/v0.2.0...v0.2.1) (2020-05-16)
 
 
