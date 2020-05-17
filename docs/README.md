@@ -4,7 +4,7 @@ heroImage: ./robot.svg
 heroText: 'Desolid: Single file BaaS'
 tagline: Open-source, single file, self-hosted backend-as-a-service.
 actionText: Get Started →
-actionLink: /documents/
+actionLink: /documents/getting-started.html
 features:
 - title: GraphQL API
   details: Query your data using a powerful GraphQL CRUD API.
