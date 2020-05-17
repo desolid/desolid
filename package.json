@@ -1,6 +1,7 @@
 {
     "version": "0.2.8",
     "name": "desolid",
+    "title": "Desolid",
     "description": "🤖 Desolid: Single file self hosted backend as a service",
     "homepage": "https://github.com/desolid/desolid",
     "repository": "git@github.com:desolid/desolid.git",
@@ -34,6 +35,8 @@
         "dev": "nodemon",
         "build": "npx rimraf ./dist && tsc",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+        "docs:dev": "vuepress dev --no-cache docs",
+        "docs:build": "vuepress build docs",
         "release:patch": "standard-version --release-as patch && git push && git push --tags",
         "release:minor": "standard-version --release-as minor && git push && git push --tags",
         "release:major": "standard-version --release-as major && git push && git push --tags",
@@ -51,7 +54,8 @@
         "standard-version": "^7.1.0",
         "ts-node": "^7.0.1",
         "tsconfig-paths": "^3.9.0",
-        "typescript": "^3.8.3"
+        "typescript": "^3.8.3",
+        "vuepress": "^1.5.0"
     },
     "dependencies": {
         "@nexus/schema": "^0.13.1",

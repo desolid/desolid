@@ -1,29 +1,8 @@
-# 🤖 Desolid: Single file BaaS
 
-<p align="center">
-  <a href="https://npmcharts.com/compare/desolid?minimal=true"><img src="https://img.shields.io/npm/dm/desolid.svg" alt="Downloads"></a>
-  <a href="https://www.npmjs.com/package/desolid"><img src="https://img.shields.io/npm/v/desolid.svg" alt="Version"></a>  
-  <a href="https://github.com/vuejs/desolid/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/desolid.svg" alt="License"></a>
-</p>
-
-Single file self hosted backend as a service
-
-Home page: TODO
-
-Documentation: TODO
-
-Blog: TODO
-
-## Features
-
--   GraphQL API: CRUDs
--   Authentication & Authorization: inline definition
--   File storage: Local and S3 support
--   Database agnostic: SQLite, MariaDB, PostgreSQL, MS SQL Server
-
-## Quick start
+# Getting Started
 
 Let's create an api for a blog service:
+
 
 1. Install NodeJS
 2. Create a desolid schema file: `schema.graphql`
@@ -79,13 +58,3 @@ Let's create an api for a blog service:
     - Logs errors and warnings on `./desolid.log` file
 
 4. Open http://localhost:3000/ on your browser.
-
-## Acknowledgement
-
-This project is based On these cool stuffs:
-
--   TypeScript: https://github.com/Microsoft/TypeScript
--   Sequlize: https://github.com/sequelize/sequelize
--   Nexus Schema: https://github.com/graphql-nexus/schema
--   GraphQL Yoga: https://github.com/prisma-labs/graphql-yoga
--   FlyDrive: https://github.com/Slynova-Org/flydrive

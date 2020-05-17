@@ -32,6 +32,8 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-databse.sqlite
 
+# desolid files
+databse.sqlite
 test/upload
+docs/.vuepress
