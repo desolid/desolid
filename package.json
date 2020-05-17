@@ -3,7 +3,7 @@
     "name": "desolid",
     "title": "Desolid",
     "description": "🤖 Desolid: Single file self hosted backend as a service",
-    "homepage": "https://github.com/desolid/desolid",
+    "homepage": "https://desolid.netlify.app/",
     "repository": "git@github.com:desolid/desolid.git",
     "author": "Sajjad Shirazy <shirazy.sajjad@gmail.com>",
     "license": "MIT",
