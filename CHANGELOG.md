@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.9](https://github.com/desolid/desolid/compare/v0.2.8...v0.2.9) (2020-05-17)
+
+
+### Features
+
+* initialising docs ([39c9f7c](https://github.com/desolid/desolid/commit/39c9f7c217712fb426a19c4b6f4e85313017a7fb))
+
+
+### Bug Fixes
+
+* docsBranch ([1df4b32](https://github.com/desolid/desolid/commit/1df4b32ee40349ebea3b584ebe05c4c7e51df03b))
+* documents getting-started ([6ef1dd1](https://github.com/desolid/desolid/commit/6ef1dd1132b7fb64a2e95be37339eb1ab5e7ca74))
+* home page ([9c98620](https://github.com/desolid/desolid/commit/9c9862006eb2190ece433b44548efd46ba929b43))
+* keeping `docs/.vuepress` files ([7f9ca0a](https://github.com/desolid/desolid/commit/7f9ca0a63d6b850f837ce3679019f34010653864))
+
 ### [0.2.8](https://github.com/desolid/desolid/compare/v0.2.7...v0.2.8) (2020-05-16)
 
 
