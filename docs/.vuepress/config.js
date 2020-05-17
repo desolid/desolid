@@ -8,6 +8,7 @@ module.exports = {
         logo: '/logo_outline.png',
         repo: 'desolid/desolid',
         docsDir: 'docs',
+        docsBranch: 'develop',
         editLinkText: 'Edit this page on GitHub',
         editLinks: true,
         searchPlaceholder: 'Search...',
