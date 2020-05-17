@@ -36,4 +36,4 @@ lerna-debug.log*
 # desolid files
 databse.sqlite
 test/upload
-docs/.vuepress
+docs/.vuepress/dist
