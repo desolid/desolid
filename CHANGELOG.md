@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.10](https://github.com/desolid/desolid/compare/v0.2.9...v0.2.10) (2020-05-18)
+
+
+### Features
+
+* google analytics ([63e7891](https://github.com/desolid/desolid/commit/63e789172167c7b76da982e6b32e6b56da0572d1))
+* reference document ([2b8a10b](https://github.com/desolid/desolid/commit/2b8a10bcd787848fa4e23fc2ef5f91b0b54f4f12))
+
+
+### Bug Fixes
+
+* guide/getting-started.html ([c3eca5a](https://github.com/desolid/desolid/commit/c3eca5a70b04b6cb6c7da79c8c28f8fedbe8631d))
+* vuepress plugins ([deb69fc](https://github.com/desolid/desolid/commit/deb69fcdded7a6eba9edab0484e34ab89bfdefd7))
+
 ### [0.2.9](https://github.com/desolid/desolid/compare/v0.2.8...v0.2.9) (2020-05-17)
 
 
