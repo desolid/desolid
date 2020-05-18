@@ -18,6 +18,7 @@ module.exports = {
             { text: 'Home', link: '/' },
             { text: 'Guide', link: '/guide/' },
             { text: 'Reference', link: '/reference/' },
+            { text: 'Blog', link: 'https://dev.to/desolid' },
         ],
         displayAllHeaders: true, // Default: false
         sidebar: {

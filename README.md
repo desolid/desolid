@@ -11,7 +11,7 @@ Open source, single file, self hosted, Backend as a service.
 
 Documentation: [https://desolid.netlify.app/](https://desolid.netlify.app/)
 
-Blog: TODO
+Blog: [https://dev.to/desolid](https://dev.to/desolid)
 
 ## Features
 
