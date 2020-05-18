@@ -2,7 +2,7 @@
 home: true
 heroImage: ./robot.svg
 heroText: 'Desolid: Single file BaaS'
-tagline: Open-source, single file, self-hosted backend-as-a-service.
+tagline: Open source, single file, self hosted, Backend as a service.
 actionText: Get Started →
 actionLink: /guide/getting-started.html
 features:

@@ -7,11 +7,9 @@
   <a href="https://app.netlify.com/sites/desolid/deploys"><img src="https://api.netlify.com/api/v1/badges/e07ea82e-df51-4658-9897-64b95719bafd/deploy-status" alt="License"></a>
 </p>
 
-Single file self hosted backend as a service
+Open source, single file, self hosted, Backend as a service.
 
-Home page: TODO
-
-Documentation: TODO
+Documentation: [https://desolid.netlify.app/](https://desolid.netlify.app/)
 
 Blog: TODO
 
@@ -85,8 +83,8 @@ Let's create an api for a blog service:
 
 This project is based On these cool stuffs:
 
--   TypeScript: https://github.com/Microsoft/TypeScript
--   Sequlize: https://github.com/sequelize/sequelize
--   Nexus Schema: https://github.com/graphql-nexus/schema
--   GraphQL Yoga: https://github.com/prisma-labs/graphql-yoga
--   FlyDrive: https://github.com/Slynova-Org/flydrive
+-   TypeScript: [https://github.com/Microsoft/TypeScript](https://github.com/Microsoft/TypeScript)
+-   Sequlize: [https://github.com/sequelize/sequelize](https://github.com/sequelize/sequelize)
+-   Nexus Schema: [https://github.com/graphql-nexus/schema](https://github.com/graphql-nexus/schema)
+-   GraphQL Yoga: [https://github.com/prisma-labs/graphql-yoga](https://github.com/prisma-labs/graphql-yoga)
+-   FlyDrive: [https://github.com/Slynova-Org/flydrive](https://github.com/Slynova-Org/flydrive)

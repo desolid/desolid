@@ -28,6 +28,7 @@ module.exports = {
                     collapsable: false,
                     children: [
                         'getting-started', //
+                        'built-in-models',
                         'aknowledgement',
                     ],
                 },
