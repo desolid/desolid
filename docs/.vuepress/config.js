@@ -1,4 +1,5 @@
 const package = require('../../package.json');
+const { sidebarTree } = require('../reference/config');
 
 module.exports = {
     title: package.title,
@@ -15,20 +16,23 @@ module.exports = {
         smoothScroll: true,
         nav: [
             { text: 'Home', link: '/' },
-            { text: 'Documents', link: '/Documents/' },
+            { text: 'Guide', link: '/guide/' },
+            { text: 'Reference', link: '/reference/' },
         ],
         displayAllHeaders: true, // Default: false
-        // sidebar: ['/documents', '/documents/getting-started'],
-        sidebar: [
-            {
-                title: 'Documents',
-                collapsable: false,
-                children: [
-                    'documents/getting-started', //
-                    'documents/aknowledgement',
-                ],
-            },
-        ],
+        sidebar: {
+            ...sidebarTree('Reference'),
+            '/guide/': [
+                {
+                    title: 'Guide',
+                    collapsable: false,
+                    children: [
+                        'getting-started', //
+                        'aknowledgement',
+                    ],
+                },
+            ],
+        },
     },
     configureWebpack: {
         resolve: {

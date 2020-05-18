@@ -37,3 +37,4 @@ lerna-debug.log*
 databse.sqlite
 test/upload
 docs/.vuepress/dist
+docs/reference

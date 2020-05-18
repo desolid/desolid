@@ -1,3 +1,9 @@
+/*
+ * @vuepress
+ * ---
+ * title: Desolid API refernce
+ * ---
+ */
 export * from './api';
 export * from './database';
 export * from './schema';

@@ -1,6 +1,6 @@
 import { createLogger, transports, format } from 'winston';
 import * as moment from 'moment';
-import chalk = require('chalk');
+import * as chalk  from 'chalk';
 
 const colorMap = {
     emerg: 'black',
