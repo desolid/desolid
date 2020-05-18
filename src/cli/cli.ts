@@ -1,26 +1,21 @@
 #!/usr/bin/env node
-import * as chalk from 'chalk';
 import * as clear from 'clear';
-import * as figlet from 'figlet';
 import * as path from 'path';
 import * as program from 'commander';
 import { Desolid } from '../Desolid';
 import { logger } from '../utils';
-
 const info = require('../../package.json');
 
 async function main() {
     clear();
-    console.log(chalk.green(figlet.textSync('Desolid', { horizontalLayout: 'full' })));
-    console.log(info.description);
-    console.log(`🔥 v${info.version} running on ${process.platform}`);
-    // program
-    //     .version(process.env.npm_package_version)
-    //     .description(process.env.npm_package_description)
-    //     .option('-p, --path', 'Root desolid directory')
-    //     .parse(process.argv);
-
-    const desolid = new Desolid(process.cwd());
+    program
+        .version(info.version)
+        .description(info.description)
+        .option('-p, --path <path>', 'Root desolid directory', process.cwd())
+        .parse(process.argv);
+    const args = program.opts();
+    const root = path.isAbsolute(args.path) ? args.path : path.join(process.cwd(), args.path);
+    const desolid = new Desolid(root);
     await desolid.start();
 }
 

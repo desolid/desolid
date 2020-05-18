@@ -8,7 +8,7 @@
             "name": "Debug Typescript",
             "type": "node",
             "request": "launch",
-            "args": ["${workspaceFolder}\\src\\server.ts"],
+            "args": ["${workspaceFolder}\\src\\cli\\cli.ts", "-p", "./test"],
             "runtimeArgs": ["-r", "ts-node/register","-r", "tsconfig-paths/register"],
             "cwd": "${workspaceRoot}",
             "protocol": "inspector",

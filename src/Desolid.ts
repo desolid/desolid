@@ -1,5 +1,7 @@
 import { readFileSync, existsSync } from 'fs-extra';
 import * as yaml from 'js-yaml';
+import * as chalk from 'chalk';
+import * as figlet from 'figlet';
 import * as path from 'path';
 import * as _ from 'lodash';
 import { DatabaseConfig, Database } from './database';
@@ -7,6 +9,8 @@ import { GraphQLAPIConfig, GraphQLAPI } from './api';
 import { StorageConfig, Storage } from './storage';
 import { Schema } from './schema';
 import { log, logger } from './utils/Logger';
+
+const info = require('../package.json');
 
 export interface DesolidConfig {
     api: GraphQLAPIConfig;
@@ -22,6 +26,9 @@ export class Desolid {
     protected readonly schema: Schema;
 
     constructor(public readonly root: string, config?: DesolidConfig) {
+        console.log(chalk.green(figlet.textSync('Desolid', { horizontalLayout: 'full' })));
+        console.log(info.description);
+        console.log(`🔥 v${info.version} running in "${process.platform}" on "${root}"\n`);
         logger.profile('🚀');
         log('Compiling Schema ...');
         this.config = _.merge({}, this.loadConfig(), config);
