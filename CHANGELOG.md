@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/desolid/desolid/compare/v0.2.11...v0.3.0) (2020-05-19)
+
+
+### Features
+
+* cli guid ([e3a267c](https://github.com/desolid/desolid/commit/e3a267c9e6cec0ce8a6725209303fc0240ca3395))
+* extending base ([8eb88ac](https://github.com/desolid/desolid/commit/8eb88ac598ba33a695f35e65a6a60960e024c512))
+
+
+### Bug Fixes
+
+* isolating docs project ([e1835aa](https://github.com/desolid/desolid/commit/e1835aa76f49a15f53c7093136ad715cc5ebce6e))
+
 ### [0.2.11](https://github.com/desolid/desolid/compare/v0.2.10...v0.2.11) (2020-05-18)
 
 
