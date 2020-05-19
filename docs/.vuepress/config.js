@@ -31,7 +31,9 @@ module.exports = {
                     children: [
                         'getting-started', //
                         'cli',
+                        'schema',
                         'built-in-models',
+                        'authentication',
                         'aknowledgement',
                     ],
                 },

@@ -1,4 +1,8 @@
 export class MapX<K, V> extends Map<K, V> {
+    public get<T = V>(key: K) {
+        return (super.get(key) as any) as T;
+    }
+
     public importArray(array: V[], uniqueAttribute: string) {
         array.forEach((item) => {
             this.set(item[uniqueAttribute], item);
@@ -66,9 +70,9 @@ export class MapX<K, V> extends Map<K, V> {
 
     public map(callback: (value: V, key: K) => any) {
         const result = [];
-        this.forEach((value,key) => {
-            result.push(callback(value,key));
-        })
+        this.forEach((value, key) => {
+            result.push(callback(value, key));
+        });
         return result;
     }
 }

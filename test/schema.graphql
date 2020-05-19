@@ -3,6 +3,17 @@ extend enum UserGroup {
     Author
 }
 
+extend type User
+    @model
+    @authorization(
+        CREATE: [Admin, Editor]
+        READ: [Admin, "$user.id == {{id}}"]
+        UPDATE: [Admin, "$user.id == {{id}}"]
+        DELETE: [Admin] #
+    ) {
+    avatar: File @upload(accept: ["image/jpeg"], size: { max: "5", min: "0.1" })
+}
+
 """
 This is a description of a Post
 """

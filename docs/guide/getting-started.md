@@ -1,8 +1,6 @@
-
 # Getting Started
 
 Let's create an api for a blog service:
-
 
 1. Install NodeJS
 2. Create a desolid schema file: `schema.graphql`
@@ -13,6 +11,20 @@ Let's create an api for a blog service:
         Author
     }
 
+    extend type User
+        @model
+        @authorization(
+            CREATE: [Admin, Editor]
+            READ: [Admin, "$user.id == {{id}}"]
+            UPDATE: [Admin, "$user.id == {{id}}"]
+            DELETE: [Admin] #
+        ) {
+        avatar: File @upload(accept: ["image/jpeg"], size: { max: "5", min: "0.1" })
+    }
+
+    """
+    This is a description of a Post
+    """
     type Post
         @model
         @authorization(
@@ -31,6 +43,9 @@ Let's create an api for a blog service:
         categories: [Category]
     }
 
+    """
+    This is a description of a Category
+    """
     type Category
         @model
         @authorization(
@@ -57,4 +72,4 @@ Let's create an api for a blog service:
     - Stores files under `./upload` directory
     - Logs errors and warnings on `./desolid.log` file
 
-4. Open http://localhost:3000/ on your browser.
+4. Open (http://localhost:3000/)[http://localhost:3000/] on your browser.

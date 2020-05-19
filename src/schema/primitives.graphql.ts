@@ -46,10 +46,10 @@ export const primitives = gql`
     type User
         @model
         @authorization(
-            # CREATE: [Admin]
+            CREATE: [Admin]
             READ: [Admin, "$user.id == {{id}}"]
             UPDATE: [Admin, "$user.id == {{id}}"]
-            DELETE: [Admin] #
+            DELETE: [Admin]
         ) {
         id: ID!
         createdAt: DateTime!
@@ -58,6 +58,5 @@ export const primitives = gql`
         password: Password!
         group: UserGroup!
         name: String!
-        avatar: File @upload(accept: ["image/jpeg"], size: { max: "5", min: "0.1" })
     }
 `;

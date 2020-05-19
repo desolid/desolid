@@ -1,4 +1,4 @@
-import { ObjectTypeDefinitionNode } from 'graphql';
+import { ObjectTypeDefinitionNode, ObjectTypeExtensionNode } from 'graphql';
 import {
     FieldOutConfig,
     NexusObjectTypeDef,
@@ -48,5 +48,15 @@ export class TypeDefinition extends NexusObjectTypeDef<string> {
 
     public get description() {
         return this.definition.description?.value;
+    }
+
+    public extend(definition: ObjectTypeExtensionNode) {
+        definition.fields.forEach((field) => {
+            this.fields.set(field.name.value, new FieldDefinition(field, this));
+        });
+        definition.directives.forEach((item) => {
+            const directive = new DirectiveDefinition(item);
+            this.directives.set(directive.name as TypeDirectives, directive.arguments);
+        });
     }
 }

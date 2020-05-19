@@ -8,7 +8,7 @@ import {
 import * as path from 'path';
 import gql from 'graphql-tag';
 import { readFileSync } from 'fs-extra';
-import { TypeDefinitionNode, EnumTypeExtensionNode, DocumentNode } from 'graphql';
+import { TypeDefinitionNode, EnumTypeExtensionNode, DocumentNode, ObjectTypeExtensionNode } from 'graphql';
 import { TypeDefinition, scalars } from '.';
 import { MapX } from '../utils';
 import { primitives } from './primitives.graphql';
@@ -45,30 +45,46 @@ export class Schema {
         definitions.forEach((definition) => this.importTypeDef(definition as TypeDefinitionNode));
     }
 
-    private importTypeDef(definition: TypeDefinitionNode | EnumTypeExtensionNode) {
-        if (this.dictionary.get(definition.name.value) && definition.kind != 'EnumTypeExtension') {
-            throw new Error(`Conflict on "${definition.name.value}" !`);
+    private importTypeDef(definition: TypeDefinitionNode | EnumTypeExtensionNode | ObjectTypeExtensionNode) {
+        let entity = this.dictionary.get(definition.name.value);
+        if (entity) {
+            switch (definition.kind) {
+                case 'EnumTypeExtension':
+                    {
+                        const base = entity as NexusEnumTypeDef<string>;
+                        (base.value.members as string[]).push(...definition.values.map((item) => item.name.value));
+                    }
+                    break;
+                case 'ObjectTypeExtension':
+                    {
+                        const base = entity as TypeDefinition;
+                        base.extend(definition);
+                    }
+                    break;
+                default:
+                    throw new Error(`Conflict on "${definition.name.value}" !`);
+            }
+        } else {
+            switch (definition.kind) {
+                case 'EnumTypeDefinition':
+                    entity = enumType({
+                        name: definition.name.value,
+                        description: definition.description?.value,
+                        members: definition.values.map((item) => item.name.value),
+                    });
+                    break;
+                case 'EnumTypeExtension':
+                    const base = this.dictionary.get(definition.name.value) as NexusEnumTypeDef<string>;
+                    (base.value.members as string[]).push(...definition.values.map((item) => item.name.value));
+                    return;
+                case 'ObjectTypeDefinition':
+                    entity = new TypeDefinition(this, definition);
+                    break;
+                default:
+                    throw new Error(`Forbidden ${definition.kind}: "${definition.name.value}"`);
+            }
+            this.dictionary.set(entity.name, entity);
         }
-        let entity: EntityDefinition;
-        switch (definition.kind) {
-            case 'EnumTypeDefinition':
-                entity = enumType({
-                    name: definition.name.value,
-                    description: definition.description?.value,
-                    members: definition.values.map((item) => item.name.value),
-                });
-                break;
-            case 'EnumTypeExtension':
-                const base = this.dictionary.get(definition.name.value) as NexusEnumTypeDef<string>;
-                (base.value.members as string[]).push(...definition.values.map((item) => item.name.value));
-                return;
-            case 'ObjectTypeDefinition':
-                entity = new TypeDefinition(this, definition);
-                break;
-            default:
-                throw new Error(`Forbidden ${definition.kind}: "${definition.name.value}"`);
-        }
-        this.dictionary.set(entity.name, entity);
         return entity;
     }
 }

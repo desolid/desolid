@@ -2,13 +2,16 @@
 
 Which you can extend them or make a relation with them within your schema.
 
-## User
+## Models
+
+### User
 
 ```graphql
 type User
     @model
     @authorization(
-        READ: [Admin, "$user.id == {{id}}"] #
+        CREATE: [Admin]
+        READ: [Admin, "$user.id == {{id}}"]
         UPDATE: [Admin, "$user.id == {{id}}"]
         DELETE: [Admin]
     ) {
@@ -19,11 +22,10 @@ type User
     password: Password!
     group: UserGroup!
     name: String!
-    avatar: File @upload(accept: ["image/jpeg", "image/png"], size: { max: "5", min: "0.1" })
 }
 ```
 
-## File
+### File
 
 ```graphql
 """
@@ -46,7 +48,9 @@ type File
 }
 ```
 
-## UserGroup
+## Enums
+
+### UserGroup
 
 ```graphql
 enum UserGroup {
@@ -60,3 +64,11 @@ enum UserGroup {
     User
 }
 ```
+
+## Extending Built in Models/Enums
+
+You can extend any one of built in models. just notice 3 things:
+
+- Attributes (columns) of the model will merge with base
+- All directives of the new will shallow merge with the base ones
+- Enum items will append to the base
