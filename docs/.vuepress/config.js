@@ -2,6 +2,7 @@ const package = require('../../package.json');
 const { sidebarTree } = require('../reference/config');
 
 module.exports = {
+    dest: './dist',
     title: package.title,
     description: package.description,
     head: [['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/logo_outline.png' }]],
