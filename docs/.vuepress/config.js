@@ -29,6 +29,7 @@ module.exports = {
                     collapsable: false,
                     children: [
                         'getting-started', //
+                        'cli',
                         'built-in-models',
                         'aknowledgement',
                     ],
