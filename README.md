@@ -95,24 +95,24 @@ Let's create an api for a blog service:
     - Logs errors and warnings on `./desolid.log` file
     - Must output something like this:
 
-    ```bash
-    ____                         _   _       _
-    |  _ \    ___   ___    ___   | | (_)   __| |
-    | | | |  / _ \ / __|  / _ \  | | | |  / _` |
-    | |_| | |  __/ \__ \ | (_) | | | | | | (_| |
-    |____/   \___| |___/  \___/  |_| |_|  \__,_|
+```bash
+____                         _   _       _
+|  _ \    ___   ___    ___   | | (_)   __| |
+| | | |  / _ \ / __|  / _ \  | | | |  / _` |
+| |_| | |  __/ \__ \ | (_) | | | | | | (_| |
+|____/   \___| |___/  \___/  |_| |_|  \__,_|
 
-    🤖 Desolid: Single file self hosted backend as a service
-    🔥 v0.2.11 running in "win32" on "./home/user/app"
+🤖 Desolid: Single file self hosted backend as a service
+🔥 v0.2.11 running in "win32" on "./home/user/app"
 
-    [2020-05-20 10:38:57]  INFO  Compiling Schema ...
-    [2020-05-20 10:38:57]  WARN  Authentication Secret value didn't set into configuration file. the genrated JWT tokens will expire on every restart.
-    [2020-05-20 10:38:57]  INFO  Connecting to database ...
-    [2020-05-20 10:38:57]  INFO  Connected to "sqlite://./databse.sqlite"
-    [2020-05-20 10:38:57]  INFO  Starting server ...
-    [2020-05-20 10:38:57]  INFO  Server is running on http://localhost:3000
-    [2020-05-20 10:38:57]  INFO  🚀 in 488ms
-    ```
+[2020-05-20 10:38:57]  INFO  Compiling Schema ...
+[2020-05-20 10:38:57]  WARN  Authentication Secret value didn't set into configuration file. the genrated JWT tokens will expire on every restart.
+[2020-05-20 10:38:57]  INFO  Connecting to database ...
+[2020-05-20 10:38:57]  INFO  Connected to "sqlite://./databse.sqlite"
+[2020-05-20 10:38:57]  INFO  Starting server ...
+[2020-05-20 10:38:57]  INFO  Server is running on http://localhost:3000
+[2020-05-20 10:38:57]  INFO  🚀 in 488ms
+```
 
 4. Open (http://localhost:3000/)[http://localhost:3000/] on your browser.
 
