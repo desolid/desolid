@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1](https://github.com/desolid/desolid/compare/v0.3.0...v0.3.1) (2020-05-20)
+
+
+### Features
+
+* docs:authentication:create user ([1604741](https://github.com/desolid/desolid/commit/160474180a403ab5121210a345b9415fcbb0e744))
+
+
+### Bug Fixes
+
+* authentication issues ([44a9c16](https://github.com/desolid/desolid/commit/44a9c163f4dbe59b623e3890d5c0b924660fed97))
+* readme ([a497075](https://github.com/desolid/desolid/commit/a497075f4629508e754f0ce98ee9feea95021eef))
+
 ## [0.3.0](https://github.com/desolid/desolid/compare/v0.2.11...v0.3.0) (2020-05-19)
 
 
