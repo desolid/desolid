@@ -21,7 +21,7 @@ module.exports = {
             { text: 'Reference', link: '/reference/' },
             { text: 'Blog', link: 'https://dev.to/desolid' },
         ],
-        displayAllHeaders: true, // Default: false
+        // displayAllHeaders: true, // Default: false
         sidebar: {
             ...sidebarTree('Reference'),
             '/guide/': [
