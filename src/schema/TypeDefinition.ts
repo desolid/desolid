@@ -30,7 +30,7 @@ class ObjectTypeConfig implements NexusObjectTypeConfig<string> {
 
 export class TypeDefinition extends NexusObjectTypeDef<string> {
     public readonly config = new ObjectTypeConfig(this);
-    public readonly fields = new MapX<string, FieldDefinition>(); //{} as { [key: string]: FieldDefinition };
+    public readonly fields = new MapX<string, FieldDefinition>();
     public readonly directives = new MapX<TypeDirectives, any>();
     public readonly isModel: boolean;
 
@@ -48,6 +48,9 @@ export class TypeDefinition extends NexusObjectTypeDef<string> {
 
     public get description() {
         return this.definition.description?.value;
+    }
+    public get uniqueFields() {
+        return this.fields.filter((field) => field.directives.has('unique'));
     }
 
     public extend(definition: ObjectTypeExtensionNode) {

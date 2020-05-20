@@ -5,7 +5,9 @@ import { Model } from './Model';
 import { MapX } from '../utils';
 import { Storage } from '../storage';
 
-export type DatabaseConfig = Options;
+export interface DatabaseConfig extends Options {
+    forceSync?: boolean;
+}
 
 export class Database {
     private readonly defaultConfig: DatabaseConfig = {
@@ -36,6 +38,6 @@ export class Database {
     }
 
     public async start() {
-        await this.connection.sync({ force: false });
+        await this.connection.sync({ force: this.config.forceSync });
     }
 }

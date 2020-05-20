@@ -48,8 +48,21 @@ export class FieldDefinition {
             nullable: !/!$/.test(encodedFieldType),
             list: list ? list.map((item) => /^!/.test(item)) : false,
         } as FieldOutConfig<any, any>;
-        if(this.typeName == 'File' && this.config.list) {
-            throw new Error(`To many relations with "File" (on "${owner.name}" model) doesn't support yet.`)
+
+        this.validate();
+    }
+
+    private validate() {
+        if (this.typeName == 'File' && this.config.list) {
+            throw new Error(
+                `To many relations with "File" doesn't support yet. (error on "${this.owner.name}"."${this.name}")`,
+            );
+        }
+
+        if (this.directives.has('unique') && this.config.nullable) {
+            throw new Error(
+                `Unique fields couldn't be nullable. (error on "${this.owner.name}"."${this.name}")`,
+            );
         }
     }
 

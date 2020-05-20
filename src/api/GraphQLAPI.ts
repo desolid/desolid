@@ -4,12 +4,12 @@ import * as _ from 'lodash';
 import { scalars } from '../schema';
 import { Model } from '../database';
 import { Storage } from '../storage';
-import { CRUD, Authenticate } from '.';
+import { CRUD, Authenticate, AuthenticationConfig } from '.';
 import { MapX, log } from '../utils';
 
 export interface GraphQLAPIConfig {
     port: number;
-    secret: string;
+    authentication: AuthenticationConfig;
     upload: {
         maxFileSize: number;
     };
@@ -18,7 +18,7 @@ export interface GraphQLAPIConfig {
 export class GraphQLAPI {
     private readonly defaultConfig: GraphQLAPIConfig = {
         port: 3000,
-        secret: 'secret',
+        authentication: undefined,
         upload: {
             maxFileSize: 64, //MB
         },
@@ -28,13 +28,9 @@ export class GraphQLAPI {
     private readonly authenticate: Authenticate;
     private server: GraphQLServer;
 
-    constructor(
-        config: GraphQLAPIConfig,
-        models: MapX<string, Model>,
-        private readonly storage: Storage,
-    ) {
+    constructor(config: GraphQLAPIConfig, models: MapX<string, Model>, private readonly storage: Storage) {
         this.config = _.merge({}, this.defaultConfig, config);
-        this.authenticate = new Authenticate(models.get('User'), this.config.secret);
+        this.authenticate = new Authenticate(models.get('User'), this.config.authentication);
         models.forEach((model) => {
             this.cruds.set(model.name, new CRUD(model, storage));
         });

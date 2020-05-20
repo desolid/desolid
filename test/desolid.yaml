@@ -2,11 +2,15 @@ database:
     dialect: 'sqlite'
     storage: 'databse.sqlite'
     logging: false
+    forceSync: false
+
 api:
     port: 3000
-    secret: 'secret'
+    authentication:
+        secret: 'secret'
+        expiration: 48 # hours
     upload:
-        maxFileSize: 64 #MB
+        maxFileSize: 64 # MB
 
 storage:
     # pattern: '${UUID}.${EXT}'

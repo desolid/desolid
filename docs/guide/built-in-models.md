@@ -72,3 +72,7 @@ You can extend any one of built in models. just notice 3 things:
 - Attributes (columns) of the model will merge with base
 - All directives of the new will shallow merge with the base ones
 - Enum items will append to the base
+
+::: tip
+The known issue here is that, you don't can change directives (including `authorization` rulls) of any model without adding or overriding a new field.
+:::

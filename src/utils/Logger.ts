@@ -29,7 +29,7 @@ const consoleTransport = new transports.Console({
             const timeStamp = moment().format('YYYY-MM-DD hh:mm:ss');
             console.log(
                 chalk.reset(`[${timeStamp}]`),
-                chalk.bgKeyword(backgroundColorMap[level]).keyword(colorMap[level])(` ${level} `),
+                chalk.bgKeyword(backgroundColorMap[level]).keyword(colorMap[level])(` ${level.toUpperCase()} `),
                 chalk.italic(durationMs ? `${message} in ${durationMs}ms` : message),
             );
             return false;

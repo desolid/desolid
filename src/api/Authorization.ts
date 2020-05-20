@@ -106,9 +106,7 @@ export class Authorization {
             }, false)
         ) {
             throw new Error(
-                `You are not authorized to ${category.toLowerCase()} ${this.typeDefinition.name} where { id: ${
-                    record.id
-                } }`,
+                `You are not authorized to ${category} a ${this.typeDefinition.name}.`,
             );
         }
     }

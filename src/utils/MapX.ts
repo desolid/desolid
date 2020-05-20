@@ -9,10 +9,10 @@ export class MapX<K, V> extends Map<K, V> {
         });
     }
 
-    public filter(callback: (value: V, key: K) => any) {
+    public filter(by: (value: V, key: K) => any | { [key: string]: V }) {
         const result = new MapX<K, V>();
         for (const [key, value] of this) {
-            if (callback(value, key)) {
+            if ((by instanceof Function && by(value, key)) || by[(key as any) as string] === value) {
                 result.set(key, value);
             }
         }
