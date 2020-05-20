@@ -93,4 +93,4 @@ Let's create an api for a blog service:
     [2020-05-20 10:38:57]  INFO  🚀 in 488ms
     ```
 
-4. Open (http://localhost:3000/)[http://localhost:3000/] on your browser.
+4. Open [http://localhost:3000/](http://localhost:3000/) on your browser.
