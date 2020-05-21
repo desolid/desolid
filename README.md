@@ -3,7 +3,7 @@
 <p align="center">
   <a href="https://npmcharts.com/compare/desolid?minimal=true"><img src="https://img.shields.io/npm/dm/desolid.svg" alt="Downloads"></a>
   <a href="https://www.npmjs.com/package/desolid"><img src="https://img.shields.io/npm/v/desolid.svg" alt="Version"></a>  
-  <a href="https://github.com/vuejs/desolid/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/desolid.svg" alt="License"></a>
+  <a href="https://github.com/desolid/desolid/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/desolid.svg" alt="License"></a>
   <a href="https://app.netlify.com/sites/desolid/deploys"><img src="https://api.netlify.com/api/v1/badges/e07ea82e-df51-4658-9897-64b95719bafd/deploy-status" alt="License"></a>
 </p>
 
