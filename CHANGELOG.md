@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.2](https://github.com/desolid/desolid/compare/v0.3.1...v0.3.2) (2020-05-21)
+
+
+### Features
+
+* check if all admin users deleted skip User authorization ([eec0017](https://github.com/desolid/desolid/commit/eec00176ae0bd3d00f40d6c946568f951b1cbeda))
+* initial admin user creation ([0fc8410](https://github.com/desolid/desolid/commit/0fc841087f334116a74584de6f103ff0a394b0ce))
+
+
+### Bug Fixes
+
+* getting started ([1bb9510](https://github.com/desolid/desolid/commit/1bb95101e02e543cd7e2c9fbd7c5938685ecd435))
+
 ### [0.3.1](https://github.com/desolid/desolid/compare/v0.3.0...v0.3.1) (2020-05-20)
 
 
