@@ -51,3 +51,5 @@ export const logger = createLogger({
 });
 
 export const log: (string) => void = logger.info.bind(logger);
+export const warn: (string) => void = logger.warn.bind(logger);
+export const error: (string) => void = logger.error.bind(logger);

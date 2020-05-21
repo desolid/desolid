@@ -8,7 +8,7 @@ import { DatabaseConfig, Database } from './database';
 import { GraphQLAPIConfig, GraphQLAPI } from './api';
 import { StorageConfig, Storage } from './storage';
 import { Schema } from './schema';
-import { log, logger } from './utils/Logger';
+import { log, logger } from './utils';
 
 const info = require('../package.json');
 

@@ -8,7 +8,7 @@ actionLink: /guide/getting-started.html
 features:
 - title: GraphQL API
   details: Query your data using a powerful GraphQL CRUD API.
-- title: Access controll
+- title: Inline Authorization
   details: Inline authorization definitions for controlling user accesses.
 - title: File handling
   details: Directly using GraphQL gateway, supporting local and S3 storages

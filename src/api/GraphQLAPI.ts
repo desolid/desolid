@@ -4,8 +4,8 @@ import * as _ from 'lodash';
 import { scalars } from '../schema';
 import { Model } from '../database';
 import { Storage } from '../storage';
-import { CRUD, Authenticate, AuthenticationConfig } from '.';
 import { MapX, log } from '../utils';
+import { CRUD, Authenticate, AuthenticationConfig, UserAuthorization } from '.';
 
 export interface GraphQLAPIConfig {
     port: number;
@@ -32,7 +32,14 @@ export class GraphQLAPI {
         this.config = _.merge({}, this.defaultConfig, config);
         this.authenticate = new Authenticate(models.get('User'), this.config.authentication);
         models.forEach((model) => {
-            this.cruds.set(model.name, new CRUD(model, storage));
+            switch (model.name) {
+                case 'User':
+                    this.cruds.set(model.name, new CRUD(model, new UserAuthorization(model)));
+                    break;
+                default:
+                    this.cruds.set(model.name, new CRUD(model));
+                    break;
+            }
         });
     }
 

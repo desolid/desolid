@@ -58,8 +58,6 @@ These new fields will come on the `authenticate` API automatically.
 
 ## Creating Users
 
-### Initial Admin user
-
 `createUser` and `createManyUsers` mutations are where you can request creating users:
 
 ```graphql
@@ -116,7 +114,6 @@ extend type User
 The known issue here is that, you don't can change authorisation rulls of the `User` model without adding or overriding a new field.
 :::
 
-
 Also, by removing `CREATE` rule you can allow anybody to create a user:
 
 ```graphql
@@ -134,3 +131,7 @@ extend type User
 ::: danger
 In this case, the API needs to protect against DDOS attacks and it didn't implement yet.
 :::
+
+### Initial admin user
+
+Desolid skips `User` model authorization till the first `Admin` user creation. so it's recommanded to create the admin user as the first usage of the api.

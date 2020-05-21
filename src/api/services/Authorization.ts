@@ -1,7 +1,7 @@
-import { TypeDefinition } from '../schema';
-import { Record } from '../database';
+import { TypeDefinition } from '../../schema';
+import { Record } from '../../database';
 import * as _ from 'lodash';
-import { SelectAttributes } from '.';
+import { SelectAttributes } from '..';
 
 export enum AuthorizationCategory {
     CREATE = 'CREATE',
@@ -96,7 +96,7 @@ export class Authorization {
         return condition;
     }
 
-    private authorize(category: AuthorizationCategory, user: User, record: Record, input?: any) {
+    protected async authorize(category: AuthorizationCategory, user: User, record: Record, input?: any) {
         const conditions = this.categories[category];
         if (
             conditions &&
@@ -105,9 +105,7 @@ export class Authorization {
                 return output;
             }, false)
         ) {
-            throw new Error(
-                `You are not authorized to ${category} a ${this.typeDefinition.name}.`,
-            );
+            throw new Error(`You are not authorized to ${category} a ${this.typeDefinition.name}.`);
         }
     }
 
@@ -171,19 +169,35 @@ export class Authorization {
         }, {} as { [key: string]: SelectAttributes });
     }
 
-    create(user: User, input: any) {
-        this.authorize(AuthorizationCategory.CREATE, user, undefined, input);
+    async create(user: User, input: any) {
+        await this.authorize(AuthorizationCategory.CREATE, user, undefined, input);
     }
 
-    read(user: User, record: Record) {
-        this.authorize(AuthorizationCategory.READ, user, record);
+    async read(user: User, record: Record) {
+        await this.authorize(AuthorizationCategory.READ, user, record);
     }
 
-    update(user: User, record: Record, input: any) {
-        this.authorize(AuthorizationCategory.UPDATE, user, record, input);
+    async update(user: User, record: Record, input: any) {
+        await this.authorize(AuthorizationCategory.UPDATE, user, record, input);
     }
 
-    delete(user: User, record: Record) {
-        this.authorize(AuthorizationCategory.DELETE, user, record);
+    async delete(user: User, record: Record) {
+        await this.authorize(AuthorizationCategory.DELETE, user, record);
+    }
+
+    async createMany(user: User, inputs: any[]) {
+        await Promise.all(inputs.map((input) => this.authorize(AuthorizationCategory.CREATE, user, undefined, input)));
+    }
+
+    async readAll(user: User, records: Record[]) {
+        await Promise.all(records.map((record) => this.authorize(AuthorizationCategory.READ, user, record)));
+    }
+
+    async updateMany(user: User, records: Record[], input: any) {
+        await Promise.all(records.map((record) => this.authorize(AuthorizationCategory.UPDATE, user, record, input)));
+    }
+
+    async deleteMany(user: User, records: Record[]) {
+        await Promise.all(records.map((record) => this.authorize(AuthorizationCategory.DELETE, user, record)));
     }
 }

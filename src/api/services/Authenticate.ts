@@ -4,8 +4,8 @@ import { GraphQLResolveInfo } from 'graphql';
 import * as jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import * as _ from 'lodash';
-import { Model } from '../database';
-import { logger } from '../utils';
+import { Model } from '../../database';
+import { warn, log } from '../../utils';
 
 export interface AuthenticationConfig {
     secret: string;
@@ -17,6 +17,7 @@ export interface AuthenticationConfig {
 
 export class Authenticate {
     private readonly config: AuthenticationConfig;
+
     private readonly defaultConfig: AuthenticationConfig = {
         secret: uuidv4(),
         expiration: 48, // hours
@@ -24,7 +25,7 @@ export class Authenticate {
 
     constructor(private readonly model: Model, config: AuthenticationConfig) {
         if (!config?.secret) {
-            logger.warn(
+            warn(
                 `Authentication Secret value didn't set into configuration file. the genrated JWT tokens will expire on every restart.`,
             );
         }
@@ -48,7 +49,7 @@ export class Authenticate {
             },
         );
         t.field('authenticate', {
-            type: this.model.typeDefinition.schema.dictionary.get('AuthenticationPayload') as NexusObjectTypeDef<any>,
+            type: this.model.typeDefinition.schema.dictionary.get('AuthenticationPayload'),
             args,
             resolve: this.authenticate.bind(this),
         });

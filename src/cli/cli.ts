@@ -3,7 +3,7 @@ import * as clear from 'clear';
 import * as path from 'path';
 import * as program from 'commander';
 import { Desolid } from '../Desolid';
-import { logger } from '../utils';
+import { error } from '../utils';
 const info = require('../../package.json');
 
 async function main() {
@@ -19,6 +19,6 @@ async function main() {
     await desolid.start();
 }
 
-main().catch((error) => {
-    logger.error(error.message);
+main().catch(({ message }) => {
+    error(message);
 });
