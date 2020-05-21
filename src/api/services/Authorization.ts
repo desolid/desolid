@@ -10,12 +10,11 @@ export enum AuthorizationCategory {
     DELETE = 'DELETE',
 }
 
-export interface User {
-    id: number;
+export interface User extends Record {
     name: string;
     family: string;
     email: string;
-    group: 'string';
+    group: string;
 }
 
 interface AuthorizationCondition {

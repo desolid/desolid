@@ -15,14 +15,17 @@ export class UserAuthorization extends Authorization {
      * @param record
      * @param input
      */
-    protected async authorize(category: AuthorizationCategory, user: User, record: Record, input?: any) {
+    protected async authorize(category: AuthorizationCategory, user: User, record: User, input?: any) {
         try {
             await super.authorize(category, user, record);
+            if (category == AuthorizationCategory.DELETE && record.group == 'Admin') {
+                this.adminUserExists = false;
+            }
         } catch (error) {
             if (this.adminUserExists) {
                 throw error;
             } else {
-                const adminUsersCount = await this.model.datasource.count({ where: { group: 'Admin' } });
+                const adminUsersCount = await this.countAdminUsers();
                 if (adminUsersCount > 0) {
                     this.adminUserExists = true;
                     throw error;
@@ -31,5 +34,9 @@ export class UserAuthorization extends Authorization {
                 }
             }
         }
+    }
+
+    protected countAdminUsers() {
+        return this.model.datasource.count({ where: { group: 'Admin' } });
     }
 }
