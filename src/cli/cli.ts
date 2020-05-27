@@ -3,8 +3,7 @@ import * as clear from 'clear';
 import * as path from 'path';
 import * as program from 'commander';
 import { Desolid } from '../Desolid';
-import { error } from '../utils';
-const info = require('../../package.json');
+import { error, info } from '../utils';
 
 async function main() {
     clear();

@@ -10,6 +10,11 @@ export const primitives = gql`
         token: String!
     }
 
+    type SystemInfo {
+        version: String!
+        adminUserExists: Boolean!
+    }
+
     enum UserGroup {
         """
         System Administrator

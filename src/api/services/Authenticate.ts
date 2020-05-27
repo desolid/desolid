@@ -49,7 +49,7 @@ export class Authenticate {
             },
         );
         t.field('authenticate', {
-            type: this.model.typeDefinition.schema.dictionary.get('AuthenticationPayload'),
+            type: this.model.typeDefinition.schema.get('AuthenticationPayload'),
             args,
             resolve: this.authenticate.bind(this),
         });

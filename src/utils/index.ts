@@ -1,2 +1,3 @@
 export * from './MapX';
-export * from './Logger';
+export * from './logger';
+export * from './info';

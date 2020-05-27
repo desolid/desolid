@@ -132,6 +132,16 @@ extend type User
 In this case, the API needs to protect against DDOS attacks and it didn't implement yet.
 :::
 
-### Initial admin user
+## Initial Admin user
 
-Desolid skips `User` model authorization till the first `Admin` user creation. so it's recommanded to create the admin user as the first usage of the api.
+Desolid skips `User` model authorization till the first `Admin` user creation or when all `Admin` users are removed. so it's recommanded to create the admin user as the first usage of the api.
+
+For indicating the state of admin users you can query this like:
+
+```graphql
+{
+  system {
+    adminUserExists
+  }
+}
+```

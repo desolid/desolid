@@ -4,6 +4,7 @@ import {
     enumType,
     NexusInputObjectTypeDef,
     inputObjectType,
+    NexusObjectTypeDef,
 } from '@nexus/schema/dist/core';
 import * as path from 'path';
 import gql from 'graphql-tag';
@@ -15,6 +16,7 @@ import { primitives } from './primitives.graphql';
 
 export type EntityDefinition =
     | TypeDefinition
+    | NexusObjectTypeDef<string>
     | NexusScalarTypeDef<string>
     | NexusEnumTypeDef<string>
     | NexusInputObjectTypeDef<string>;
@@ -33,7 +35,7 @@ export class Schema {
         this.models = this.dictionary.search({ isModel: true }) as MapX<string, TypeDefinition>;
     }
 
-    public get<T = TypeDefinition>(name: string) {
+    public get<T = EntityDefinition>(name: string) {
         return (this.dictionary.get(name) as any) as T;
     }
 
@@ -46,7 +48,7 @@ export class Schema {
     }
 
     private importTypeDef(definition: TypeDefinitionNode | EnumTypeExtensionNode | ObjectTypeExtensionNode) {
-        let entity = this.dictionary.get(definition.name.value);
+        let entity = this.get(definition.name.value);
         if (entity) {
             switch (definition.kind) {
                 case 'EnumTypeExtension':
@@ -74,7 +76,7 @@ export class Schema {
                     });
                     break;
                 case 'EnumTypeExtension':
-                    const base = this.dictionary.get(definition.name.value) as NexusEnumTypeDef<string>;
+                    const base = this.get(definition.name.value) as NexusEnumTypeDef<string>;
                     (base.value.members as string[]).push(...definition.values.map((item) => item.name.value));
                     return;
                 case 'ObjectTypeDefinition':

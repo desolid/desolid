@@ -1,11 +1,11 @@
 import { makeSchema, queryType, mutationType } from '@nexus/schema/dist/core';
 import { GraphQLServer } from 'graphql-yoga';
 import * as _ from 'lodash';
-import { scalars } from '../schema';
+import { scalars, Schema } from '../schema';
 import { Model } from '../database';
 import { Storage } from '../storage';
 import { MapX, log } from '../utils';
-import { CRUD, Authenticate, AuthenticationConfig, UserAuthorization } from '.';
+import { CRUD, Authenticate, AuthenticationConfig, UserAuthorization, SystemInfo } from '.';
 
 export interface GraphQLAPIConfig {
     port: number;
@@ -26,11 +26,17 @@ export class GraphQLAPI {
     private readonly config: GraphQLAPIConfig;
     private readonly cruds = new MapX<string, CRUD>();
     private readonly authenticate: Authenticate;
+    private readonly systemInfo: SystemInfo;
     private server: GraphQLServer;
 
-    constructor(config: GraphQLAPIConfig, models: MapX<string, Model>, private readonly storage: Storage) {
+    constructor(
+        config: GraphQLAPIConfig,
+        models: MapX<string, Model>,
+        private readonly storage: Storage,
+    ) {
         this.config = _.merge({}, this.defaultConfig, config);
         this.authenticate = new Authenticate(models.get('User'), this.config.authentication);
+        this.systemInfo = new SystemInfo(models.get('User'));
         models.forEach((model) => {
             switch (model.name) {
                 case 'User':
@@ -49,6 +55,7 @@ export class GraphQLAPI {
                 ...scalars,
                 queryType({
                     definition: (t) => {
+                        this.systemInfo.generateQueries(t);
                         this.authenticate.generateQueries(t);
                         this.cruds.forEach((crud) => crud.generateQueries(t));
                     },

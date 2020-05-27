@@ -70,7 +70,7 @@ export class FieldDefinition {
         if (this.isScalar) {
             return this.typeName;
         } else {
-            const type = this.owner.schema.dictionary.get(this.typeName);
+            const type = this.owner.schema.get(this.typeName);
             if (type) {
                 return type;
             } else {
