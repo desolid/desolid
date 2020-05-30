@@ -66,7 +66,7 @@ export class Authenticate {
         const token = context.request.get('Authorization');
         if (token) {
             try {
-                const payload = jwt.verify(token, this.config.secret) as {
+                const payload = jwt.verify(token.replace('Bearer ', ''), this.config.secret) as {
                     id: number;
                     exp: number;
                 };

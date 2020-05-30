@@ -11,7 +11,7 @@ extend type User
         UPDATE: [Admin, "$user.id == {{id}}"]
         DELETE: [Admin] #
     ) {
-    phone: PhoneNumber! @unique
+    # phone: PhoneNumber! @unique
     avatar: File @upload(accept: ["image/jpeg"], size: { max: 5, min: 0.1 })
 }
 

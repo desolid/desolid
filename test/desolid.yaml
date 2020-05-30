@@ -2,7 +2,7 @@ database:
     dialect: 'sqlite'
     storage: 'databse.sqlite'
     logging: false
-    forceSync: true
+    forceSync: false
 
 api:
     port: 3000
