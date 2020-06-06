@@ -82,7 +82,7 @@ export class WhereInput extends Input {
         ['in', 'notIn'].forEach((operator) => {
             fields.push({
                 name: `${field.name}_${operator}`,
-                typeName: field.typeName,
+                type: field.type,
                 isScalar: field.isScalar,
                 config: { nullable: true, list: [true] },
             } as FieldDefinition);
@@ -99,7 +99,7 @@ export class WhereInput extends Input {
         operators.forEach((operator) => {
             fields.push({
                 name: `${field.name}_${operator}`,
-                typeName: operator != 'isNull' ? field.typeName : 'Boolean',
+                type: operator != 'isNull' ? field.type : 'Boolean',
                 isScalar: field.isScalar,
                 config: { nullable: true },
             } as FieldDefinition);

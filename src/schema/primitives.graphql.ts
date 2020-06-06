@@ -10,8 +10,22 @@ export const primitives = gql`
         token: String!
     }
 
+    type Field {
+        name: String!
+        type: String!
+        isScalar: Boolean!
+        isString: Boolean!
+        relationType: String!
+    }
+
+    type Model {
+        name: String!
+        fields: [Field]!
+    }
+
     type SystemInfo {
         version: String!
+        models: [Model!]!
         adminUserExists: Boolean!
     }
 

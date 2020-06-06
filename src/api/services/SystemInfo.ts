@@ -18,6 +18,20 @@ export class SystemInfo {
             adminUserExists: await this.userModel.datasource
                 .count({ where: { group: 'Admin' } })
                 .then((res) => res > 0),
+            models: this.userModel.typeDefinition.schema.models.map((typeDefinition) => {
+                return {
+                    name: typeDefinition.name,
+                    fields: typeDefinition.fields.map((fieldDefinition) => {
+                        return {
+                            name: fieldDefinition.name,
+                            type: fieldDefinition.typeName,
+                            isScalar: fieldDefinition.isScalar,
+                            isString: fieldDefinition.isString,
+                            relationType: fieldDefinition.relationType,
+                        };
+                    }),
+                };
+            }),
         };
     }
 }

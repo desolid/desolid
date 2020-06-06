@@ -163,9 +163,12 @@ export class Authorization {
     }
 
     getSelectOf(category: AuthorizationCategory) {
-        return this.categories[category].reduce((output, condition) => {
-            return _.merge(output, condition.select);
-        }, {} as { [key: string]: SelectAttributes });
+        return (
+            // In case of skipping an authorization category, it will return `{}`
+            this.categories[category]?.reduce((output, condition) => {
+                return _.merge(output, condition.select);
+            }, {} as { [key: string]: SelectAttributes }) || {}
+        );
     }
 
     async create(user: User, input: any) {

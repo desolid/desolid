@@ -28,7 +28,7 @@ export class MapX<K, V> extends Map<K, V> {
 
     public merge(map: MapX<K, V>) {
         for (const [key, value] of map) {
-            map.set(key, value);
+            this.set(key, value);
         }
     }
 

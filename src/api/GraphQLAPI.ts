@@ -27,16 +27,18 @@ export class GraphQLAPI {
     private readonly cruds = new MapX<string, CRUD>();
     private readonly authenticate: Authenticate;
     private readonly systemInfo: SystemInfo;
+    private readonly userModel: Model;
     private server: GraphQLServer;
 
     constructor(
         config: GraphQLAPIConfig,
-        models: MapX<string, Model>,
+        private readonly models: MapX<string, Model>,
         private readonly storage: Storage,
     ) {
         this.config = _.merge({}, this.defaultConfig, config);
-        this.authenticate = new Authenticate(models.get('User'), this.config.authentication);
-        this.systemInfo = new SystemInfo(models.get('User'));
+        this.userModel = models.get('User');
+        this.authenticate = new Authenticate(this.userModel, this.config.authentication);
+        this.systemInfo = new SystemInfo(this.userModel);
         models.forEach((model) => {
             switch (model.name) {
                 case 'User':
@@ -53,6 +55,8 @@ export class GraphQLAPI {
         return makeSchema({
             types: [
                 ...scalars,
+                this.userModel.typeDefinition.schema.get('Model'),
+                this.userModel.typeDefinition.schema.get('Field'),
                 queryType({
                     definition: (t) => {
                         this.systemInfo.generateQueries(t);

@@ -49,8 +49,13 @@ export class TypeDefinition extends NexusObjectTypeDef<string> {
     public get description() {
         return this.definition.description?.value;
     }
+
     public get uniqueFields() {
         return this.fields.filter((field) => field.directives.has('unique'));
+    }
+
+    public get scalars() {
+        return this.fields.filter((field) => field.isScalar);
     }
 
     public extend(definition: ObjectTypeExtensionNode) {
