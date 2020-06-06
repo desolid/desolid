@@ -53,36 +53,40 @@ export class ModelSchema {
             comment: field.typeName,
         } as ModelAttributeColumnOptions;
         if (field.isScalar) {
-            switch (field.typeName) {
-                case 'ID':
-                    column.primaryKey = true;
-                    column.autoIncrement = true;
-                    column.type = INTEGER;
-                    break;
-                case 'Int':
-                    column.type = INTEGER;
-                    break;
-                case 'Long':
-                case 'BigInt':
-                    column.type = BIGINT;
-                    break;
-                case 'Float':
-                    column.type = FLOAT;
-                    break;
-                case 'Boolean':
-                    column.type = BOOLEAN;
-                    break;
-                case 'DateTime':
-                    column.type = DATE;
-                    // if(field.directives.createdAt || field.directives.createdAt) {
-                    //     column.field = field.name;
-                    // }
-                    break;
-                case 'JSON':
-                    column.type = JSON;
-                default:
-                    column.type = STRING;
-                    break;
+            if (field.config.list) {
+                column.type = JSON;
+            } else {
+                switch (field.typeName) {
+                    case 'ID':
+                        column.primaryKey = true;
+                        column.autoIncrement = true;
+                        column.type = INTEGER;
+                        break;
+                    case 'Int':
+                        column.type = INTEGER;
+                        break;
+                    case 'Long':
+                    case 'BigInt':
+                        column.type = BIGINT;
+                        break;
+                    case 'Float':
+                        column.type = FLOAT;
+                        break;
+                    case 'Boolean':
+                        column.type = BOOLEAN;
+                        break;
+                    case 'DateTime':
+                        column.type = DATE;
+                        // if(field.directives.createdAt || field.directives.createdAt) {
+                        //     column.field = field.name;
+                        // }
+                        break;
+                    case 'JSON':
+                        column.type = JSON;
+                    default:
+                        column.type = STRING;
+                        break;
+                }
             }
         } else {
             const right = field.type as TypeDefinition;
