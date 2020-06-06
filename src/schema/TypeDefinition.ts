@@ -10,7 +10,7 @@ import { MapX } from '../utils';
 
 export type TypeDirectives = 'model' | 'authorization';
 
-class ObjectTypeConfig implements NexusObjectTypeConfig<string> {
+export class ObjectTypeConfig implements NexusObjectTypeConfig<string> {
     name: string;
     description: string;
 

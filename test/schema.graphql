@@ -43,7 +43,7 @@ This is a description of a Category
 type Category
     @model
     @authorization(
-        CREATE: [Admin, Editor]
+        # CREATE: [Admin, Editor]
         UPDATE: [Admin, Editor]
         DELETE: [Admin, Editor] #
     ) {

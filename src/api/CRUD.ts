@@ -19,6 +19,7 @@ import {
     AuthorizationCategory,
 } from '.';
 import { Model } from '../database';
+import { Connection } from './archetypes/Connection';
 
 export interface FindArgs {
     where: any;
@@ -65,6 +66,13 @@ export class CRUD {
             type: this.model.typeDefinition,
             args: { where: this.inputs.whereUnique.toArg(true) },
             resolve: this.findOne.bind(this),
+        });
+        t.field(`${pluralize(this.model.name.toLowerCase())}Connection`, {
+            type: new Connection(this.model.typeDefinition),
+            args: {
+                where: this.inputs.where.toArg(false),
+            },
+            resolve: this.resolveConnection.bind(this),
         });
         t.list.field(pluralize(this.model.name.toLowerCase()), {
             type: this.model.typeDefinition,
@@ -270,5 +278,13 @@ export class CRUD {
             this.authorization.read(context.user, record);
             return record;
         }
+    }
+
+    private async resolveConnection(root: any, { where }: FindArgs, context: any, info: GraphQLResolveInfo) {
+        return {
+            aggregate: {
+                count: await this.model.datasource.count({ where }),
+            },
+        };
     }
 }
