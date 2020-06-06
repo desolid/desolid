@@ -27,7 +27,7 @@ export class SystemInfo {
                             type: fieldDefinition.typeName,
                             isScalar: fieldDefinition.isScalar,
                             isString: fieldDefinition.isString,
-                            list: fieldDefinition.config.list,
+                            list: fieldDefinition.config.list ? true : false,
                             relationType: fieldDefinition.relationType,
                         };
                     }),

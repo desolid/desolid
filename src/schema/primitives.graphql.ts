@@ -15,8 +15,8 @@ export const primitives = gql`
         type: String!
         isScalar: Boolean!
         isString: Boolean!
-        list: [Boolean!]
-        relationType: String!
+        list: Boolean!
+        relationType: String
     }
 
     type Model {
