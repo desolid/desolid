@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.6](https://github.com/desolid/desolid/compare/v0.3.5...v0.3.6) (2020-06-06)
+
+
+### Features
+
+* models connection ([518a370](https://github.com/desolid/desolid/commit/518a3709b03e9902ddc66168728eadb04fc18d07))
+* Scalar list field types ([21884d5](https://github.com/desolid/desolid/commit/21884d5d7e60e1b9cac0c1630347c24ba2b92e23))
+* system info models ([99c0f17](https://github.com/desolid/desolid/commit/99c0f176c50a387b44a95988ea86eb92fe41fb70))
+* system info models field isList ([c95cfda](https://github.com/desolid/desolid/commit/c95cfda3f902f090a002ba740a663b61b2ebe154))
+
+
+### Bug Fixes
+
+* Autoriization header issue ([7606b65](https://github.com/desolid/desolid/commit/7606b659f71d5627d9384fc38245972400995ff1))
+* renaming input-archetypes > archetypea ([9d25db0](https://github.com/desolid/desolid/commit/9d25db0d29dea19c21fdb6d7f83e6d47ae9e64a7))
+
 ### [0.3.5](https://github.com/desolid/desolid/compare/v0.3.4...v0.3.5) (2020-05-27)
 
 
