@@ -22,7 +22,7 @@ export class SystemInfo {
                 return {
                     name: typeDefinition.name,
                     fields: typeDefinition.fields.map(
-                        ({ name, typeName, isScalar, isString, readonly, relationType, config }) => {
+                        ({ name, typeName, isScalar, isString, readonly, relationType, config, values }) => {
                             return {
                                 name,
                                 isScalar,
@@ -30,6 +30,7 @@ export class SystemInfo {
                                 readonly,
                                 isString,
                                 type: typeName,
+                                values,
                                 list: config.list ? true : false,
                             };
                         },

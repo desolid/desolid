@@ -1,5 +1,5 @@
 import { FieldDefinitionNode, TypeNode } from 'graphql';
-import { FieldOutConfig } from '@nexus/schema/dist/core';
+import { FieldOutConfig, NexusEnumTypeDef } from '@nexus/schema/dist/core';
 import * as _ from 'lodash';
 import { Scalar, DirectiveDefinition, scalarTypes, stringScalars, TypeDefinition } from '.';
 import { MapX } from '../utils';
@@ -78,7 +78,14 @@ export class FieldDefinition {
     }
 
     public get readonly() {
-        return _.includes(['ID', 'createdAt', 'updatedAt'], this.typeName);
+        return _.includes(['ID'], this.typeName) || _.includes(['createdAt', 'updatedAt'], this.name);
+    }
+
+    /**
+     * Enum values
+     */
+    public get values() {
+        return this.type instanceof NexusEnumTypeDef ? this.type.value.members : undefined;
     }
 
     public get relationType() {
