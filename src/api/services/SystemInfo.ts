@@ -21,16 +21,19 @@ export class SystemInfo {
             models: this.userModel.typeDefinition.schema.models.map((typeDefinition) => {
                 return {
                     name: typeDefinition.name,
-                    fields: typeDefinition.fields.map((fieldDefinition) => {
-                        return {
-                            name: fieldDefinition.name,
-                            type: fieldDefinition.typeName,
-                            isScalar: fieldDefinition.isScalar,
-                            isString: fieldDefinition.isString,
-                            list: fieldDefinition.config.list ? true : false,
-                            relationType: fieldDefinition.relationType,
-                        };
-                    }),
+                    fields: typeDefinition.fields.map(
+                        ({ name, typeName, isScalar, isString, readonly, relationType, config }) => {
+                            return {
+                                name,
+                                isScalar,
+                                relationType,
+                                readonly,
+                                isString,
+                                type: typeName,
+                                list: config.list ? true : false,
+                            };
+                        },
+                    ),
                 };
             }),
         };

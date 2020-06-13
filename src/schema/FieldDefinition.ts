@@ -60,9 +60,7 @@ export class FieldDefinition {
         }
 
         if (this.directives.has('unique') && this.config.nullable) {
-            throw new Error(
-                `Unique fields couldn't be nullable. (error on "${this.owner.name}"."${this.name}")`,
-            );
+            throw new Error(`Unique fields couldn't be nullable. (error on "${this.owner.name}"."${this.name}")`);
         }
     }
 
@@ -77,6 +75,10 @@ export class FieldDefinition {
                 throw new Error(`Getting Type "${this.typeName}" before initial deffinitions gathering.`);
             }
         }
+    }
+
+    public get readonly() {
+        return _.includes(['ID', 'createdAt', 'updatedAt'], this.typeName);
     }
 
     public get relationType() {
