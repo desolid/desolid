@@ -131,7 +131,6 @@ export class Authorization {
                             fieldsByTypeName: {
                                 // Preventing overwriting on prev values
                                 ...output[name]?.fieldsByTypeName,
-                                name: name as any,
                                 [relation.name]: {
                                     // Preventing overwriting on prev values
                                     ...output[name]?.fieldsByTypeName[relation.name],
@@ -140,7 +139,7 @@ export class Authorization {
                                         fieldsByTypeName: {},
                                     },
                                 },
-                            },
+                            } as any,
                         };
                     } else {
                         throw new Error(
