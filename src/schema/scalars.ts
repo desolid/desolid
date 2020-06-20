@@ -123,8 +123,7 @@ scalars.push(
          * @todo implement
          */
         parseValue(value) {
-            debugger;
-            return value;
+            return md5(value);
         },
 
         parseLiteral({ value }: StringValueNode) {
