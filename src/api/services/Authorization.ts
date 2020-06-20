@@ -2,6 +2,7 @@ import { TypeDefinition } from '../../schema';
 import { Record } from '../../database';
 import * as _ from 'lodash';
 import { SelectAttributes } from '..';
+import { AuthenticationError } from 'apollo-server-core';
 
 export enum AuthorizationCategory {
     CREATE = 'CREATE',
@@ -104,7 +105,7 @@ export class Authorization {
                 return output;
             }, false)
         ) {
-            throw new Error(`You are not authorized to ${category} a ${this.typeDefinition.name}.`);
+            throw new AuthenticationError(`You are not authorized to ${category} a ${this.typeDefinition.name}.`);
         }
     }
 
