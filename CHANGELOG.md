@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.7](https://github.com/desolid/desolid/compare/v0.3.6...v0.3.7) (2020-06-20)
+
+
+### Features
+
+* return readonly on fiels info ([02c08e5](https://github.com/desolid/desolid/commit/02c08e59acb11cbe0cdb976529110977d2b4b821))
+* values of enum fields ([ced06ef](https://github.com/desolid/desolid/commit/ced06ef8790f77163ada25d1d5af8f8c3bed7818))
+
+
+### Bug Fixes
+
+* authorization error type ([35b9ca0](https://github.com/desolid/desolid/commit/35b9ca04bc5f1fa3219bf99883a9206e1305c79f))
+* Cannot query field "list" on type "Field ([72ac2fa](https://github.com/desolid/desolid/commit/72ac2fad8d715670728bc0f21332098ce6afebff))
+* relationType issue ([b176d13](https://github.com/desolid/desolid/commit/b176d13062a2400381fa4b712c0acd88c5699aa4))
+* TypeError: Cannot convert undefined or null to object ([913963f](https://github.com/desolid/desolid/commit/913963f2a29bde78bfe9df262aafd5344075d1c8))
+
 ### [0.3.6](https://github.com/desolid/desolid/compare/v0.3.5...v0.3.6) (2020-06-06)
 
 
