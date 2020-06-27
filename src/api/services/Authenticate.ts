@@ -26,7 +26,7 @@ export class Authenticate {
     constructor(private readonly model: Model, config: AuthenticationConfig) {
         if (!config?.secret) {
             warn(
-                `Authentication Secret value didn't set into configuration file. the genrated JWT tokens will expire on every restart.`,
+                `Authentication Secret value didn't set into the configuration file. the generated JWT tokens will expire on every restart.`,
             );
         }
         this.config = _.merge({}, this.defaultConfig, config);

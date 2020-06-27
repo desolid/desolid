@@ -99,12 +99,14 @@ export class GraphQLAPI {
             },
         });
         log(`Server is running on http://localhost:${this.server.options.port}`);
+        log(`Amin panel is available on http://localhost:${this.server.options.port}/admin`);
     }
 
     private serveAdminPanel() {
-        this.server.express.use('/admin', express.static('./node_modules/desolid-admin/dist/', {}));
+        const desolidAdminPath = path.join(__dirname, '../../node_modules/desolid-admin/dist');
+        this.server.express.use('/admin', express.static(desolidAdminPath));
         this.server.express.use('/admin', function(req, res, next) {
-            res.sendFile(path.join(process.cwd(), './node_modules/desolid-admin/dist/index.html'));
+            res.sendFile(`${desolidAdminPath}/index.html`);
         });
     }
 }

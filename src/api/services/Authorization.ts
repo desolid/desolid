@@ -163,12 +163,14 @@ export class Authorization {
     }
 
     getSelectOf(category: AuthorizationCategory) {
-        return (
-            // In case of skipping an authorization category, it will return `{}`
-            this.categories[category]?.reduce((output, condition) => {
+        // In case of skipping an authorization category, it will return `{}`
+        if (!this.categories || !this.categories[category]) {
+            return {};
+        } else {
+            return this.categories[category].reduce((output, condition) => {
                 return _.merge(output, condition.select);
-            }, {} as { [key: string]: SelectAttributes }) || {}
-        );
+            }, {} as { [key: string]: SelectAttributes });
+        }
     }
 
     async create(user: User, input: any) {
