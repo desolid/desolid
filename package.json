@@ -61,6 +61,8 @@
         "chalk": "^4.0.0",
         "clear": "^0.1.0",
         "commander": "^5.1.0",
+        "desolid-admin": "^1.1.8",
+        "express": "^4.17.1",
         "figlet": "^1.4.0",
         "fs-extra": "^8.1.0",
         "graphql": "^14.6.0",

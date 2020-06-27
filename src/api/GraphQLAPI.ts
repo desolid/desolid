@@ -1,7 +1,9 @@
 import { makeSchema, queryType, mutationType } from '@nexus/schema/dist/core';
 import { GraphQLServer } from 'graphql-yoga';
+import * as express from 'express';
+import * as path from 'path';
 import * as _ from 'lodash';
-import { scalars, Schema } from '../schema';
+import { scalars } from '../schema';
 import { Model } from '../database';
 import { Storage } from '../storage';
 import { MapX, log } from '../utils';
@@ -85,6 +87,10 @@ export class GraphQLAPI {
             middlewares: [this.authenticate.middleware, this.storage.middleware],
             context: (req) => ({ ...req }),
         });
+        // Serving Admin panel
+        this.serveAdminPanel();
+
+        // Starting the server
         const maxFileSize = this.config.upload?.maxFileSize || 64;
         await this.server.start({
             port: process.env.PORT || this.config.port || 3000,
@@ -93,5 +99,12 @@ export class GraphQLAPI {
             },
         });
         log(`Server is running on http://localhost:${this.server.options.port}`);
+    }
+
+    private serveAdminPanel() {
+        this.server.express.use('/admin', express.static('./node_modules/desolid-admin/dist/', {}));
+        this.server.express.use('/admin', function(req, res, next) {
+            res.sendFile(path.join(process.cwd(), './node_modules/desolid-admin/dist/index.html'));
+        });
     }
 }
