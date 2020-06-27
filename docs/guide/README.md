@@ -39,7 +39,7 @@ type Category @model {
 }
 ```
 
-## Start [Desolid](https://desolid.netlify.app/)
+## Start Desolid
 
 So far we just defined a model on the schema file, we can start [Desolid](https://desolid.netlify.app/) to see what happens:
 
