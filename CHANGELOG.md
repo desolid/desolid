@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/desolid/desolid/compare/v0.3.7...v0.4.0) (2020-06-27)
+
+
+### Features
+
+* desolid -admin ([e2f8bf2](https://github.com/desolid/desolid/commit/e2f8bf272a000e7b47050e02c0f7d81f85855ee6))
+
+
+### Bug Fixes
+
+* Password field issue ([e9e4e21](https://github.com/desolid/desolid/commit/e9e4e2180115a508fd338b043c9ad4ce9688fc99))
+
 ### [0.3.7](https://github.com/desolid/desolid/compare/v0.3.6...v0.3.7) (2020-06-20)
 
 
