@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.2](https://github.com/desolid/desolid/compare/v0.4.1...v0.4.2) (2020-07-04)
+
+
+### Features
+
+* alter table capability ([d7e79ed](https://github.com/desolid/desolid/commit/d7e79edd79e8d345224e5ece7802c858e4227911))
+
+
+### Bug Fixes
+
+* type ([08eca08](https://github.com/desolid/desolid/commit/08eca08e3c134470802e81b4fd9eb193ce7ee833))
+
 ### [0.4.1](https://github.com/desolid/desolid/compare/v0.4.0...v0.4.1) (2020-06-27)
 
 
