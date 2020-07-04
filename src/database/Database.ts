@@ -6,7 +6,7 @@ import { MapX } from '../utils';
 import { Storage } from '../storage';
 
 export interface DatabaseConfig extends Options {
-    forceSync?: boolean;
+    alter?: boolean;
 }
 
 export class Database {
@@ -14,6 +14,7 @@ export class Database {
         dialect: 'sqlite',
         storage: './databse.sqlite',
         logging: false,
+        alter: true,
     };
     private readonly connection: Sequelize;
     private readonly config: DatabaseConfig;
@@ -38,6 +39,6 @@ export class Database {
     }
 
     public async start() {
-        await this.connection.sync({ force: this.config.forceSync });
+        await this.connection.sync({ alter: this.config.alter });
     }
 }
