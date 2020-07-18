@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.7](https://github.com/desolid/desolid/compare/v0.4.6...v0.4.7) (2020-07-18)
+
+
+### Features
+
+* path in api configuration ([b1a1ba1](https://github.com/desolid/desolid/commit/b1a1ba1fa662dffed2e0688d0580f729619597b1))
+
+
+### Bug Fixes
+
+* remove Server.ts ([619780d](https://github.com/desolid/desolid/commit/619780d9b1e59078c9257b9389d8e7f74d90c545))
+
 ### [0.4.6](https://github.com/desolid/desolid/compare/v0.4.5...v0.4.6) (2020-07-18)
 
 
