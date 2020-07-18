@@ -20,9 +20,9 @@ const MB = Math.pow(1024, 2);
 // export type StorageConfig = StorageManagerSingleDiskConfig;
 
 export interface StorageConfig {
-    pattern: string;
-    driver: StorageDrivers;
-    config: {
+    pattern?: string;
+    driver?: StorageDrivers;
+    config?: {
         root?: string; // Using on `Local` driver
         key?: string; // Using on `S3` driver
         secret?: string; // Using on `S3` driver

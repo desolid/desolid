@@ -8,11 +8,11 @@ import { Model } from '../../database';
 import { warn, log } from '../../utils';
 
 export interface AuthenticationConfig {
-    secret: string;
+    secret?: string;
     /**
      * expiration time in hours
      */
-    expiration: number;
+    expiration?: number;
 }
 
 export class Authenticate {

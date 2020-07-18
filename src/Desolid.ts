@@ -13,9 +13,9 @@ import { log, logger } from './utils';
 const info = require('../package.json');
 
 export interface DesolidConfig {
-    api: GraphQLAPIConfig;
-    database: DatabaseConfig;
-    storage: StorageConfig;
+    api?: GraphQLAPIConfig;
+    database?: DatabaseConfig;
+    storage?: StorageConfig;
 }
 
 export class Desolid {

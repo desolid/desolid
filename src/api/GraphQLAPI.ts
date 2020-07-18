@@ -10,10 +10,10 @@ import { MapX, log } from '../utils';
 import { CRUD, Authenticate, AuthenticationConfig, UserAuthorization, SystemInfo } from '.';
 
 export interface GraphQLAPIConfig {
-    port: number;
-    authentication: AuthenticationConfig;
-    upload: {
-        maxFileSize: number;
+    port?: number;
+    authentication?: AuthenticationConfig;
+    upload?: {
+        maxFileSize?: number;
     };
 }
 
