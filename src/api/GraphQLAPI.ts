@@ -23,6 +23,7 @@ export class GraphQLAPI {
     private readonly defaultConfig: GraphQLAPIConfig = {
         deaf: false,
         port: 3000,
+        path: '/graphql',
         authentication: undefined,
         upload: {
             maxFileSize: 64, //MB
@@ -101,7 +102,7 @@ export class GraphQLAPI {
             },
         };
         if (this.config.deaf) {
-            const server = await this.server.createHttpServer(options);
+            await this.server.createHttpServer(options);
             log(`Server is running on deaf mod. see documentation for more info;`);
         } else {
             // runMiddleware(this.server.express);
