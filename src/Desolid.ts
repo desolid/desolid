@@ -19,11 +19,11 @@ export interface DesolidConfig {
 }
 
 export class Desolid {
-    protected readonly config: DesolidConfig;
-    protected readonly storage: Storage;
-    protected readonly database: Database;
-    protected readonly api: GraphQLAPI;
-    protected readonly schema: Schema;
+    public readonly config: DesolidConfig;
+    public readonly storage: Storage;
+    public readonly database: Database;
+    public readonly api: GraphQLAPI;
+    public readonly schema: Schema;
 
     constructor(public readonly root: string, config?: DesolidConfig) {
         console.log(chalk.green(figlet.textSync('Desolid', { horizontalLayout: 'full' })));

@@ -5,6 +5,7 @@ database:
     alter: true
 
 api:
+    deaf: true
     port: 3000
     authentication:
         secret: 'secret'

@@ -10,6 +10,7 @@ import { MapX, log } from '../utils';
 import { CRUD, Authenticate, AuthenticationConfig, UserAuthorization, SystemInfo } from '.';
 
 export interface GraphQLAPIConfig {
+    deaf?: boolean;
     port?: number;
     authentication?: AuthenticationConfig;
     upload?: {
@@ -19,6 +20,7 @@ export interface GraphQLAPIConfig {
 
 export class GraphQLAPI {
     private readonly defaultConfig: GraphQLAPIConfig = {
+        deaf: false,
         port: 3000,
         authentication: undefined,
         upload: {
@@ -31,6 +33,11 @@ export class GraphQLAPI {
     private readonly systemInfo: SystemInfo;
     private readonly userModel: Model;
     private server: GraphQLServer;
+    private handlers = {
+        graphql: undefined,
+        playground: undefined,
+        admin: undefined,
+    };
 
     constructor(
         config: GraphQLAPIConfig,
@@ -89,17 +96,26 @@ export class GraphQLAPI {
         });
         // Serving Admin panel
         this.serveAdminPanel();
+        if (this.config.deaf) {
+            const server = await this.server.createHttpServer({});
+            log(`Server is running on deaf mod. see documentation for more info;`);
+        } else {
+            // runMiddleware(this.server.express);
+            // Starting the server
+            const maxFileSize = this.config.upload?.maxFileSize || 64;
+            await this.server.start({
+                port: process.env.PORT || this.config.port || 3000,
+                uploads: {
+                    maxFileSize: maxFileSize * Math.pow(1024, 2), //MB
+                },
+            });
+            log(`Server is running on http://localhost:${this.server.options.port}`);
+            log(`Amin panel is available on http://localhost:${this.server.options.port}/admin`);
+        }
+    }
 
-        // Starting the server
-        const maxFileSize = this.config.upload?.maxFileSize || 64;
-        await this.server.start({
-            port: process.env.PORT || this.config.port || 3000,
-            uploads: {
-                maxFileSize: maxFileSize * Math.pow(1024, 2), //MB
-            },
-        });
-        log(`Server is running on http://localhost:${this.server.options.port}`);
-        log(`Amin panel is available on http://localhost:${this.server.options.port}/admin`);
+    public async request(req: Request, res: Response, next: Function) {
+        return this.server.express._router.handle(req, res, next);
     }
 
     private serveAdminPanel() {
