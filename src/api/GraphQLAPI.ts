@@ -13,6 +13,7 @@ export interface GraphQLAPIConfig {
     deaf?: boolean;
     port?: number;
     authentication?: AuthenticationConfig;
+    path?: string;
     upload?: {
         maxFileSize?: number;
     };
@@ -33,11 +34,6 @@ export class GraphQLAPI {
     private readonly systemInfo: SystemInfo;
     private readonly userModel: Model;
     private server: GraphQLServer;
-    private handlers = {
-        graphql: undefined,
-        playground: undefined,
-        admin: undefined,
-    };
 
     constructor(
         config: GraphQLAPIConfig,
@@ -96,19 +92,21 @@ export class GraphQLAPI {
         });
         // Serving Admin panel
         this.serveAdminPanel();
+        const maxFileSize = this.config.upload?.maxFileSize || 64;
+        const options = {
+            endpoint: this.config.path,
+            port: process.env.PORT || this.config.port || 3000,
+            uploads: {
+                maxFileSize: maxFileSize * Math.pow(1024, 2), //MB
+            },
+        };
         if (this.config.deaf) {
-            const server = await this.server.createHttpServer({});
+            const server = await this.server.createHttpServer(options);
             log(`Server is running on deaf mod. see documentation for more info;`);
         } else {
             // runMiddleware(this.server.express);
             // Starting the server
-            const maxFileSize = this.config.upload?.maxFileSize || 64;
-            await this.server.start({
-                port: process.env.PORT || this.config.port || 3000,
-                uploads: {
-                    maxFileSize: maxFileSize * Math.pow(1024, 2), //MB
-                },
-            });
+            await this.server.start(options);
             log(`Server is running on http://localhost:${this.server.options.port}`);
             log(`Amin panel is available on http://localhost:${this.server.options.port}/admin`);
         }
