@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.4](https://github.com/desolid/desolid/compare/v0.4.3...v0.4.4) (2020-07-18)
+
+
+### Bug Fixes
+
+* typing ([fc7248a](https://github.com/desolid/desolid/commit/fc7248af1a8429dd5ac243b90bee17973eaae438))
+
 ### [0.4.3](https://github.com/desolid/desolid/compare/v0.4.2...v0.4.3) (2020-07-15)
 
 
