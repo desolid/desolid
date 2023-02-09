@@ -4,7 +4,7 @@
 ## Installation
 
 ```bash
-npm inistall -g desolid
+npm install -g desolid
 ```
 
 ## Usage
